@@ -1,0 +1,145 @@
+:root{
+  --yellow: #fff159;         /* Amarillo estilo Mercado Libre */
+  --blue:   #3483fa;         /* Azul de marca */
+  --ink:    #111213;
+  --muted:  #6b727a;
+  --surface:#f2f3f5;
+  --radius: 999px;
+  --shadow: 0 2px 10px rgba(17,18,19,.08);
+}
+
+/* Barra */
+.mt-navbar{
+  background: var(--yellow);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+}
+
+/* Contenedor principal */
+.mt-nav{
+  max-width: 1240px;
+  margin: 0 auto;
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Grupo izquierdo */
+.mt-left{
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Logo */
+.mt-logo{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--blue);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 20px;
+}
+.mt-logo-word{ color: var(--blue); }
+.mt-logo-primary{ color: var(--blue); }
+.mt-logo-dot{ color: var(--blue); opacity: .9; }
+
+/* Menú */
+.mt-menu{
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+}
+.mt-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+.mt-link:hover{ text-decoration: underline; }
+
+/* Buscador (centro) */
+.mt-search{
+  flex: 1 1 520px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.mt-search .mt-icon{
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.mt-search input{
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--ink);
+}
+.mt-search input::placeholder{ color: var(--muted); }
+
+/* Acciones derecha */
+.mt-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mt-icon-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  text-decoration: none;
+  color: var(--ink);
+}
+.mt-icon-btn:hover{ background: rgba(0,0,0,.06); }
+.mt-icon{
+  width: 22px;
+  height: 22px;
+}
+.mt-icon.sm{
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsivo */
+@media (max-width: 900px){
+  .mt-menu li:nth-child(3){ display:none; } /* Oculta "Mis trueques" */
+  .mt-search{ flex-basis: 420px; }
+}
+@media (max-width: 720px){
+  .mt-menu{ display:none; }
+  .mt-search{ flex-basis: 100%; }
+  .mt-logo{ font-size: 18px; }
+  .mt-nav{ height: 60px; padding: 0 16px; }
+}
+
+/* Accesibilidad: foco visible */
+a:focus, button:focus, input:focus{
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
