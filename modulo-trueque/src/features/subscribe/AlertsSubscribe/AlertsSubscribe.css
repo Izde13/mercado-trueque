@@ -1,0 +1,107 @@
+:root{
+  --as-bg: #0b0b0b;
+  --as-fg: #ffffff;
+  --as-muted: rgba(255,255,255,.75);
+  --as-line: rgba(255,255,255,.14);
+  --as-radius: 999px;
+  --as-shadow: 0 6px 24px rgba(0,0,0,.24);
+}
+
+/* Sección de fondo negro */
+.as-section{
+  width: 100%;
+  background: var(--as-bg);
+  color: var(--as-fg);
+}
+
+/* Contenedor interno */
+.as-inner{
+  max-width: 1240px;             /* quita este max si quieres 100% full-bleed */
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Copys */
+.as-copy h2{
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+}
+.as-copy p{
+  margin: 0;
+  color: var(--as-muted);
+}
+
+/* Formulario */
+.as-form{
+  display: grid;
+  gap: 12px;
+  justify-items: end;             /* alinea a la derecha como en el mock */
+}
+
+/* Input en pastilla con icono */
+.as-input{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--as-line);
+  border-radius: var(--as-radius);
+  padding: 10px 14px;
+  min-width: 360px;               /* similar al ancho del mock */
+  box-shadow: var(--as-shadow);
+}
+.as-ic{
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+  flex: 0 0 auto;
+}
+.as-input input{
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: #111213;
+}
+.as-input input::placeholder{
+  color: #9aa3af;
+}
+
+/* Botón en pastilla */
+.as-btn{
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--as-radius);
+  background: #ffffff;
+  color: #111213;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--as-shadow);
+}
+.as-btn:hover{ filter: brightness(0.97); }
+.as-btn:focus-visible,
+.as-input input:focus-visible{
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+/* Responsivo */
+@media (max-width: 900px){
+  .as-inner{
+    grid-template-columns: 1fr;
+  }
+  .as-form{
+    justify-items: start;         /* en móvil, a la izquierda */
+  }
+  .as-input{
+    width: 100%;
+    min-width: 0;
+  }
+}
