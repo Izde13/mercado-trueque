@@ -1,0 +1,104 @@
+:root{
+  --ink:#111213;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --surface:#f5f6f7;
+  --star:#fbbf24;         /* amarillo estrellas */
+  --off-bg:#ffe4e6;       /* badge descuento */
+  --off-fg:#e11d48;
+  --radius:22px;
+  --shadow:0 6px 24px rgba(0,0,0,.08);
+}
+
+/* Card base */
+.pcard{
+  width: 100%;
+  max-width: 360px;              /* quita si la usarás en grilla fluida */
+  display: grid;
+  gap: 10px;
+  color: var(--ink);
+}
+
+/* Media */
+.pcard-media{
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 16px;
+  aspect-ratio: 4/5;             /* alto tipo mock */
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-decoration: none;
+}
+.pcard-media img{
+  max-width: 86%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 12px 12px rgba(0,0,0,.12));
+}
+/* Fallback gris si no carga la imagen */
+.pcard-ph{
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg,#edf1f5,#e6ebf0);
+  border-radius: 24px;
+}
+
+/* Título */
+.pcard-title{
+  margin: 6px 0 0;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+/* Rating */
+.pcard-rating{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stars{
+  display: inline-flex;
+  gap: 4px;
+}
+.star{ width: 18px; height: 18px; color: var(--star); }
+.star.filled path{ fill: currentColor; }
+.star.empty path{
+  fill: none;
+  stroke: currentColor;
+  opacity: .35;
+}
+.rating-text{
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Precios */
+.pcard-price{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+.price-now{
+  font-weight: 800;
+  font-size: 24px;
+}
+.price-old{
+  color: #9aa3af;
+  text-decoration: line-through;
+  font-weight: 700;
+}
+.price-off{
+  background: var(--off-bg);
+  color: var(--off-fg);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Opcional: hover suave */
+.pcard-media:hover{ filter: brightness(.995); }
