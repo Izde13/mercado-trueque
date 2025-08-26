@@ -1,10 +1,12 @@
-function App() {
+import HomePage from "./pages/Home/HomePage";
+import MainLayout from "./app/layouts/MainLayout";
 
+function App() {
   return (
-    <>
-      <h1>Mercado trueque</h1>
-    </>
-  )
+    <MainLayout>
+      <HomePage />
+    </MainLayout>
+  );
 }
 
-export default App
+export default App;

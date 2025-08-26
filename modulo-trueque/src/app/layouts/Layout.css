@@ -1,0 +1,14 @@
+.layout{
+  min-height: 100svh;            /* Alto pantalla */
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.layout-content{
+  flex: 1;                        /* Empuja el footer al fondo */
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px 48px;        /* espacio interior para tus páginas */
+}

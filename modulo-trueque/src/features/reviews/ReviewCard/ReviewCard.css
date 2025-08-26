@@ -1,0 +1,57 @@
+:root{
+  --ink:#111213;
+  --muted:#4b5563;
+  --green:#16a34a;
+}
+
+/* Tarjeta compacta */
+.tm{
+  max-width: 520px;     /* ajusta o quita este límite si la quieres fluida */
+  display: grid;
+  gap: 10px;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Encabezado: nombre + verificado */
+.tm-head{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tm-name{
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+/* Badge de verificado */
+.tm-verified{
+  display: inline-flex;
+  width: 20px; height: 20px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.tm-verified svg{
+  width: 100%; height: 100%;
+  display: block;
+}
+.tm-verified svg circle{ fill: var(--green); }
+.tm-verified svg path{
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Cita */
+.tm-quote{
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 16px;
+  quotes: "“" "”";
+}
+.tm-quote::before{ content: open-quote; }
+.tm-quote::after { content: close-quote; }
