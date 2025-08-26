@@ -1,8 +1,18 @@
 import "./ProductCard.css";
+import { Link } from "react-router-dom";
 
-export default function ProductCard() {
+export default function ProductCard({
+  id = "123",
+  title = "T-shirt with Tape Details",
+}) {
   return (
     <article className="pcard" aria-label="Producto">
+      <Link
+        to={`/producto/${id}`}
+        className="pcard-link"
+        aria-label={`Ver ${title}`}
+      />
+
       {/* Imagen */}
       <a href="#" className="pcard-media" aria-label="Ver producto">
         <img

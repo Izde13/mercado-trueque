@@ -1,11 +1,18 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Home/HomePage";
 import MainLayout from "./app/layouts/MainLayout";
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage";
 
 function App() {
   return (
-    <MainLayout>
-      <HomePage />
-    </MainLayout>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="producto/:id" element={<ProductDetailPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

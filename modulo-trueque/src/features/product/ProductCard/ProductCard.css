@@ -17,6 +17,14 @@
   display: grid;
   gap: 10px;
   color: var(--ink);
+  position: relative; 
+}
+
+.pcard-link{
+  position: absolute;
+  inset: 0;              /* ocupa todo el card */
+  z-index: 10;
+  text-decoration: none;
 }
 
 /* Media */

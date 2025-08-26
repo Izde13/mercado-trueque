@@ -13,13 +13,24 @@ export default function HomePage() {
             <p>Intercambia artículos de forma segura con personas cercanas.</p>
 
             <div className="hero-cta">
-              <a className="btn-primary" href="#" role="button">Buscar trueques</a>
+              <a className="btn-primary" href="#" role="button">
+                Buscar trueques
+              </a>
             </div>
 
             <ul className="hero-stats" aria-label="Estadísticas">
-              <li><span className="stat-num">500+</span><span className="stat-label">Artículos disponibles</span></li>
-              <li><span className="stat-num">300+</span><span className="stat-label">Usuarios activos</span></li>
-              <li><span className="stat-num">1,200+</span><span className="stat-label">Trueques completados</span></li>
+              <li>
+                <span className="stat-num">500+</span>
+                <span className="stat-label">Artículos disponibles</span>
+              </li>
+              <li>
+                <span className="stat-num">300+</span>
+                <span className="stat-label">Usuarios activos</span>
+              </li>
+              <li>
+                <span className="stat-num">1,200+</span>
+                <span className="stat-label">Trueques completados</span>
+              </li>
             </ul>
           </div>
 
@@ -36,13 +47,15 @@ export default function HomePage() {
           <h2 className="hp-title">Nuevos trueques</h2>
         </div>
         <div className="hp-grid">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard id="101" title="T-shirt with Tape Details" />
+          <ProductCard id="102" title="Skinny Fit Jeans" />
+          <ProductCard id="103" title="Checkered Shirt" />
+          <ProductCard id="104" title="Sleeve Striped T-shirt" />
         </div>
         <div className="hp-actions">
-          <button className="btn-ghost" type="button">Ver más</button>
+          <button className="btn-ghost" type="button">
+            Ver más
+          </button>
         </div>
       </section>
 
@@ -60,7 +73,9 @@ export default function HomePage() {
           <ProductCard />
         </div>
         <div className="hp-actions">
-          <button className="btn-ghost" type="button">Ver más</button>
+          <button className="btn-ghost" type="button">
+            Ver más
+          </button>
         </div>
       </section>
 
@@ -71,8 +86,12 @@ export default function HomePage() {
         <div className="hp-header">
           <h2 className="hp-title">Historias de trueque</h2>
           <div className="hp-nav" aria-hidden="true">
-            <button className="nav-arrow" type="button" title="Anterior">‹</button>
-            <button className="nav-arrow" type="button" title="Siguiente">›</button>
+            <button className="nav-arrow" type="button" title="Anterior">
+              ‹
+            </button>
+            <button className="nav-arrow" type="button" title="Siguiente">
+              ›
+            </button>
           </div>
         </div>
 
