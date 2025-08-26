@@ -1,0 +1,144 @@
+:root{
+  --ink:   #111213;
+  --muted: #6b7280;
+  --line:  #e5e7eb;
+  --bg:    #f5f6f7;    /* gris claro del fondo */
+  --blue:  #3483fa;
+}
+
+/* Contenedor */
+.mt-footer{
+  background: var(--bg);
+  color: var(--ink);
+  border-top: 1px solid #eee;
+}
+.mt-footer-inner{
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px 20px;
+}
+
+/* Grid superior */
+.mt-footer-grid{
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Marca */
+.mt-foot-logo{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  font-size: 22px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.mt-foot-logo .word{ color: var(--ink); }
+.mt-foot-logo .dot{ color: var(--ink); opacity: .9; }
+
+.mt-foot-desc{
+  margin: 12px 0 16px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* Social */
+.mt-social{
+  display: flex;
+  gap: 10px;
+}
+.mt-social-btn{
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.mt-social-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.mt-social .ic{ width: 18px; height: 18px; }
+
+/* Columnas de enlaces */
+.mt-foot-title{
+  font-size: 12px;
+  letter-spacing: .12em;
+  color: #6b7280;
+  margin: 6px 0 12px;
+}
+.mt-foot-links{
+  list-style: none;
+  padding: 0; margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.mt-foot-links a{
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 14px;
+}
+.mt-foot-links a:hover{ color: var(--blue); }
+
+/* Barra inferior */
+.mt-footer-bottom{
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.mt-copy{
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Badges de pago (simples, sin logos) */
+.mt-payments{
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.badge{
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.badge.visa    { color: #1a73e8; }
+.badge.mc      { color: #f59e0b; }
+.badge.paypal  { color: #1b4f9c; }
+.badge.apple   { color: #111; }
+.badge.gpay    { color: #0f9d58; }
+
+/* Responsivo */
+@media (max-width: 900px){
+  .mt-footer-grid{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px){
+  .mt-footer-grid{
+    grid-template-columns: 1fr;
+  }
+  .mt-footer-bottom{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
