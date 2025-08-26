@@ -4,12 +4,12 @@ import AlertsSubscribe from '../../features/subscribe/AlertsSubscribe/AlertsSubs
 
 import "./layout.css";
 
-export default function MainLayout() {
+export default function MainLayout({ children }) {
   return (
     <div className="layout">
       <Navbar />
       <main className="layout-content" role="main">
-         {/* Aquí insertas el componente de la página */}
+         {children}
       </main>
       <AlertsSubscribe />
       <Footer />
