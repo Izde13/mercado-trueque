@@ -1,0 +1,147 @@
+:root{
+  --ink:#111213;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --surface:#f7f8fa;
+  --blue:#3483fa;
+}
+
+/* Contenedor tarjeta */
+.fx{
+  width: 280px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  color: var(--ink);
+
+  /* 👇 sticky correcto y SIN tapar el grid */
+  position: sticky;
+  top: calc(var(--navbar-h) + 12px);
+  max-height: calc(100dvh - var(--navbar-h) - 24px);
+  overflow: auto;
+
+  z-index: 0;           /* <- importante: evita que se superponga */
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+/* Cabecera */
+.fx-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:6px;
+}
+.fx-head h3{ margin:0; font-size:16px; font-weight:800; }
+.fx-reset{
+  background:none; border:0; color:var(--muted); cursor:pointer;
+  font-size:13px;
+}
+.fx-reset:hover{ color:#3b4250; }
+
+/* Grupo */
+.fx-group{
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.fx-group:first-of-type{
+  border-top: 0; padding-top: 0; margin-top: 0;
+}
+.fx-group > summary{
+  list-style: none;
+  cursor: pointer;
+  display:flex; align-items:center; justify-content:space-between;
+  font-weight:700;
+}
+.fx-group > summary::-webkit-details-marker{ display:none; }
+.fx-group > summary::after{
+  content:"";
+  width: 18px; height: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111213' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  transition: transform .15s ease;
+  opacity:.7;
+}
+.fx-group[open] > summary::after{ transform: rotate(180deg); }
+
+.fx-content{
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* --- Precio: slider doble (visual) --- */
+.fx-range{ position: relative; height: 24px; }
+.fx-range input[type="range"]{
+  position:absolute; left:0; right:0; top:8px;
+  width: 100%;
+  -webkit-appearance:none; appearance:none;
+  background: transparent;
+  pointer-events: none;        /* hace que parezca un slider doble */
+}
+.fx-range input[type="range"]::-webkit-slider-runnable-track{
+  height:4px; background:#dfe3e8; border-radius:999px;
+}
+.fx-range input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; border:1px solid var(--line); box-shadow:0 1px 2px rgba(0,0,0,.1);
+  margin-top:-6px;
+  pointer-events: auto;        /* permite agarrar el thumb */
+}
+.fx-range-values{
+  display:flex; justify-content:space-between;
+  color: var(--ink);
+  font-weight:600;
+}
+
+/* Checks / Radios */
+.fx-checks{ list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+.fx-radio label{ display:block; }
+.fx-radio input{ margin-right:8px; }
+
+/* Chips (almacenamiento) */
+.fx-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:13px; cursor:pointer;
+}
+.chip:hover{ border-color:#cfd4dc; }
+
+/* Swatches (colores) */
+.fx-swatches{ display:flex; flex-wrap:wrap; gap:10px; }
+.swatch{
+  --c:#000;
+  width:24px; height:24px; border-radius:50%;
+  background: var(--c);
+  border:1px solid rgba(0,0,0,.15);
+  cursor:pointer;
+}
+.swatch.is-selected{
+  box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--blue);
+}
+
+/* Footer */
+.fx-footer{ margin-top:12px; }
+.fx-apply{
+  width:100%;
+  height:40px;
+  border-radius:999px;
+  background: var(--blue);
+  color:#fff;
+  border:0;
+  font-weight:700;
+  cursor:pointer;
+}
+.fx-apply:hover{ filter:brightness(.98); }
+
+/* Responsive: ocultar sticky en móviles si molesta */
+@media (max-width: 900px){
+  .fx{ position:static; width:100%; }
+}

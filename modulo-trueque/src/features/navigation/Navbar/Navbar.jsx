@@ -1,38 +1,41 @@
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+
+  const handleCategoryChange = (e) => {
+    const slug = e.target.value;
+    if (!slug) return;
+    navigate(`/categoria/${slug}`);
+  };
+
   return (
     <header className="mt-navbar" role="banner">
       <nav className="mt-nav">
         {/* Izquierda: logo + menú */}
         <div className="mt-left">
-          <a href="#" className="mt-logo" aria-label="Mercado Trueque">
+          <Link to="/" className="mt-logo" aria-label="Mercado Trueque">
             <span className="mt-logo-word mt-logo-primary">Mercado</span>
             <span className="mt-logo-dot" aria-hidden="true">
               •
             </span>
             <span className="mt-logo-word">Trueque</span>
-          </a>
+          </Link>
+
+          <select
+            className="mt-cat-select"
+            defaultValue=""
+            onChange={handleCategoryChange}
+            aria-label="Categorías"
+          >
+            <option value="" disabled>
+              Categorías
+            </option>
+            <option value="tecnologia">Tecnología</option>
+          </select>
 
           <ul className="mt-menu" aria-label="Menú principal">
-            <li>
-              <a href="#" className="mt-link">
-                Categorías
-                <svg
-                  className="mt-icon sm"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M7 9l5 5 5-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </a>
-            </li>
             <li>
               <a href="#" className="mt-link">
                 Trueque

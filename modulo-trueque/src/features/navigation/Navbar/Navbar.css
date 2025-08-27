@@ -143,3 +143,26 @@ a:focus, button:focus, input:focus{
   outline: 2px solid #1a73e8;
   outline-offset: 2px;
 }
+
+.mt-cat-select{
+  height: 32px;
+  border-radius: 8px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--line, #e5e7eb);
+  background: #fff;
+  color: var(--ink, #111213);
+  font-size: 14px;
+  cursor: pointer;
+
+  /* flecha */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23111213' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+.mt-cat-select:focus{
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}

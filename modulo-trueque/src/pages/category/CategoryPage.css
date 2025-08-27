@@ -1,0 +1,34 @@
+.cat-wrap{
+  max-width:1240px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.cat-layout{
+  display:grid;
+  grid-template-columns: 280px 1fr;
+  gap:16px;
+  align-items:start;              /* evita centrados verticales raros */
+  column-gap: 20px;
+}
+
+/* 👉 el contenido principal siempre en la 2ª columna */
+.cat-main{
+  grid-column: 2 / -1;
+  position: relative;         /* crea contexto de apilado propio */
+  z-index: 1;                 /* 👈 queda por encima del sidebar */
+}
+
+
+.cat-breadcrumb{
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--muted, #6b7280);
+}
+
+
+/* responsive */
+@media (max-width:900px){
+  .cat-layout{ grid-template-columns:1fr; }
+  .cat-main{ grid-column:auto; }  /* ya no forzamos columna en móvil */
+}
