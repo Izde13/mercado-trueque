@@ -1,0 +1,9 @@
+.box-title{ font-size:14px; color:#111; font-weight:700; margin:0 0 8px; }
+.ipcard{ border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; }
+.ip-body{ display:flex; gap:12px; align-items:center; }
+.ip-img{ width:64px; height:64px; object-fit:cover; border-radius:8px; background:#f5f6f7; }
+.ip-info{ flex:1; }
+.ip-title{ margin:0 0 4px; font-size:14px; font-weight:700; }
+.ip-attrs{ margin:0 0 6px; padding:0; list-style:none; color:#6b7280; font-size:12px; }
+.ip-attrs li{ display:inline; margin-right:10px; }
+.ip-price{ font-weight:800; }

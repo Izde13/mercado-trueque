@@ -1,0 +1,15 @@
+.sum-box{
+  border:1px solid #e5e7eb; border-radius:14px; background:#f7f7f7;
+  padding:16px; box-shadow:0 6px 20px rgba(0,0,0,.06);
+}
+.sum-title{ margin:0 0 10px; font-size:14px; font-weight:800; }
+.sum-sec{ margin-top:12px; }
+.sum-sec h4{ margin:0 0 6px; font-size:13px; color:#6b7280; }
+.sum-row{ display:flex; justify-content:space-between; gap:8px; padding:6px 0; }
+.sum-row strong{ font-weight:700; }
+.sum-muted{ margin:6px 0; color:#6b7280; font-size:13px; }
+.sum-cta{
+  width:100%; height:42px; border-radius:999px; margin-top:14px;
+  background:#3483fa; color:#fff; border:0; font-weight:700; cursor:pointer;
+}
+.sum-cta:hover{ filter:brightness(.98); }

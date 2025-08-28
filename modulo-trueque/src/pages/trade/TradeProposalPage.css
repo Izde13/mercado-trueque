@@ -1,0 +1,12 @@
+.trade-wrap{ max-width:1240px; margin:0 auto; padding:24px; }
+.trade-bc{ color:#6b7280; font-size:13px; margin-bottom:6px; }
+.trade-title{ margin:0 0 12px; font-weight:900; font-size:26px; }
+.trade-grid{
+  display:grid; grid-template-columns: 1fr 360px; gap:24px; align-items:start;
+}
+.trade-col{ display:grid; gap:16px; }
+.trade-aside{ position:sticky; top:84px; }
+@media (max-width: 980px){
+  .trade-grid{ grid-template-columns: 1fr; }
+  .trade-aside{ position:static; }
+}

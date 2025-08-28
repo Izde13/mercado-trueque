@@ -3,6 +3,7 @@ import HomePage from "./pages/Home/HomePage";
 import MainLayout from "./app/layouts/MainLayout";
 import ProductDetailPage from "./pages/productDetail/ProductDetailPage";
 import CategoryPage from "./pages/category/CategoryPage";
+import TradeProposalPage from "./pages/trade/TradeProposalPage";
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="producto/:id" element={<ProductDetailPage />} />
-          <Route path="categoria/:slug" element={<CategoryPage />} />{" "}
+          <Route path="categoria/:slug" element={<CategoryPage />} />
+          <Route path="propuesta" element={<TradeProposalPage />} /> 
         </Route>
       </Routes>
     </BrowserRouter>

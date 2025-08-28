@@ -1,0 +1,10 @@
+.pr-item{
+  display:grid; grid-template-columns: 64px 1fr auto; gap:12px;
+  align-items:center; padding:10px; border:1px solid #e5e7eb;
+  border-radius:12px; background:#fff;
+}
+.pr-img{ width:64px; height:64px; object-fit:cover; border-radius:8px; background:#f5f6f7; }
+.pr-title{ margin:0 0 4px; font-size:14px; font-weight:700; }
+.pr-attrs{ margin:0 0 6px; padding:0; list-style:none; color:#6b7280; font-size:12px; }
+.pr-attrs li{ display:inline; margin-right:10px; }
+.pr-price{ font-weight:800; }

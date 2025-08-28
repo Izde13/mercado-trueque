@@ -1,7 +1,30 @@
 import "./ProductSummary.css";
+import { useNavigate } from "react-router-dom";
 import VariantsSelector from "../VariantsSelector/VariantsSelector.jsx";
 
-export default function ProductSummary({ title, rating, estimated, description }) {
+export default function ProductSummary({
+  id,
+  title,
+  rating,
+  estimated,
+  description,
+}) {
+  const navigate = useNavigate();
+  const handlePropose = () => {
+    navigate("/propuesta", {
+      state: {
+        interest: {
+          id,
+          title,
+          price: estimated,
+          img: "/images/products/shirt-1.png", // pon la imagen real si la tienes
+          size: "Large",
+          color: "Olive",
+        },
+      },
+    });
+  };
+
   return (
     <section className="ps">
       <h1 className="ps-title">{title}</h1>
@@ -12,7 +35,8 @@ export default function ProductSummary({ title, rating, estimated, description }
       </div>
 
       <p className="ps-price">
-        <span className="label">Valor estimado:</span> <strong>{estimated}</strong>
+        <span className="label">Valor estimado:</span>{" "}
+        <strong>{estimated}</strong>
       </p>
 
       <p className="ps-desc">{description}</p>
@@ -21,20 +45,26 @@ export default function ProductSummary({ title, rating, estimated, description }
 
       <VariantsSelector />
 
-      <button type="button" className="ps-cta">Proponer trueque</button>
+      <button type="button" className="ps-cta" onClick={handlePropose}>
+        Proponer trueque
+      </button>
     </section>
   );
 }
 
 /* ——— Estrellas estáticas ——— */
-function Stars(){
+function Stars() {
   return (
     <span className="stars" aria-hidden="true">
-      <Star type="full" /><Star type="full" /><Star type="full" /><Star type="full" /><Star type="half" />
+      <Star type="full" />
+      <Star type="full" />
+      <Star type="full" />
+      <Star type="full" />
+      <Star type="half" />
     </span>
   );
 }
-function Star({ type="full" }){
+function Star({ type = "full" }) {
   return (
     <svg className={`star ${type}`} viewBox="0 0 24 24">
       <defs>
