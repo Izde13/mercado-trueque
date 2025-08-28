@@ -1,0 +1,14 @@
+.pdp{
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.pdp-grid{
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) 420px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 1024px){
+  .pdp-grid{ grid-template-columns: 1fr; }
+}

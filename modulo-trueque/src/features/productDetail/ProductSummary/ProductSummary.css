@@ -1,0 +1,50 @@
+:root{
+  --ink:#111213;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --blue:#3483fa;
+}
+
+.ps{ display:grid; gap:14px; }
+
+.ps-title{
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(24px, 4.2vw, 40px);
+  line-height: 1.05;
+}
+
+/* rating */
+.ps-rating{ display:flex; align-items:center; gap:8px; }
+.stars{ display:inline-flex; gap:4px; color:#fbbf24; }
+.star{ width:20px; height:20px; }
+.star.full path{ fill: currentColor; }
+.star.half path{ fill: url(#halfGrad); stroke: currentColor; }
+.star.empty path{ fill: none; stroke: currentColor; opacity:.35; }
+.ps-rating-text{ color: var(--muted); }
+
+/* price */
+.ps-price{
+  font-size: 22px;
+  margin: 2px 0;
+}
+.ps-price .label{ color: var(--ink); font-weight: 800; margin-right: 6px; }
+
+/* description */
+.ps-desc{ color: var(--muted); margin: 0; }
+
+/* separator */
+.ps-hr{ height:1px; border:0; background: var(--line); margin: 4px 0; }
+
+/* CTA */
+.ps-cta{
+  margin-top: 6px;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #fff;
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ps-cta:hover{ filter: brightness(.98); }

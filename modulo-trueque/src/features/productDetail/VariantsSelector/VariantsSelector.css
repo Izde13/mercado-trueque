@@ -1,0 +1,49 @@
+:root{
+  --line:#e5e7eb;
+  --ink:#111213;
+  --muted:#6b7280;
+  --blue:#3483fa;
+}
+
+.vs{ display:grid; gap:14px; }
+
+.vs-block{ display:grid; gap:8px; }
+.vs-label{
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.vs-hr{
+  height:1px; border:0; background: var(--line);
+  margin: 2px 0;
+}
+
+/* Swatches */
+.vs-swatches{ display:flex; gap:10px; }
+.swatch{
+  --c:#222;
+  width:32px; height:32px; border-radius:50%;
+  background: var(--c);
+  border:1px solid rgba(0,0,0,.12);
+  display:grid; place-items:center;
+}
+.swatch svg{ width:18px; height:18px; }
+.swatch svg circle{ fill: transparent; }
+.swatch svg path{ fill:none; stroke:#fff; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; opacity:0; }
+.swatch.is-selected{ box-shadow:0 0 0 3px #fff, 0 0 0 5px #111; }
+.swatch.is-selected svg path{ opacity:1; }
+
+/* Sizes */
+.vs-sizes{ display:flex; gap:8px; flex-wrap:wrap; }
+.size{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-weight: 600;
+}
+.size.is-selected{
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}

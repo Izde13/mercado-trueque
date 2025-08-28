@@ -1,0 +1,63 @@
+:root{
+  --line:#e5e7eb;
+  --surface:#f5f6f7;
+  --ink:#111213;
+}
+
+/* layout de galería */
+.gal{
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+}
+
+.gal-ctrl{ display:none; }
+
+/* miniaturas */
+.gal-thumbs{
+  display: grid;
+  gap: 12px;
+}
+.thumb{
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 8px;
+  cursor: pointer;
+}
+.thumb img{ width: 100%; height: auto; display:block; border-radius: 12px; }
+
+/* imagen principal */
+.gal-main{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.gal-main img{ max-width: 92%; height: auto; display:none; filter: drop-shadow(0 10px 18px rgba(0,0,0,.12)); }
+
+/* reglas para mostrar la imagen seleccionada y resaltar miniatura
+   (hasta 6 imágenes; añade más si necesitas) */
+#g0:checked ~ .gal-main img:nth-of-type(1){ display:block; }
+#g1:checked ~ .gal-main img:nth-of-type(2){ display:block; }
+#g2:checked ~ .gal-main img:nth-of-type(3){ display:block; }
+#g3:checked ~ .gal-main img:nth-of-type(4){ display:block; }
+#g4:checked ~ .gal-main img:nth-of-type(5){ display:block; }
+#g5:checked ~ .gal-main img:nth-of-type(6){ display:block; }
+
+#g0:checked ~ .gal-thumbs .thumb:nth-child(1){ outline:2px solid #111; background:#fff; }
+#g1:checked ~ .gal-thumbs .thumb:nth-child(2){ outline:2px solid #111; background:#fff; }
+#g2:checked ~ .gal-thumbs .thumb:nth-child(3){ outline:2px solid #111; background:#fff; }
+#g3:checked ~ .gal-thumbs .thumb:nth-child(4){ outline:2px solid #111; background:#fff; }
+#g4:checked ~ .gal-thumbs .thumb:nth-child(5){ outline:2px solid #111; background:#fff; }
+#g5:checked ~ .gal-thumbs .thumb:nth-child(6){ outline:2px solid #111; background:#fff; }
+
+@media (max-width: 640px){
+  .gal{ grid-template-columns: 1fr; }
+  .gal-thumbs{ grid-auto-flow: column; grid-auto-columns: 80px; overflow:auto; }
+}
