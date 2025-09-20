@@ -24,7 +24,38 @@ import { UsersController } from './presentation/controllers/users.controller';
       password: process.env.DATABASE_PASSWORD || 'password',
       database: process.env.DATABASE_NAME || 'mercado_trueque',
       autoLoadModels: true,
-      synchronize: true,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, // Azure usa certificados que pueden requerir esto
+        },
+        // Schema específico para Azure
+        options: {
+          schema: 'mercadotrueque', // Tu schema específico
+          encrypt: true,
+          trustServerCertificate: false,
+        },
+      },
+
+      // ⭐ CONFIGURACIÓN DE SCHEMA A NIVEL SEQUELIZE
+      define: {
+        schema: 'mercadotrueque', // Schema por defecto para todos los modelos
+        timestamps: true, // Si usas created_at/updated_at
+        underscored: true, // Para nombres como created_at en lugar de createdAt
+      },
+
+      // Pool de conexiones optimizado para Azure
+      pool: {
+        max: 10,
+        min: 2,
+        acquire: 60000,
+        idle: 10000,
+        evict: 10000,
+      },
+
+      models: [],
+      synchronize: false, // IMPORTANTE: No modificar tu BD
+      logging: process.env.NODE_ENV === 'development' ? console.log : false,
     }),
     SequelizeModule.forFeature([UserModel]),
   ],
