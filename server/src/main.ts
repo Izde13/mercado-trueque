@@ -14,6 +14,12 @@ async function bootstrap() {
     defaultVersion: '1',
   });
 
+  app.enableCors({
+    origin: 'http://localhost:5400',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 
   console.log('🚀 API running on: http://localhost:3000/api/v1');
