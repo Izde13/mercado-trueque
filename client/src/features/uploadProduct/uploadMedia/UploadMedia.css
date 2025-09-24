@@ -1,0 +1,103 @@
+.um-card {
+  background: #fff;
+  border: 1px solid #eef1f4;
+  border-radius: 20px;
+  padding: 20px 20px 16px;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+}
+
+.um-header { margin-bottom: 16px; }
+.um-title { font-size: 14px; font-weight: 600; color: #101828; margin: 0 0 4px; }
+.um-subtitle { font-size: 12px; color: #667085; margin: 0; }
+
+.um-dropzone {
+  border: 2px dashed #d0d5dd;
+  border-radius: 16px;
+  padding: 28px 16px 44px;
+  text-align: center;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.um-dropzone.is-drag {
+  border-color: #98a2b3;
+  background: #f8fafc;
+}
+
+.um-cloud {
+  width: 28px;
+  height: 28px;
+  fill: #98a2b3;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.um-drop-hint { margin: 0; font-size: 14px; color: #344054; font-weight: 500; }
+.um-drop-meta { margin: 4px 0 12px; font-size: 12px; color: #98a2b3; }
+
+.um-browse {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.um-browse:hover { background: #f9fafb; }
+.um-input { display: none; }
+
+.um-filelist {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.um-fileitem {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #eef1f4;
+  border-radius: 12px;
+}
+
+.um-thumb {
+  width: 56px; height: 40px;
+  border-radius: 8px; overflow: hidden;
+  background: #f2f4f7;
+  display: grid; place-items: center;
+}
+.um-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+.um-fileinfo { min-width: 0; display: flex; gap: 8px; align-items: baseline; }
+.um-filename {
+  font-size: 14px; color: #101828; font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.um-filesize { font-size: 12px; color: #667085; }
+
+.um-remove {
+  border: none; background: transparent; cursor: pointer;
+  font-size: 22px; line-height: 1; color: #98a2b3;
+}
+.um-remove:hover { color: #475467; }
+
+.um-errors {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff1f0;
+  border: 1px solid #ffcccc;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.um-footerbar {
+  margin-top: 14px;
+  height: 44px;
+  background: #eef2f6;
+  border-radius: 999px;
+}
