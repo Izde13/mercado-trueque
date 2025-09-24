@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../domain/entities/user.entity';
+import { Usuario, EstadoUsuario } from '../../domain/entities/user.entity';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 
 @Injectable()
@@ -8,12 +8,26 @@ export class UpdateUserUseCase {
 
   async execute(
     id: string,
-    name?: string,
-    email?: string,
-  ): Promise<User | null> {
+    nombre?: string,
+    apellido?: string,
+    telefono?: string,
+    estado?: EstadoUsuario,
+    avatarUrl?: string,
+  ): Promise<Usuario | null> {
     const user = await this.userRepository.findById(id);
     if (!user) return null;
-    user.update(name, email);
-    return this.userRepository.update(user);
+    const updatedUser = new Usuario(
+      user.id,
+      user.email,
+      nombre ?? user.nombre,
+      apellido ?? user.apellido,
+      telefono ?? user.telefono,
+      user.fechaRegistro,
+      estado ?? user.estado,
+      avatarUrl ?? user.avatarUrl,
+      user.calificacionPromedio,
+      user.totalIntercambios,
+    );
+    return this.userRepository.update(updatedUser);
   }
 }

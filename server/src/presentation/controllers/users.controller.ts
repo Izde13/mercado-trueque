@@ -31,8 +31,10 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUserUseCase.execute(
-      createUserDto.name,
       createUserDto.email,
+      createUserDto.nombre,
+      createUserDto.apellido,
+      createUserDto.telefono,
     );
     return new UserResponseDto(user);
   }
@@ -56,8 +58,11 @@ export class UsersController {
   ): Promise<UserResponseDto | null> {
     const user = await this.updateUserUseCase.execute(
       id,
-      updateUserDto.name,
-      updateUserDto.email,
+      updateUserDto.nombre,
+      updateUserDto.apellido,
+      updateUserDto.telefono,
+      updateUserDto.estado,
+      updateUserDto.avatarUrl,
     );
     return user ? new UserResponseDto(user) : null;
   }
