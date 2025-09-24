@@ -1,0 +1,386 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alertas_activadas {
+  id                    String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  suscripcion_id        String                @db.Uuid
+  producto_id           String                @db.Uuid
+  enviada               Boolean?              @default(false)
+  fecha_activacion      DateTime?             @default(now()) @db.Timestamp(6)
+  productos             productos             @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  suscripciones_alertas suscripciones_alertas @relation(fields: [suscripcion_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model caracteristicas_categoria {
+  id                       String                     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  categoria_id             String                     @db.Uuid
+  nombre                   String                     @db.VarChar(50)
+  tipo_dato                String?                    @default("text") @db.VarChar(20)
+  requerido                Boolean?                   @default(false)
+  opciones                 Json?
+  categorias               categorias                 @relation(fields: [categoria_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  caracteristicas_producto caracteristicas_producto[]
+
+  @@unique([categoria_id, nombre])
+  @@index([categoria_id], map: "idx_caracteristicas_categoria")
+}
+
+model caracteristicas_producto {
+  id                        String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  producto_id               String                    @db.Uuid
+  caracteristica_id         String                    @db.Uuid
+  valor                     String
+  caracteristicas_categoria caracteristicas_categoria @relation(fields: [caracteristica_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productos                 productos                 @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([producto_id, caracteristica_id])
+  @@index([producto_id], map: "idx_caracteristicas_producto")
+}
+
+model carrito_trueque {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id     String    @db.Uuid
+  producto_id    String    @db.Uuid
+  fecha_agregado DateTime? @default(now()) @db.Timestamp(6)
+  productos      productos @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios       usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([usuario_id, producto_id])
+  @@index([producto_id], map: "idx_carrito_producto")
+  @@index([usuario_id], map: "idx_carrito_usuario")
+}
+
+model categorias {
+  id                        String                      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  codigo                    Int                         @unique @default(autoincrement())
+  nombre                    String                      @unique @db.VarChar(100)
+  descripcion               String?
+  activo                    Boolean?                    @default(true)
+  caracteristicas_categoria caracteristicas_categoria[]
+  productos                 productos[]
+  suscripciones_alertas     suscripciones_alertas[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model centros_distribucion {
+  id               String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  codigo           Int            @unique @default(autoincrement())
+  nombre           String         @db.VarChar(100)
+  direccion        String
+  ciudad           String         @db.VarChar(100)
+  departamento     String         @db.VarChar(100)
+  telefono         String?        @db.VarChar(20)
+  email            String?        @db.VarChar(255)
+  activo           Boolean?       @default(true)
+  capacidad_maxima Int?           @default(100)
+  intercambios     intercambios[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model envios {
+  id                     String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  intercambio_id         String       @db.Uuid
+  producto_id            String       @db.Uuid
+  direccion_origen       String
+  fecha_envio            DateTime?    @db.Timestamp(6)
+  fecha_recepcion_centro DateTime?    @db.Timestamp(6)
+  codigo_tracking        String?      @db.VarChar(50)
+  transportadora         String?      @db.VarChar(100)
+  estado_envio           String?      @default("preparando") @db.VarChar(30)
+  costo_envio            Decimal?     @default(0) @db.Decimal(10, 2)
+  intercambios           intercambios @relation(fields: [intercambio_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productos              productos    @relation(fields: [producto_id], references: [id], onUpdate: NoAction)
+
+  @@index([estado_envio], map: "idx_envios_estado")
+  @@index([intercambio_id], map: "idx_envios_intercambio")
+  @@index([producto_id], map: "idx_envios_producto")
+  @@index([codigo_tracking], map: "idx_envios_tracking")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model estadisticas_sistema {
+  id                    String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  fecha                 DateTime @unique @db.Date
+  articulos_disponibles Int?     @default(0)
+  usuarios_activos      Int?     @default(0)
+  trueques_completados  Int?     @default(0)
+}
+
+model historias_trueque {
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id        String    @db.Uuid
+  titulo            String    @db.VarChar(200)
+  historia          String
+  imagen_url        String?
+  fecha_publicacion DateTime? @default(now()) @db.Timestamp(6)
+  activa            Boolean?  @default(true)
+  usuarios          usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model imagenes_producto {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  producto_id  String    @db.Uuid
+  url_imagen   String
+  orden        Int?      @default(1)
+  es_principal Boolean?  @default(false)
+  productos    productos @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model intercambios {
+  id                     String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propuesta_id           String               @db.Uuid
+  fecha_inicio           DateTime?            @default(now()) @db.Timestamp(6)
+  estado                 String?              @default("iniciado") @db.VarChar(30)
+  centro_distribucion_id String               @db.Uuid
+  fecha_completado       DateTime?            @db.Timestamp(6)
+  notas_revision         String?
+  costo_envio_total      Decimal?             @default(0) @db.Decimal(10, 2)
+  envios                 envios[]
+  centros_distribucion   centros_distribucion @relation(fields: [centro_distribucion_id], references: [id], onUpdate: NoAction)
+  propuestas_trueque     propuestas_trueque   @relation(fields: [propuesta_id], references: [id], onUpdate: NoAction)
+  rese_as                rese_as[]
+  revision_productos     revision_productos[]
+
+  @@index([centro_distribucion_id], map: "idx_intercambios_centro")
+  @@index([estado], map: "idx_intercambios_estado")
+  @@index([fecha_inicio(sort: Desc)], map: "idx_intercambios_fecha")
+  @@index([propuesta_id], map: "idx_intercambios_propuesta")
+}
+
+model mensajes_propuesta {
+  id                 String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propuesta_id       String             @db.Uuid
+  usuario_id         String             @db.Uuid
+  mensaje            String
+  fecha_mensaje      DateTime?          @default(now()) @db.Timestamp(6)
+  propuestas_trueque propuestas_trueque @relation(fields: [propuesta_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios           usuarios           @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model notificaciones {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id      String    @db.Uuid
+  tipo            String    @db.VarChar(50)
+  titulo          String    @db.VarChar(200)
+  mensaje         String
+  leida           Boolean?  @default(false)
+  fecha_creacion  DateTime? @default(now()) @db.Timestamp(6)
+  referencia_id   String?   @db.Uuid
+  referencia_tipo String?   @db.VarChar(50)
+  usuarios        usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([fecha_creacion(sort: Desc)], map: "idx_notificaciones_fecha")
+  @@index([leida], map: "idx_notificaciones_leida")
+  @@index([tipo], map: "idx_notificaciones_tipo")
+  @@index([usuario_id], map: "idx_notificaciones_usuario")
+}
+
+model preguntas_productos {
+  id                   String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  producto_id          String                 @db.Uuid
+  usuario_id           String                 @db.Uuid
+  pregunta             String
+  fecha_pregunta       DateTime?              @default(now()) @db.Timestamp(6)
+  activa               Boolean?               @default(true)
+  productos            productos              @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios             usuarios               @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  respuestas_preguntas respuestas_preguntas[]
+
+  @@index([fecha_pregunta(sort: Desc)], map: "idx_preguntas_fecha")
+  @@index([producto_id], map: "idx_preguntas_producto")
+  @@index([usuario_id], map: "idx_preguntas_usuario")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model productos {
+  id                       String                     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id               String                     @db.Uuid
+  categoria_id             String                     @db.Uuid
+  titulo                   String                     @db.VarChar(200)
+  descripcion              String?
+  estado_producto          Int?                       @default(3)
+  valor_estimado           Decimal?                   @db.Decimal(12, 2)
+  fecha_publicacion        DateTime?                  @default(now()) @db.Timestamp(6)
+  estado_publicacion       String?                    @default("disponible") @db.VarChar(20)
+  imagen_principal         String?
+  vistas                   Int?                       @default(0)
+  popularidad              Int?                       @default(0)
+  alertas_activadas        alertas_activadas[]
+  caracteristicas_producto caracteristicas_producto[]
+  carrito_trueque          carrito_trueque[]
+  envios                   envios[]
+  imagenes_producto        imagenes_producto[]
+  preguntas_productos      preguntas_productos[]
+  categorias               categorias                 @relation(fields: [categoria_id], references: [id], onUpdate: NoAction)
+  usuarios                 usuarios                   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productos_propuesta      productos_propuesta[]
+  propuestas_trueque       propuestas_trueque[]
+  revision_productos       revision_productos[]
+
+  @@index([categoria_id], map: "idx_productos_categoria")
+  @@index([estado_publicacion], map: "idx_productos_estado_publicacion")
+  @@index([fecha_publicacion(sort: Desc)], map: "idx_productos_fecha_publicacion")
+  @@index([popularidad(sort: Desc)], map: "idx_productos_popularidad")
+  @@index([usuario_id], map: "idx_productos_usuario")
+  @@index([valor_estimado], map: "idx_productos_valor")
+  @@index([vistas(sort: Desc)], map: "idx_productos_vistas")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model productos_propuesta {
+  id                 String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propuesta_id       String             @db.Uuid
+  producto_id        String             @db.Uuid
+  orden              Int?               @default(1)
+  productos          productos          @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  propuestas_trueque propuestas_trueque @relation(fields: [propuesta_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([propuesta_id, producto_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model propuestas_trueque {
+  id                     String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  producto_solicitado_id String                @db.Uuid
+  usuario_oferente_id    String                @db.Uuid
+  mensaje                String?
+  fecha_propuesta        DateTime?             @default(now()) @db.Timestamp(6)
+  estado                 String?               @default("pendiente") @db.VarChar(20)
+  fecha_respuesta        DateTime?             @db.Timestamp(6)
+  intercambios           intercambios[]
+  mensajes_propuesta     mensajes_propuesta[]
+  productos_propuesta    productos_propuesta[]
+  productos              productos             @relation(fields: [producto_solicitado_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios               usuarios              @relation(fields: [usuario_oferente_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([estado], map: "idx_propuestas_estado")
+  @@index([fecha_propuesta(sort: Desc)], map: "idx_propuestas_fecha")
+  @@index([usuario_oferente_id], map: "idx_propuestas_oferente")
+  @@index([producto_solicitado_id], map: "idx_propuestas_solicitado")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model rese_as {
+  id                                                String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  intercambio_id                                    String       @db.Uuid
+  usuario_calificador_id                            String       @db.Uuid
+  usuario_calificado_id                             String       @db.Uuid
+  calificacion_usuario                              Int
+  calificacion_producto                             Int
+  comentario                                        String?
+  fecha_rese_a                                      DateTime?    @default(now()) @map("fecha_reseña") @db.Timestamp(6)
+  visible                                           Boolean?     @default(true)
+  intercambios                                      intercambios @relation(fields: [intercambio_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_rese_as_usuario_calificado_idTousuarios  usuarios     @relation("rese_as_usuario_calificado_idTousuarios", fields: [usuario_calificado_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_rese_as_usuario_calificador_idTousuarios usuarios     @relation("rese_as_usuario_calificador_idTousuarios", fields: [usuario_calificador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([intercambio_id, usuario_calificador_id])
+  @@map("reseñas")
+}
+
+model respuestas_preguntas {
+  id                  String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pregunta_id         String              @db.Uuid
+  usuario_id          String              @db.Uuid
+  respuesta           String
+  fecha_respuesta     DateTime?           @default(now()) @db.Timestamp(6)
+  preguntas_productos preguntas_productos @relation(fields: [pregunta_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios            usuarios            @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model revision_productos {
+  id                  String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  intercambio_id      String       @db.Uuid
+  producto_id         String       @db.Uuid
+  empleado_revisor    String?      @db.VarChar(100)
+  estado_revision     String?      @default("pendiente") @db.VarChar(30)
+  calificacion_estado Int?
+  observaciones       String?
+  fecha_revision      DateTime?    @db.Timestamp(6)
+  fotos_revision      Json?
+  intercambios        intercambios @relation(fields: [intercambio_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productos           productos    @relation(fields: [producto_id], references: [id], onUpdate: NoAction)
+
+  @@unique([intercambio_id, producto_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model suscripciones_alertas {
+  id                String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email             String              @db.VarChar(255)
+  categoria_id      String?             @db.Uuid
+  palabras_clave    String?
+  activa            Boolean?            @default(true)
+  fecha_suscripcion DateTime?           @default(now()) @db.Timestamp(6)
+  alertas_activadas alertas_activadas[]
+  categorias        categorias?         @relation(fields: [categoria_id], references: [id], onUpdate: NoAction)
+
+  @@index([activa], map: "idx_suscripciones_activa")
+  @@index([categoria_id], map: "idx_suscripciones_categoria")
+  @@index([email], map: "idx_suscripciones_email")
+}
+
+model ubicaciones {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id        String   @db.Uuid
+  direccion         String
+  ciudad            String   @db.VarChar(100)
+  departamento      String   @db.VarChar(100)
+  codigo_postal     String?  @db.VarChar(10)
+  nombre_contacto   String   @db.VarChar(200)
+  telefono_contacto String?  @db.VarChar(20)
+  es_principal      Boolean? @default(false)
+  activa            Boolean? @default(true)
+  usuarios          usuarios @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([ciudad], map: "idx_ubicaciones_ciudad")
+  @@index([usuario_id], map: "idx_ubicaciones_usuario")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuarios {
+  id                                               String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                                            String                 @unique @db.VarChar(255)
+  nombre                                           String                 @db.VarChar(100)
+  apellido                                         String                 @db.VarChar(100)
+  telefono                                         String?                @db.VarChar(20)
+  fecha_registro                                   DateTime?              @default(now()) @db.Timestamp(6)
+  estado                                           String?                @default("activo") @db.VarChar(20)
+  avatar_url                                       String?
+  calificacion_promedio                            Decimal?               @default(0.00) @db.Decimal(3, 2)
+  total_intercambios                               Int?                   @default(0)
+  carrito_trueque                                  carrito_trueque[]
+  historias_trueque                                historias_trueque[]
+  mensajes_propuesta                               mensajes_propuesta[]
+  notificaciones                                   notificaciones[]
+  preguntas_productos                              preguntas_productos[]
+  productos                                        productos[]
+  propuestas_trueque                               propuestas_trueque[]
+  rese_as_rese_as_usuario_calificado_idTousuarios  rese_as[]              @relation("rese_as_usuario_calificado_idTousuarios")
+  rese_as_rese_as_usuario_calificador_idTousuarios rese_as[]              @relation("rese_as_usuario_calificador_idTousuarios")
+  respuestas_preguntas                             respuestas_preguntas[]
+  ubicaciones                                      ubicaciones[]
+
+  @@index([calificacion_promedio(sort: Desc)], map: "idx_usuarios_calificacion")
+  @@index([email], map: "idx_usuarios_email")
+  @@index([estado], map: "idx_usuarios_estado")
+}
