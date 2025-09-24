@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserUseCase } from './create-user.use-case';
-import { User } from '../../domain/entities/user.entity';
+import { Usuario } from '../../domain/entities/user.entity';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 
 describe('CreateUserUseCase', () => {
@@ -27,17 +27,19 @@ describe('CreateUserUseCase', () => {
   });
 
   it('should create a user', async () => {
-    const name = 'John Doe';
     const email = 'john@example.com';
-    const mockUser = User.create(name, email);
+    const nombre = 'John';
+    const apellido = 'Doe';
+    const mockUser = Usuario.create(email, nombre, apellido);
     userRepository.save.mockResolvedValue(mockUser);
 
-    const result = await useCase.execute(name, email);
+    const result = await useCase.execute(email, nombre, apellido);
 
     expect(userRepository.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        name,
         email,
+        nombre,
+        apellido,
       }),
     );
     expect(result).toEqual(mockUser);
