@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import "./UploadMedia.css";
 
 const DEFAULT_ACCEPT = "image/*";
 const bytesToMB = (b) => +(b / (1024 * 1024)).toFixed(2);
 
-const UploadMedia = ({
+const UploadMedia = forwardRef(({
   title = "Upload files",
   subtitle = "Select and upload the files of your choice",
   accept = DEFAULT_ACCEPT,
   maxSizeMB = 50,
   multiple = true,
   onChange,
-}) => {
+}, ref) => {
   const [files, setFiles] = useState([]);
   const [errors, setErrors] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -74,6 +74,17 @@ const UploadMedia = ({
       return next;
     });
   };
+
+  const clearFiles = useCallback(() => {
+    setFiles([]);
+    setErrors([]);
+    onChange?.([]);
+  }, [onChange]);
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    clearFiles
+  }), [clearFiles]);
 
   return (
     <section className="um-card">
@@ -172,7 +183,7 @@ const UploadMedia = ({
       <div className="um-footerbar" aria-hidden="true" />
     </section>
   );
-};
+});
 
 export default UploadMedia;
 

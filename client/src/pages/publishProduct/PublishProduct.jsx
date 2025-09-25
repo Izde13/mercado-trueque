@@ -1,170 +1,277 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import UploadMedia from "../../features/uploadProduct/uploadMedia/UploadMedia";
+import SuccessModal from "../../shared/components/SuccessModal";
+import { FormField, SelectField, TextAreaField } from "../../shared/components/Form";
+import { useCategories } from "../../shared/hooks/useCategories";
+import { useCreateProduct } from "../../shared/hooks/useCreateProduct";
+import { useForm } from "../../shared/hooks/useForm";
+import { productValidationRules, validateProductImages } from "../../shared/utils/validationRules";
 import "./PublishProduct.css";
+import "./PublishProductEnhancements.css";
 
+// Constants
+const INITIAL_FORM_VALUES = {
+  categoriaId: "",
+  titulo: "",
+  valorEstimado: "",
+  descripcion: "",
+};
+
+/**
+ * Product Details Form - Separated component for better organization
+ */
+const ProductDetailsForm = React.memo(({
+  form,
+  errors,
+  handleChange,
+  handleBlur,
+  categories,
+  categoriesLoading,
+  categoriesError
+}) => {
+  // Transform categories for SelectField
+  const categoryOptions = useMemo(() =>
+    categories.map(cat => ({
+      value: cat.id,
+      label: cat.nombre
+    })),
+    [categories]
+  );
+
+  return (
+    <div className="pp-card">
+      <h2 className="pp-card-title">Detalles del producto</h2>
+
+      <SelectField
+        id="categoriaId"
+        label="Categoría"
+        placeholder="Selecciona una categoría..."
+        value={form.values.categoriaId}
+        onChange={handleChange('categoriaId')}
+        onBlur={handleBlur('categoriaId')}
+        error={errors.categoriaId || categoriesError}
+        loading={categoriesLoading}
+        options={categoryOptions}
+        required
+      />
+
+      <FormField
+        id="titulo"
+        label="Título del producto"
+        type="text"
+        placeholder="Ej. Bicicleta urbana en excelente estado"
+        value={form.values.titulo}
+        onChange={handleChange('titulo')}
+        onBlur={handleBlur('titulo')}
+        error={errors.titulo}
+        maxLength={100}
+        required
+      />
+
+      <FormField
+        id="valorEstimado"
+        label="Valor estimado"
+        type="number"
+        placeholder="Ej. 250000"
+        value={form.values.valorEstimado}
+        onChange={handleChange('valorEstimado')}
+        onBlur={handleBlur('valorEstimado')}
+        error={errors.valorEstimado}
+        min="1000"
+        step="1000"
+        required
+      />
+
+      <TextAreaField
+        id="descripcion"
+        label="Descripción detallada"
+        placeholder="Describe las características, estado, razón de intercambio, etc. Sé específico para atraer mejores ofertas."
+        value={form.values.descripcion}
+        onChange={handleChange('descripcion')}
+        onBlur={handleBlur('descripcion')}
+        error={errors.descripcion}
+        rows={6}
+        maxLength={500}
+        showCharacterCount
+        required
+      />
+    </div>
+  );
+});
+
+ProductDetailsForm.displayName = 'ProductDetailsForm';
+
+/**
+ * Image Upload Section - Separated component
+ */
+const ImageUploadSection = React.memo(({
+  uploadRef,
+  onImagesChange,
+  imageError
+}) => (
+  <div className="pp-card">
+    <UploadMedia
+      ref={uploadRef}
+      title="Imágenes del producto"
+      subtitle="Sube fotos claras y de buena calidad. La primera imagen será la principal."
+      onChange={onImagesChange}
+      accept="image/*"
+      multiple={true}
+      maxSizeMB={10}
+    />
+    {imageError && <p className="pp-error mt">{imageError}</p>}
+  </div>
+));
+
+ImageUploadSection.displayName = 'ImageUploadSection';
+
+/**
+ * Main PublishProduct Component - Refactored with best practices
+ */
 const PublishProduct = () => {
-  // imagenPrincipal: tomamos la primera imagen del UploadMedia
-  const [imagenes, setImagenes] = useState([]);
-  const [categorias, setCategorias] = useState([]);
+  // Custom hooks for data and operations
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { createProduct, loading: creatingProduct, error: createProductError, clearError } = useCreateProduct();
 
-  const [form, setForm] = useState({
-    categoriaId: "",
-    titulo: "",
-    valorEstimado: "",
-    descripcion: "",
-  });
-  const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  // Form management with custom hook
+  const form = useForm(INITIAL_FORM_VALUES, productValidationRules);
 
-  // TODO: traerlo de tu auth/context
-  const usuarioId = "00000000-0000-0000-0000-000000000000";
+  // Local state for images and modal
+  const [images, setImages] = useState([]);
+  const [imageError, setImageError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdProduct, setCreatedProduct] = useState(null);
 
-  useEffect(() => {
-    // Ajusta la URL a tu backend que devuelve CategoryResponseDto[]
-    const load = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        setCategorias(data || []);
-      } catch (e) {
-        console.error("No se pudieron cargar categorías", e);
-      }
-    };
-    load();
+  // Refs
+  const uploadMediaRef = useRef(null);
+
+  // Handle image changes with validation
+  const handleImagesChange = useCallback((newImages) => {
+    setImages(newImages);
+    const error = validateProductImages(newImages);
+    setImageError(error || '');
   }, []);
 
-  const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  const validate = () => {
-    const e = {};
-    if (!form.categoriaId) e.categoriaId = "Selecciona una categoría.";
-    if (!form.titulo.trim()) e.titulo = "El título es obligatorio.";
-    if (!form.valorEstimado || Number(form.valorEstimado) <= 0)
-      e.valorEstimado = "Ingresa un valor válido.";
-    if (!form.descripcion.trim() || form.descripcion.trim().length < 10)
-      e.descripcion = "Describe el producto (mín. 10 caracteres).";
-    if (imagenes.length === 0) e.media = "Adjunta al menos una imagen.";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const onSubmit = async (e) => {
+  // Handle form submission
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!validate()) return;
 
-    setSubmitting(true);
-    try {
-      const fd = new FormData();
-      fd.append("usuarioId", usuarioId);
-      fd.append("categoriaId", form.categoriaId);
-      fd.append("titulo", form.titulo.trim());
-      fd.append("descripcion", form.descripcion.trim());
-      fd.append("valorEstimado", String(form.valorEstimado));
-      fd.append("imagenPrincipal", imagenes[0]?.name || "");
+    // Validate form and images
+    const isFormValid = form.validate();
+    const imageValidationError = validateProductImages(images);
 
-      // Si también subes binarios:
-      imagenes.forEach((f) => fd.append("media[]", f, f.name));
-
-      // Ajusta endpoint:
-      // const res = await fetch("/api/products", { method: "POST", body: fd });
-      // if (!res.ok) throw new Error("Error publicando");
-
-      console.log("PAYLOAD listo (demo):", Object.fromEntries(fd.entries()));
-      alert("¡Producto publicado! (demo)");
-
-      setForm({ categoriaId: "", titulo: "", valorEstimado: "", descripcion: "" });
-      setImagenes([]);
-      setErrors({});
-    } catch (err) {
-      console.error(err);
-      alert("Error al publicar. Intenta nuevamente.");
-    } finally {
-      setSubmitting(false);
+    if (imageValidationError) {
+      setImageError(imageValidationError);
     }
-  };
+
+    if (!isFormValid || imageValidationError) {
+      return;
+    }
+
+    clearError(); // Clear previous API errors
+
+    try {
+      const result = await createProduct(form.values);
+
+      // Show success modal with product data
+      setCreatedProduct({
+        ...result.data, // API response data
+        titulo: form.values.titulo,
+        valorEstimado: form.values.valorEstimado
+      });
+      setShowSuccessModal(true);
+
+      // Reset form and images
+      form.reset();
+      setImages([]);
+      setImageError('');
+      uploadMediaRef.current?.clearFiles();
+
+    } catch (error) {
+      console.error("Error creating product:", error);
+      // Error is handled by the useCreateProduct hook
+    }
+  }, [form, images, createProduct, clearError]);
+
+  // Handle modal close
+  const handleCloseModal = useCallback(() => {
+    setShowSuccessModal(false);
+    setCreatedProduct(null);
+  }, []);
+
+  // Check if form can be submitted
+  const canSubmit = useMemo(() =>
+    !creatingProduct &&
+    !categoriesLoading &&
+    !form.hasErrors &&
+    images.length > 0,
+    [creatingProduct, categoriesLoading, form.hasErrors, images.length]
+  );
 
   return (
     <main className="pp-wrap">
-      <div className="pp-breadcrumb">Inicio <span>›</span> Publicar</div>
+      {/* Breadcrumb */}
+      <div className="pp-breadcrumb">
+        Inicio <span>›</span> Publicar
+      </div>
+
       <h1 className="pp-title">Publica tu producto</h1>
 
-      <form className="pp-grid" onSubmit={onSubmit} noValidate>
-        {/* Columna izquierda: imágenes */}
+      <form className="pp-grid" onSubmit={handleSubmit} noValidate>
+        {/* Left Column - Images */}
         <section className="pp-col">
-          <div className="pp-card">
-            <UploadMedia onChange={setImagenes} accept="image/*" />
-            {errors.media && <p className="pp-error mt">{errors.media}</p>}
-          </div>
+          <ImageUploadSection
+            uploadRef={uploadMediaRef}
+            onImagesChange={handleImagesChange}
+            imageError={imageError}
+          />
         </section>
 
-        {/* Columna derecha: DTO */}
+        {/* Right Column - Product Details */}
         <aside className="pp-col">
-          <div className="pp-card">
-            <h2 className="pp-card-title">Detalles del producto</h2>
+          <ProductDetailsForm
+            form={form}
+            errors={form.errors}
+            handleChange={form.handleChange}
+            handleBlur={form.handleBlur}
+            categories={categories}
+            categoriesLoading={categoriesLoading}
+            categoriesError={categoriesError}
+          />
 
-            <div className="pp-field">
-              <label className="pp-label" htmlFor="cat">Categoría</label>
-              <select
-                id="cat"
-                className={`pp-input pp-select ${errors.categoriaId ? "is-error" : ""}`}
-                value={form.categoriaId}
-                onChange={(e) => setField("categoriaId", e.target.value)}
-              >
-                <option value="">Selecciona…</option>
-                {categorias.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
-              {errors.categoriaId && <p className="pp-error">{errors.categoriaId}</p>}
-            </div>
+          {/* API Error Display */}
+          {createProductError && (
+            <p className="pp-error" role="alert">
+              {createProductError}
+            </p>
+          )}
 
-            <div className="pp-field">
-              <label className="pp-label" htmlFor="titulo">Título</label>
-              <input
-                id="titulo"
-                className={`pp-input ${errors.titulo ? "is-error" : ""}`}
-                type="text"
-                placeholder="Ej. Bicicleta urbana"
-                value={form.titulo}
-                onChange={(e) => setField("titulo", e.target.value)}
-              />
-              {errors.titulo && <p className="pp-error">{errors.titulo}</p>}
-            </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="pp-submit"
+            disabled={!canSubmit}
+            aria-describedby="submit-help"
+          >
+            {creatingProduct ? "Publicando…" : "Publicar producto"}
+          </button>
 
-            <div className="pp-field">
-              <label className="pp-label" htmlFor="valor">Valor estimado</label>
-              <input
-                id="valor"
-                className={`pp-input ${errors.valorEstimado ? "is-error" : ""}`}
-                type="number"
-                min="0"
-                step="1"
-                placeholder="Ej. 250000"
-                value={form.valorEstimado}
-                onChange={(e) => setField("valorEstimado", e.target.value)}
-              />
-              {errors.valorEstimado && <p className="pp-error">{errors.valorEstimado}</p>}
-            </div>
-
-            <div className="pp-field">
-              <label className="pp-label" htmlFor="desc">Descripción</label>
-              <textarea
-                id="desc"
-                className={`pp-textarea ${errors.descripcion ? "is-error" : ""}`}
-                rows="6"
-                placeholder="Cuenta detalles importantes del producto…"
-                value={form.descripcion}
-                onChange={(e) => setField("descripcion", e.target.value)}
-              />
-              {errors.descripcion && <p className="pp-error">{errors.descripcion}</p>}
-            </div>
-
-            <button type="submit" className="pp-submit" disabled={submitting}>
-              {submitting ? "Publicando…" : "Publicar producto"}
-            </button>
-          </div>
+          {!canSubmit && !creatingProduct && (
+            <p id="submit-help" className="pp-help-text">
+              Completa todos los campos obligatorios y adjunta al menos una imagen.
+            </p>
+          )}
         </aside>
       </form>
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseModal}
+        title="¡Producto publicado exitosamente!"
+        message="Tu producto ha sido creado y está disponible en el mercado de trueque."
+        productData={createdProduct}
+      />
     </main>
   );
 };
