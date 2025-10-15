@@ -5,21 +5,21 @@ import VariantsSelector from "../VariantsSelector/VariantsSelector.jsx";
 export default function ProductSummary({
   id,
   title,
-  rating,
-  estimated,
+  popularity,
+  estimatedValue,
   description,
+  mainImage,
 }) {
   const navigate = useNavigate();
+
   const handlePropose = () => {
     navigate("/propuesta", {
       state: {
         interest: {
           id,
           title,
-          price: estimated,
-          img: "/images/products/shirt-1.png", // pon la imagen real si la tienes
-          size: "Large",
-          color: "Olive",
+          estimatedValue,
+          mainImage,
         },
       },
     });
@@ -30,13 +30,13 @@ export default function ProductSummary({
       <h1 className="ps-title">{title}</h1>
 
       <div className="ps-rating">
-        <Stars />
-        <span className="ps-rating-text">{rating}</span>
+        <Stars rating={popularity} />
+        <span className="ps-rating-text">{popularity.toFixed(1)}/5</span>
       </div>
 
       <p className="ps-price">
         <span className="label">Valor estimado:</span>{" "}
-        <strong>{estimated}</strong>
+        <strong>${estimatedValue}</strong>
       </p>
 
       <p className="ps-desc">{description}</p>
@@ -52,18 +52,25 @@ export default function ProductSummary({
   );
 }
 
-/* ——— Estrellas estáticas ——— */
-function Stars() {
+/* ——— Estrellas dinámicas ——— */
+function Stars({ rating = 0 }) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
   return (
     <span className="stars" aria-hidden="true">
-      <Star type="full" />
-      <Star type="full" />
-      <Star type="full" />
-      <Star type="full" />
-      <Star type="half" />
+      {[...Array(fullStars)].map((_, i) => (
+        <Star key={`full-${i}`} type="full" />
+      ))}
+      {hasHalfStar && <Star key="half" type="half" />}
+      {[...Array(emptyStars)].map((_, i) => (
+        <Star key={`empty-${i}`} type="empty" />
+      ))}
     </span>
   );
 }
+
 function Star({ type = "full" }) {
   return (
     <svg className={`star ${type}`} viewBox="0 0 24 24">

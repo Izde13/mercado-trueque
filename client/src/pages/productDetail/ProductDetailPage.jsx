@@ -5,18 +5,30 @@ import Gallery from './../../features/productDetail/Gallery/Gallery.jsx'
 import ProductSummary from './../../features/productDetail/ProductSummary/ProductSummary.jsx'
 
 export default function ProductDetailPage() {
-  const { id } = useParams();                 // ← respetamos el parámetro
+  const { id } = useParams();
 
-  // Mock de imágenes (cámbialas por las reales)
+  // TODO: Obtener producto real desde API usando el id
+  // Estructura de BD mock
+  const product = {
+    id,
+    title: "One Life Graphic Camiseta",
+    description: "Camiseta gráfica en perfecto estado. Busco intercambiar por jeans, chaqueta o accesorios deportivos.",
+    estimatedValue: 260,
+    popularity: 4.5,
+    mainImage: "/images/products/shirt-1.png",
+    views: 125,
+    userId: "u1",
+    categoryId: "c1",
+    publicationDate: "2025-10-14",
+    publicationStatus: "publicado",
+    productStatusId: "ep1"
+  };
+
   const images = [
-    "/images/products/shirt-1.png",
+    product.mainImage,
     "/images/products/shirt-2.png",
     "/images/products/shirt-3.png",
   ];
-
-  // (Opcional) puedes usar el id para simular título/estimado
-  const title = "One Life Graphic Camiseta";
-  const estimated = "$260";
 
   return (
     <section className="pdp">
@@ -24,11 +36,11 @@ export default function ProductDetailPage() {
         <Gallery images={images} />
 
         <ProductSummary
-          id={id}                          // ← pasa el id si lo quieres mostrar
-          title={title}
-          rating="4.5/5"
-          estimated={estimated}
-          description="Camiseta gráfica en perfecto estado. Busco intercambiar por jeans, chaqueta o accesorios deportivos."
+          id={product.id}
+          title={product.title}
+          popularity={product.popularity}
+          estimatedValue={product.estimatedValue}
+          description={product.description}
         />
       </div>
     </section>

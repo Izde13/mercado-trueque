@@ -1,8 +1,11 @@
 import "./HomePage.css";
 import ProductCard from "../../features/product/ProductCard/ProductCard";
 import ReviewCard from "../../features/reviews/ReviewCard/ReviewCard";
+import { useAllProducts } from "../../shared/hooks/useProducts";
 
 export default function HomePage() {
+  const { newProducts, trendingProducts, loading, error } = useAllProducts();
+
   return (
     <div className="home-page">
       {/* HERO */}
@@ -46,17 +49,37 @@ export default function HomePage() {
         <div className="hp-header">
           <h2 className="hp-title">Nuevos trueques</h2>
         </div>
-        <div className="hp-grid">
-          <ProductCard id="101" title="T-shirt with Tape Details" />
-          <ProductCard id="102" title="Skinny Fit Jeans" />
-          <ProductCard id="103" title="Checkered Shirt" />
-          <ProductCard id="104" title="Sleeve Striped T-shirt" />
-        </div>
-        <div className="hp-actions">
-          <button className="btn-ghost" type="button">
-            Ver más
-          </button>
-        </div>
+        {loading ? (
+          <div className="hp-loading">
+            <p>Cargando productos...</p>
+          </div>
+        ) : error ? (
+          <div className="hp-error">
+            <p>Error al cargar productos: {error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="hp-grid">
+              {newProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  title={product.title}
+                  mainImage={product.mainImage}
+                  estimatedValue={product.estimatedValue}
+                  popularity={product.popularity}
+                  views={product.views}
+                  description={product.description}
+                />
+              ))}
+            </div>
+            <div className="hp-actions">
+              <button className="btn-ghost" type="button">
+                Ver más
+              </button>
+            </div>
+          </>
+        )}
       </section>
 
       <hr className="hp-divider" />
@@ -66,17 +89,37 @@ export default function HomePage() {
         <div className="hp-header">
           <h2 className="hp-title">Trueques en tendencia</h2>
         </div>
-        <div className="hp-grid">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-        </div>
-        <div className="hp-actions">
-          <button className="btn-ghost" type="button">
-            Ver más
-          </button>
-        </div>
+        {loading ? (
+          <div className="hp-loading">
+            <p>Cargando productos...</p>
+          </div>
+        ) : error ? (
+          <div className="hp-error">
+            <p>Error al cargar productos: {error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="hp-grid">
+              {trendingProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  title={product.title}
+                  mainImage={product.mainImage}
+                  estimatedValue={product.estimatedValue}
+                  popularity={product.popularity}
+                  views={product.views}
+                  description={product.description}
+                />
+              ))}
+            </div>
+            <div className="hp-actions">
+              <button className="btn-ghost" type="button">
+                Ver más
+              </button>
+            </div>
+          </>
+        )}
       </section>
 
       <hr className="hp-divider" />

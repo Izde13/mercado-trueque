@@ -4,7 +4,15 @@ import { Link } from "react-router-dom";
 export default function ProductCard({
   id = "123",
   title = "T-shirt with Tape Details",
+  mainImage = "/images/products/tshirt.png",
+  estimatedValue = 212,
+  popularity = 4.0,
+  views = 0,
 }) {
+  const fullStars = Math.floor(popularity);
+  const hasHalfStar = popularity % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
   return (
     <article className="pcard" aria-label="Producto">
       <Link
@@ -13,37 +21,35 @@ export default function ProductCard({
         aria-label={`Ver ${title}`}
       />
 
-      {/* Imagen */}
       <a href="#" className="pcard-media" aria-label="Ver producto">
         <img
-          src="/images/products/tshirt.png"
-          alt="T-shirt with Tape Details"
+          src={mainImage}
+          alt={title}
           onError={(e) => (e.currentTarget.style.visibility = "hidden")}
         />
-        {/* fallback visual si no hay imagen */}
         <div className="pcard-ph" aria-hidden="true" />
       </a>
 
-      {/* Título */}
-      <h3 className="pcard-title">T-shirt with Tape Details</h3>
+      <h3 className="pcard-title">{title}</h3>
 
-      {/* Rating */}
-      <div className="pcard-rating" aria-label="Calificación 4 de 5">
+      <div className="pcard-rating" aria-label={`Calificación ${popularity} de 5`}>
         <div className="stars" aria-hidden="true">
-          <Star filled />
-          <Star filled />
-          <Star filled />
-          <Star filled />
-          <Star /> {/* vacía */}
+          {[...Array(fullStars)].map((_, i) => (
+            <Star key={`full-${i}`} filled />
+          ))}
+          {hasHalfStar && <Star key="half" filled />}
+          {[...Array(emptyStars)].map((_, i) => (
+            <Star key={`empty-${i}`} />
+          ))}
         </div>
-        <span className="rating-text">4.0/5</span>
+        <span className="rating-text">
+          {popularity.toFixed(1)}/5
+          {views > 0 && ` (${views})`}
+        </span>
       </div>
 
-      {/* Precios */}
       <div className="pcard-price">
-        <span className="price-now">$212</span>
-        <span className="price-old">$242</span>
-        <span className="price-off">-20%</span>
+        <span className="price-now">${estimatedValue}</span>
       </div>
     </article>
   );
