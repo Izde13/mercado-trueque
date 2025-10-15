@@ -11,7 +11,7 @@ export const newProducts = [
     estimatedValue: 850,
     publicationDate: "2025-10-14",
     publicationStatus: "publicado",
-    mainImage: "/images/products/laptop.png",
+  mainImage: "/images/products/laptop.png",
     views: 145,
     popularity: 4.5,
     productStatusId: "ep1"
@@ -25,7 +25,7 @@ export const newProducts = [
     estimatedValue: 650,
     publicationDate: "2025-10-13",
     publicationStatus: "publicado",
-    mainImage: "/images/products/camera.png",
+  mainImage: "/images/products/camera.png",
     views: 98,
     popularity: 4.8,
     productStatusId: "ep1"
@@ -39,7 +39,7 @@ export const newProducts = [
     estimatedValue: 450,
     publicationDate: "2025-10-12",
     publicationStatus: "publicado",
-    mainImage: "/images/products/bike.png",
+  mainImage: "/images/products/bike.png",
     views: 67,
     popularity: 4.3,
     productStatusId: "ep1"
@@ -53,7 +53,7 @@ export const newProducts = [
     estimatedValue: 320,
     publicationDate: "2025-10-11",
     publicationStatus: "publicado",
-    mainImage: "/images/products/nintendo.png",
+  mainImage: "/images/products/nintendo.png",
     views: 234,
     popularity: 4.9,
     productStatusId: "ep1"
@@ -70,7 +70,7 @@ export const trendingProducts = [
     estimatedValue: 780,
     publicationDate: "2025-10-10",
     publicationStatus: "publicado",
-    mainImage: "/images/products/iphone.png",
+  mainImage: "/images/products/iphone.png",
     views: 312,
     popularity: 4.7,
     productStatusId: "ep1"
@@ -84,7 +84,7 @@ export const trendingProducts = [
     estimatedValue: 280,
     publicationDate: "2025-10-09",
     publicationStatus: "publicado",
-    mainImage: "/images/products/headphones.png",
+  mainImage: "/images/products/headphones.png",
     views: 189,
     popularity: 4.6,
     productStatusId: "ep1"
@@ -98,7 +98,7 @@ export const trendingProducts = [
     estimatedValue: 450,
     publicationDate: "2025-10-08",
     publicationStatus: "publicado",
-    mainImage: "/images/products/ps5.png",
+  mainImage: "/images/products/ps5.png",
     views: 456,
     popularity: 4.9,
     productStatusId: "ep1"
@@ -112,7 +112,7 @@ export const trendingProducts = [
     estimatedValue: 520,
     publicationDate: "2025-10-07",
     publicationStatus: "publicado",
-    mainImage: "/images/products/ipad.png",
+  mainImage: "/images/products/ipad.png",
     views: 178,
     popularity: 4.5,
     productStatusId: "ep1"

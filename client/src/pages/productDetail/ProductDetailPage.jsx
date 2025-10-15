@@ -15,7 +15,7 @@ export default function ProductDetailPage() {
     description: "Camiseta gráfica en perfecto estado. Busco intercambiar por jeans, chaqueta o accesorios deportivos.",
     estimatedValue: 260,
     popularity: 4.5,
-    mainImage: "/images/products/shirt-1.png",
+    mainImage: "/images/products/ps5.png",
     views: 125,
     userId: "u1",
     categoryId: "c1",
@@ -26,8 +26,8 @@ export default function ProductDetailPage() {
 
   const images = [
     product.mainImage,
-    "/images/products/shirt-2.png",
-    "/images/products/shirt-3.png",
+    "/images/products/headphones.png",
+    "/images/products/iphone.png",
   ];
 
   return (

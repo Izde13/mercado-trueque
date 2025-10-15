@@ -1,10 +1,25 @@
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
 
+const PLACEHOLDER_IMAGE = "/images/products/laptop.png";
+
+function resolveImagePath(imagePath) {
+  if (!imagePath) {
+    return PLACEHOLDER_IMAGE;
+  }
+
+  const hasProtocol = /^(?:https?:)?\/\//i.test(imagePath);
+  if (hasProtocol || imagePath.startsWith("data:")) {
+    return imagePath;
+  }
+
+  return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+}
+
 export default function ProductCard({
   id = "123",
   title = "T-shirt with Tape Details",
-  mainImage = "/images/products/tshirt.png",
+  mainImage = PLACEHOLDER_IMAGE,
   estimatedValue = 212,
   popularity = 4.0,
   views = 0,
@@ -12,6 +27,7 @@ export default function ProductCard({
   const fullStars = Math.floor(popularity);
   const hasHalfStar = popularity % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  const resolvedImage = resolveImagePath(mainImage);
 
   return (
     <article className="pcard" aria-label="Producto">
@@ -23,9 +39,16 @@ export default function ProductCard({
 
       <a href="#" className="pcard-media" aria-label="Ver producto">
         <img
-          src={mainImage}
+          src={resolvedImage}
           alt={title}
-          onError={(e) => (e.currentTarget.style.visibility = "hidden")}
+          onError={(event) => {
+            const img = event.currentTarget;
+            if (img.dataset.fallbackApplied === "true") {
+              return;
+            }
+            img.dataset.fallbackApplied = "true";
+            img.src = PLACEHOLDER_IMAGE;
+          }}
         />
         <div className="pcard-ph" aria-hidden="true" />
       </a>
