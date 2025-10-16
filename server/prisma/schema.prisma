@@ -113,6 +113,19 @@ model estadisticas_sistema {
   trueques_completados  Int?     @default(0)
 }
 
+model estados_producto {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  codigo      Int         @unique @default(autoincrement())
+  nombre      String      @unique @db.VarChar(50)
+  descripcion String?
+  orden       Int         @unique
+  activo      Boolean?    @default(true)
+  productos   productos[]
+
+  @@index([codigo], map: "idx_estados_producto_codigo")
+  @@index([orden], map: "idx_estados_producto_orden")
+}
+
 model historias_trueque {
   id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   usuario_id        String    @db.Uuid
@@ -208,7 +221,7 @@ model productos {
   categoria_id             String                     @db.Uuid
   titulo                   String                     @db.VarChar(200)
   descripcion              String?
-  estado_producto          Int?                       @default(3)
+  estado_producto_id       String                     @db.Uuid
   valor_estimado           Decimal?                   @db.Decimal(12, 2)
   fecha_publicacion        DateTime?                  @default(now()) @db.Timestamp(6)
   estado_publicacion       String?                    @default("disponible") @db.VarChar(20)
@@ -223,11 +236,13 @@ model productos {
   preguntas_productos      preguntas_productos[]
   categorias               categorias                 @relation(fields: [categoria_id], references: [id], onUpdate: NoAction)
   usuarios                 usuarios                   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  estados_producto         estados_producto           @relation(fields: [estado_producto_id], references: [id], onUpdate: NoAction)
   productos_propuesta      productos_propuesta[]
   propuestas_trueque       propuestas_trueque[]
   revision_productos       revision_productos[]
 
   @@index([categoria_id], map: "idx_productos_categoria")
+  @@index([estado_producto_id], map: "idx_productos_estado_producto")
   @@index([estado_publicacion], map: "idx_productos_estado_publicacion")
   @@index([fecha_publicacion(sort: Desc)], map: "idx_productos_fecha_publicacion")
   @@index([popularidad(sort: Desc)], map: "idx_productos_popularidad")

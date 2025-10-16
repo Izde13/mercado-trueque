@@ -17,6 +17,7 @@ import { GetProductsUseCase } from '../../application/use-cases/get-products.use
 import { GetProductUseCase } from '../../application/use-cases/get-product.use-case';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
+import { BusinessRuleException } from '../../domain/errors';
 
 // Response wrapper interface for OWASP compliance
 interface ApiResponse<T> {
@@ -48,16 +49,17 @@ export class ProductsController {
       // Security logging - Log product creation attempt (without sensitive data)
       this.logger.log(
         `Product creation attempt - User: ${this.sanitizeForLog(createProductDto.usuarioId)}, ` +
-        `Category: ${this.sanitizeForLog(createProductDto.categoriaId)}, RequestId: ${requestId}`,
+          `Category: ${this.sanitizeForLog(createProductDto.categoriaId)}, RequestId: ${requestId}`,
       );
 
       const product = await this.createProductUseCase.execute(
         createProductDto.usuarioId,
         createProductDto.categoriaId,
+        createProductDto.estadoProductoId,
         createProductDto.titulo,
+        createProductDto.imagenes,
         createProductDto.descripcion,
         createProductDto.valorEstimado,
-        createProductDto.imagenPrincipal,
       );
 
       const response = new ProductResponseDto(product);
@@ -78,10 +80,16 @@ export class ProductsController {
       // Security logging for errors
       this.logger.error(
         `Product creation failed - User: ${this.sanitizeForLog(createProductDto.usuarioId)}, ` +
-        `Error: ${error.message}, RequestId: ${requestId}`,
+          `Error: ${error.message}, RequestId: ${requestId}`,
         error.stack,
       );
 
+      // Si es una excepción de regla de negocio, dejar que el filtro global la maneje
+      if (error instanceof BusinessRuleException) {
+        throw error;
+      }
+
+      // Para otros errores, convertir en InternalServerErrorException
       throw new InternalServerErrorException({
         success: false,
         message: 'Error interno del servidor al crear el producto',

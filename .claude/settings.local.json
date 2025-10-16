@@ -4,7 +4,10 @@
       "Bash(npm uninstall:*)",
       "Bash(pnpm remove:*)",
       "Bash(pnpm add:*)",
-      "Bash(npx prisma:*)"
+      "Bash(npx prisma:*)",
+      "Bash(tree:*)",
+      "Bash(pnpm start:dev)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
