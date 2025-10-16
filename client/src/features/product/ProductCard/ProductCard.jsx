@@ -24,8 +24,11 @@ export default function ProductCard({
   popularity = 4.0,
   views = 0,
 }) {
-  const fullStars = Math.floor(popularity);
-  const hasHalfStar = popularity % 1 >= 0.5;
+  // Asegurar que popularity esté entre 0 y 5
+  const validPopularity = Math.max(0, Math.min(5, Number(popularity) || 0));
+
+  const fullStars = Math.floor(validPopularity);
+  const hasHalfStar = validPopularity % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
   const resolvedImage = resolveImagePath(mainImage);
 
@@ -55,7 +58,7 @@ export default function ProductCard({
 
       <h3 className="pcard-title">{title}</h3>
 
-      <div className="pcard-rating" aria-label={`Calificación ${popularity} de 5`}>
+      <div className="pcard-rating" aria-label={`Calificación ${validPopularity} de 5`}>
         <div className="stars" aria-hidden="true">
           {[...Array(fullStars)].map((_, i) => (
             <Star key={`full-${i}`} filled />
@@ -66,7 +69,7 @@ export default function ProductCard({
           ))}
         </div>
         <span className="rating-text">
-          {popularity.toFixed(1)}/5
+          {validPopularity.toFixed(1)}/5
           {views > 0 && ` (${views})`}
         </span>
       </div>
