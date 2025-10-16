@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { VersioningType } from '@nestjs/common';
+import { BusinessRuleExceptionFilter } from './presentation/filters/business-rule-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Configurar filtro global de excepciones
+  app.useGlobalFilters(new BusinessRuleExceptionFilter());
 
   // Configurar prefijo global de la API
   app.setGlobalPrefix('api');

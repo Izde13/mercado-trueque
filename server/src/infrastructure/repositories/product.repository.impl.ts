@@ -15,13 +15,28 @@ export class ProductRepositoryImpl implements ProductRepository {
         categoria_id: product.categoriaId,
         titulo: product.titulo,
         descripcion: product.descripcion,
-        estado_producto: product.estadoProducto,
+        estado_producto_id: product.estadoProductoId,
         valor_estimado: product.valorEstimado,
         fecha_publicacion: product.fechaPublicacion,
         estado_publicacion: product.estadoPublicacion,
         imagen_principal: product.imagenPrincipal,
         vistas: product.vistas,
         popularidad: product.popularidad,
+        // Crear imágenes relacionadas
+        imagenes_producto:
+          product.imagenes && product.imagenes.length > 0
+            ? {
+                create: product.imagenes.map((img) => ({
+                  id: img.id,
+                  url_imagen: img.urlImagen,
+                  orden: img.orden,
+                  es_principal: img.esPrincipal,
+                })),
+              }
+            : undefined,
+      },
+      include: {
+        imagenes_producto: true,
       },
     });
 
@@ -31,6 +46,9 @@ export class ProductRepositoryImpl implements ProductRepository {
   async findById(id: string): Promise<Product | null> {
     const product = await this.prisma.productos.findUnique({
       where: { id },
+      include: {
+        imagenes_producto: true,
+      },
     });
 
     return product ? this.toDomainEntity(product) : null;
@@ -39,6 +57,9 @@ export class ProductRepositoryImpl implements ProductRepository {
   async findAll(): Promise<Product[]> {
     const products = await this.prisma.productos.findMany({
       orderBy: { fecha_publicacion: 'desc' },
+      include: {
+        imagenes_producto: true,
+      },
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -48,6 +69,9 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { usuario_id: usuarioId },
       orderBy: { fecha_publicacion: 'desc' },
+      include: {
+        imagenes_producto: true,
+      },
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -57,6 +81,9 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { categoria_id: categoriaId },
       orderBy: { fecha_publicacion: 'desc' },
+      include: {
+        imagenes_producto: true,
+      },
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -66,6 +93,9 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { estado_publicacion: estado },
       orderBy: { fecha_publicacion: 'desc' },
+      include: {
+        imagenes_producto: true,
+      },
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -77,12 +107,15 @@ export class ProductRepositoryImpl implements ProductRepository {
       data: {
         titulo: product.titulo,
         descripcion: product.descripcion,
-        estado_producto: product.estadoProducto,
+        estado_producto_id: product.estadoProductoId,
         valor_estimado: product.valorEstimado,
         estado_publicacion: product.estadoPublicacion,
         imagen_principal: product.imagenPrincipal,
         vistas: product.vistas,
         popularidad: product.popularidad,
+      },
+      include: {
+        imagenes_producto: true,
       },
     });
 
@@ -96,13 +129,22 @@ export class ProductRepositoryImpl implements ProductRepository {
   }
 
   private toDomainEntity(prismaProduct: any): Product {
+    const imagenes =
+      prismaProduct.imagenes_producto?.map((img: any) => ({
+        id: img.id,
+        productoId: img.producto_id,
+        urlImagen: img.url_imagen,
+        orden: img.orden,
+        esPrincipal: img.es_principal,
+      })) || [];
+
     return new Product(
       prismaProduct.id,
       prismaProduct.usuario_id,
       prismaProduct.categoria_id,
       prismaProduct.titulo,
+      prismaProduct.estado_producto_id,
       prismaProduct.descripcion,
-      prismaProduct.estado_producto,
       prismaProduct.valor_estimado
         ? Number(prismaProduct.valor_estimado)
         : undefined,
@@ -111,6 +153,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       prismaProduct.imagen_principal,
       prismaProduct.vistas,
       prismaProduct.popularidad,
+      imagenes,
     );
   }
 }

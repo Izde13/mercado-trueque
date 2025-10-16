@@ -1,0 +1,110 @@
+/* Menú de usuario */
+.mt-user-menu{
+  position: relative;
+}
+
+/* Botón del usuario */
+.mt-user-menu .mt-icon-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  text-decoration: none;
+  color: var(--ink);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.mt-user-menu .mt-icon-btn:hover{ 
+  background: rgba(0,0,0,.06); 
+}
+
+.mt-user-menu .mt-icon{
+  width: 22px;
+  height: 22px;
+}
+
+.mt-dropdown{
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  min-width: 180px;
+  z-index: 100;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.mt-dropdown::before{
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  transform: rotate(45deg);
+}
+
+.mt-dropdown-list{
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.mt-dropdown-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.mt-dropdown-item:hover{
+  background: var(--surface);
+}
+
+.mt-dropdown-button{
+  font-family: inherit;
+}
+
+.mt-dropdown-icon{
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Variables CSS para el UserMenu (por si no están definidas globalmente) */
+:root {
+  --ink: #111213;
+  --muted: #6b727a;
+  --surface: #f2f3f5;
+}

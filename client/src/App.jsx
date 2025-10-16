@@ -4,6 +4,7 @@ import MainLayout from "./app/layouts/MainLayout";
 import ProductDetailPage from "./pages/productDetail/ProductDetailPage";
 import CategoryPage from "./pages/category/CategoryPage";
 import TradeProposalPage from "./pages/trade/TradeProposalPage";
+import PublishProduct from "./pages/publishProduct/PublishProduct";
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="producto/:id" element={<ProductDetailPage />} />
           <Route path="categoria/:slug" element={<CategoryPage />} />
-          <Route path="propuesta" element={<TradeProposalPage />} /> 
+          <Route path="propuesta" element={<TradeProposalPage />} />
+          <Route path="publicar" element={<PublishProduct />} />
         </Route>
       </Routes>
     </BrowserRouter>

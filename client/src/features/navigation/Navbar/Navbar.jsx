@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import UserMenu from "../UserMenu/UserMenu";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -90,18 +91,9 @@ export default function Navbar() {
               <circle cx="18" cy="20" r="1.7" />
             </svg>
           </a>
-          <a href="#" className="mt-icon-btn" aria-label="Cuenta">
-            <svg className="mt-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="8" r="4" />
-              <path
-                d="M4 20a8 8 0 0 1 16 0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </a>
+          
+          {/* Menú de usuario */}
+          <UserMenu />
         </div>
       </nav>
     </header>

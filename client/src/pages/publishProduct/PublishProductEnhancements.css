@@ -1,0 +1,165 @@
+/* Enhancements for the refactored PublishProduct component */
+
+/* Help text for submit button */
+.pp-help-text {
+  margin-top: 12px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.4;
+  text-align: center;
+  padding: 8px 16px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #d1d5db;
+}
+
+/* Enhanced submit button states */
+.pp-submit {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.pp-submit:disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: not-allowed;
+}
+
+.pp-submit:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(79, 70, 229, 0.4);
+}
+
+.pp-submit:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Loading indicator for submit button */
+.pp-submit:disabled::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Improved card spacing */
+.pp-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease;
+}
+
+.pp-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced grid layout for mobile */
+@media (max-width: 768px) {
+  .pp-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .pp-col {
+    order: initial;
+  }
+
+  /* Reorder: show form first on mobile for better UX */
+  .pp-col:last-child {
+    order: -1;
+  }
+}
+
+/* Form field enhancements integration */
+.pp-card .form-field {
+  margin-bottom: 24px;
+}
+
+.pp-card .form-field:last-of-type {
+  margin-bottom: 20px;
+}
+
+/* Character counter styling */
+.form-character-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Required field indicator */
+.form-required {
+  color: #ef4444;
+  margin-left: 2px;
+  font-weight: 600;
+}
+
+/* Error message improvements */
+.pp-error[role="alert"] {
+  border-left: 3px solid #ef4444;
+  padding-left: 12px;
+  background-color: #fef2f2;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+/* Success state for form fields */
+.form-input:valid:not(:focus):not(:placeholder-shown),
+.form-select:valid:not(:focus):not([value=""]),
+.form-textarea:valid:not(:focus):not(:placeholder-shown) {
+  border-color: #10b981;
+}
+
+/* Focus improvements */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .pp-submit,
+  .pp-card,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    transition: none;
+  }
+
+  .pp-submit::after {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .form-input,
+  .form-select,
+  .form-textarea {
+    border-width: 2px;
+  }
+
+  .form-error {
+    font-weight: 600;
+  }
+
+  .pp-submit {
+    border: 2px solid;
+  }
+}
