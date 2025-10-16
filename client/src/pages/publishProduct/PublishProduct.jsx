@@ -3,6 +3,7 @@ import UploadMedia from "../../features/uploadProduct/uploadMedia/UploadMedia";
 import SuccessModal from "../../shared/components/SuccessModal";
 import { FormField, SelectField, TextAreaField } from "../../shared/components/Form";
 import { useCategories } from "../../shared/hooks/useCategories";
+import { useEstadosProducto } from "../../shared/hooks/useEstadosProducto";
 import { useCreateProduct } from "../../shared/hooks/useCreateProduct";
 import { useForm } from "../../shared/hooks/useForm";
 import { productValidationRules, validateProductImages } from "../../shared/utils/validationRules";
@@ -12,6 +13,7 @@ import "./PublishProductEnhancements.css";
 // Constants
 const INITIAL_FORM_VALUES = {
   categoriaId: "",
+  estadoProductoId: "",
   titulo: "",
   valorEstimado: "",
   descripcion: "",
@@ -27,7 +29,10 @@ const ProductDetailsForm = React.memo(({
   handleBlur,
   categories,
   categoriesLoading,
-  categoriesError
+  categoriesError,
+  estados,
+  estadosLoading,
+  estadosError
 }) => {
   // Transform categories for SelectField
   const categoryOptions = useMemo(() =>
@@ -36,6 +41,15 @@ const ProductDetailsForm = React.memo(({
       label: cat.nombre
     })),
     [categories]
+  );
+
+  // Transform estados for SelectField
+  const estadoOptions = useMemo(() =>
+    estados.map(estado => ({
+      value: estado.id,
+      label: estado.nombre
+    })),
+    [estados]
   );
 
   return (
@@ -52,6 +66,19 @@ const ProductDetailsForm = React.memo(({
         error={errors.categoriaId || categoriesError}
         loading={categoriesLoading}
         options={categoryOptions}
+        required
+      />
+
+      <SelectField
+        id="estadoProductoId"
+        label="Estado del producto"
+        placeholder="Selecciona el estado..."
+        value={form.values.estadoProductoId}
+        onChange={handleChange('estadoProductoId')}
+        onBlur={handleBlur('estadoProductoId')}
+        error={errors.estadoProductoId || estadosError}
+        loading={estadosLoading}
+        options={estadoOptions}
         required
       />
 
@@ -131,6 +158,7 @@ ImageUploadSection.displayName = 'ImageUploadSection';
 const PublishProduct = () => {
   // Custom hooks for data and operations
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { estados, loading: estadosLoading, error: estadosError } = useEstadosProducto();
   const { createProduct, loading: creatingProduct, error: createProductError, clearError } = useCreateProduct();
 
   // Form management with custom hook
@@ -171,7 +199,8 @@ const PublishProduct = () => {
     clearError(); // Clear previous API errors
 
     try {
-      const result = await createProduct(form.values);
+      // Enviar el formulario con las imágenes
+      const result = await createProduct(form.values, images);
 
       // Show success modal with product data
       setCreatedProduct({
@@ -237,6 +266,9 @@ const PublishProduct = () => {
             categories={categories}
             categoriesLoading={categoriesLoading}
             categoriesError={categoriesError}
+            estados={estados}
+            estadosLoading={estadosLoading}
+            estadosError={estadosError}
           />
 
           {/* API Error Display */}

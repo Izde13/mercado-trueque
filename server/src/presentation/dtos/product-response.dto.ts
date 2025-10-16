@@ -6,13 +6,19 @@ export class ProductResponseDto {
   categoriaId: string;
   titulo: string;
   descripcion?: string;
-  estadoProducto?: number;
+  estadoProductoId: string;
   valorEstimado?: number;
   fechaPublicacion?: Date;
   estadoPublicacion?: string;
   imagenPrincipal?: string;
   vistas?: number;
   popularidad?: number;
+  imagenes?: Array<{
+    id: string;
+    urlImagen: string;
+    orden: number;
+    esPrincipal: boolean;
+  }>;
 
   constructor(product: Product) {
     this.id = product.id;
@@ -20,12 +26,13 @@ export class ProductResponseDto {
     this.categoriaId = product.categoriaId;
     this.titulo = product.titulo;
     this.descripcion = product.descripcion;
-    this.estadoProducto = product.estadoProducto;
+    this.estadoProductoId = product.estadoProductoId;
     this.valorEstimado = product.valorEstimado;
     this.fechaPublicacion = product.fechaPublicacion;
     this.estadoPublicacion = product.estadoPublicacion;
     this.imagenPrincipal = product.imagenPrincipal;
     this.vistas = product.vistas;
     this.popularidad = product.popularidad;
+    this.imagenes = product.imagenes;
   }
 }

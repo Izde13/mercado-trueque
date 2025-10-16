@@ -76,6 +76,9 @@ export const productValidationRules = {
   categoriaId: [
     required('La categoría')
   ],
+  estadoProductoId: [
+    required('El estado del producto')
+  ],
   titulo: [
     required('El título'),
     minLength(3, 'El título'),
