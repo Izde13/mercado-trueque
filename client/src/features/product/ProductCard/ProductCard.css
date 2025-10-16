@@ -41,6 +41,8 @@
   text-decoration: none;
 }
 .pcard-media img{
+  position: relative;
+  z-index: 1;
   max-width: 86%;
   height: auto;
   display: block;
@@ -48,7 +50,9 @@
 }
 /* Fallback gris si no carga la imagen */
 .pcard-ph{
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background: linear-gradient(135deg,#edf1f5,#e6ebf0);
   border-radius: 24px;
 }

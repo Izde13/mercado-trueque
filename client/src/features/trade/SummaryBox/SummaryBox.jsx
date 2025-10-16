@@ -8,17 +8,17 @@ export default function SummaryBox({ interest, selected = [], onSubmit }) {
       <div className="sum-sec">
         <h4>Producto de interés</h4>
         <div className="sum-row">
-          <span>{interest?.title?.replace("Graphic","T-shirt") || "—"}</span>
-          <strong>{interest?.price || "—"}</strong>
+          <span>{interest?.title || "—"}</span>
+          <strong>${interest?.estimatedValue || "—"}</strong>
         </div>
       </div>
 
       <div className="sum-sec">
         <h4>Tu propuesta</h4>
-        {selected.length ? selected.map(s=>(
+        {selected.length ? selected.map(s => (
           <div className="sum-row" key={s.id}>
-            <span>{s.title.replace("Graphic","T-shirt")}</span>
-            <strong>{s.price}</strong>
+            <span>{s.title}</span>
+            <strong>${s.estimatedValue}</strong>
           </div>
         )) : <p className="sum-muted">Selecciona al menos un artículo.</p>}
       </div>
