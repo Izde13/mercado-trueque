@@ -1,19 +1,24 @@
 import "./InterestProductCard.css";
 
 export default function InterestProductCard({ product }){
-  const { title, price, size, color, img } = product || {};
+  const { 
+    title, 
+    estimatedValue, 
+    mainImage,
+    description
+  } = product || {};
+
   return (
     <section className="ipcard">
       <h2 className="box-title">Producto de interés</h2>
       <div className="ip-body">
-        <img className="ip-img" src={img} alt={title} />
+        <img className="ip-img" src={mainImage} alt={title} />
         <div className="ip-info">
           <h3 className="ip-title">{title}</h3>
-          <ul className="ip-attrs">
-            <li><strong>Size:</strong> {size}</li>
-            <li><strong>Color:</strong> {color}</li>
-          </ul>
-          <div className="ip-price">{price}</div>
+          {description && (
+            <p className="ip-desc">{description}</p>
+          )}
+          <div className="ip-price">${estimatedValue}</div>
         </div>
       </div>
     </section>

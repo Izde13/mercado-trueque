@@ -163,6 +163,35 @@
 }
 .hp-nav .nav-arrow:hover{ background: #f5f6f7; }
 
+/* Estados de carga y error */
+.hp-loading,
+.hp-error {
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin: 12px 0;
+}
+
+.hp-loading p {
+  color: var(--muted);
+  font-size: 16px;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.hp-error p {
+  color: #dc2626;
+  font-size: 16px;
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px){
   .hero-inner{ grid-template-columns: 1fr; }
