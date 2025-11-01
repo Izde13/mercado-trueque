@@ -13,7 +13,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="producto/:id" element={<ProductDetailPage />} />
-          <Route path="categoria/:slug" element={<CategoryPage />} />
+          <Route path="productos" element={<CategoryPage />} />
           <Route path="propuesta" element={<TradeProposalPage />} />
           <Route path="publicar" element={<PublishProduct />} />
         </Route>

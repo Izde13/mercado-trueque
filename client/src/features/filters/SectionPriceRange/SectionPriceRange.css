@@ -1,0 +1,106 @@
+.price-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.price-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.price-input-group label {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.price-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.price-input::placeholder {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* Ocultar flechas de número en Chrome, Safari, Edge */
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Ocultar flechas de número en Firefox */
+.price-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.price-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.price-apply-btn,
+.price-clear-btn {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.price-apply-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.price-apply-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.price-apply-btn:active {
+  transform: translateY(0);
+}
+
+.price-clear-btn {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.price-clear-btn:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.price-clear-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

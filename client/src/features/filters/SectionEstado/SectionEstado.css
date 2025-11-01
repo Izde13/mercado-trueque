@@ -1,0 +1,97 @@
+.filter-section {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 0;
+}
+
+.filter-section-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #111213;
+  cursor: pointer;
+  padding: 8px 0;
+  user-select: none;
+}
+
+.filter-section-summary:hover {
+  color: #2563eb;
+}
+
+.filter-count {
+  font-size: 12px;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.filter-section-content {
+  padding: 12px 0 8px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.filter-action-btn {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-action-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.filter-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.estados-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.estado-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.estado-item:hover {
+  background: #f9fafb;
+}
+
+.estado-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.estado-label {
+  font-size: 14px;
+  color: #374151;
+  flex: 1;
+}
+
+.estado-item:has(.estado-checkbox:checked) .estado-label {
+  color: #111213;
+  font-weight: 500;
+}
