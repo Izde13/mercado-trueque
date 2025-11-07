@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { Product } from '../../domain/entities/product.entity';
 import type { ProductRepository } from '../../domain/repositories/product.repository';
+import { ProductFiltersVO } from '../../domain/value-objects/product-filters.vo';
+import { PrismaProductQueryBuilder } from '../builders/prisma-product-query.builder';
 
 @Injectable()
 export class ProductRepositoryImpl implements ProductRepository {
@@ -126,6 +128,23 @@ export class ProductRepositoryImpl implements ProductRepository {
     await this.prisma.productos.delete({
       where: { id },
     });
+  }
+
+  /**
+   * Busca productos con filtros múltiples
+   * Usa el Query Builder para construir las queries complejas
+   */
+  async findWithFilters(filters: ProductFiltersVO): Promise<Product[]> {
+    const where = PrismaProductQueryBuilder.buildWhereClause(filters);
+    const include = PrismaProductQueryBuilder.buildIncludeClause(filters);
+
+    const products = await this.prisma.productos.findMany({
+      where,
+      include,
+      orderBy: { fecha_publicacion: 'desc' },
+    });
+
+    return products.map((product) => this.toDomainEntity(product));
   }
 
   private toDomainEntity(prismaProduct: any): Product {
