@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Product } from '../../domain/entities/product.entity';
 import type { ProductRepository } from '../../domain/repositories/product.repository';
+import { ProductFiltersVO } from '../../domain/value-objects/product-filters.vo';
 
 @Injectable()
 export class GetProductsUseCase {
@@ -23,5 +24,13 @@ export class GetProductsUseCase {
 
   async executeByStatus(estado: string): Promise<Product[]> {
     return this.productRepository.findByEstadoPublicacion(estado);
+  }
+
+  /**
+   * Ejecuta búsqueda de productos con filtros múltiples
+   * Las validaciones están en el Value Object
+   */
+  async executeWithFilters(filters: ProductFiltersVO): Promise<Product[]> {
+    return this.productRepository.findWithFilters(filters);
   }
 }

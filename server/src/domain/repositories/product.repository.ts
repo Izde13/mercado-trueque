@@ -1,4 +1,5 @@
 import { Product } from '../entities/product.entity';
+import { ProductFiltersVO } from '../value-objects/product-filters.vo';
 
 export interface ProductRepository {
   save(product: Product): Promise<Product>;
@@ -9,6 +10,7 @@ export interface ProductRepository {
   findByUsuarioId(usuarioId: string): Promise<Product[]>;
   findByCategoriaId(categoriaId: string): Promise<Product[]>;
   findByEstadoPublicacion(estado: string): Promise<Product[]>;
+  findWithFilters(filters: ProductFiltersVO): Promise<Product[]>;
 
   /**
    * Cuenta cuántos productos activos tiene un usuario

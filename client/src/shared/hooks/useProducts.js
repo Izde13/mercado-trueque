@@ -25,40 +25,76 @@ const mapProductFromAPI = (apiProduct) => {
 };
 
 /**
- * Hook personalizado para obtener productos desde la API
- * @param {string} type - Tipo de productos: 'new' o 'trending' (actualmente retorna los mismos)
- * @returns {Object} { products, loading, error }
+ * Hook personalizado para obtener productos desde la API con filtros
+ * @param {Object} filters - Filtros a aplicar: { categoria: [], estado: [], precioMin, precioMax }
+ * @returns {Object} { products, loading, error, refetch }
  */
-export const useProducts = (type = 'new') => {
+export const useProducts = (filters = {}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchProducts = async (appliedFilters = filters) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Llamada a la API
-        const data = await apiService.get('/api/v1/products');
+      // Construir query params desde filtros
+      const queryParams = new URLSearchParams();
 
-        // Mapear los productos al formato del frontend
-        const mappedProducts = data.map(mapProductFromAPI);
-
-        setProducts(mappedProducts);
-      } catch (err) {
-        setError(err.message || 'Error al cargar productos');
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
+      // Categorías (múltiples)
+      if (appliedFilters.categoria && appliedFilters.categoria.length > 0) {
+        appliedFilters.categoria.forEach(cat => queryParams.append('categoria', cat));
       }
-    };
 
-    fetchProducts();
-  }, [type]);
+      // Estados (múltiples)
+      if (appliedFilters.estado && appliedFilters.estado.length > 0) {
+        appliedFilters.estado.forEach(estado => queryParams.append('estado', estado));
+      }
 
-  return { products, loading, error };
+      // Precio mínimo
+      if (appliedFilters.precioMin) {
+        queryParams.set('precioMin', appliedFilters.precioMin);
+      }
+
+      // Precio máximo
+      if (appliedFilters.precioMax) {
+        queryParams.set('precioMax', appliedFilters.precioMax);
+      }
+
+      // Llamada a la API con query params
+      const queryString = queryParams.toString();
+      const url = `/api/v1/products${queryString ? `?${queryString}` : ''}`;
+      const data = await apiService.get(url);
+
+      // Mapear los productos al formato del frontend
+      const mappedProducts = data.map(mapProductFromAPI);
+
+      setProducts(mappedProducts);
+    } catch (err) {
+      setError(err.message || 'Error al cargar productos');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    filters.categoria?.join(','),
+    filters.estado?.join(','),
+    filters.precioMin,
+    filters.precioMax,
+  ]);
+
+  // Función para refrescar productos con nuevos filtros
+  const refetch = (newFilters = filters) => {
+    fetchProducts(newFilters);
+  };
+
+  return { products, loading, error, refetch };
 };
 
 /**

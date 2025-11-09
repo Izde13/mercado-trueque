@@ -3,14 +3,6 @@ import UserMenu from "../UserMenu/UserMenu";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const navigate = useNavigate();
-
-  const handleCategoryChange = (e) => {
-    const slug = e.target.value;
-    if (!slug) return;
-    navigate(`/categoria/${slug}`);
-  };
-
   return (
     <header className="mt-navbar" role="banner">
       <nav className="mt-nav">
@@ -24,23 +16,11 @@ export default function Navbar() {
             <span className="mt-logo-word">Trueque</span>
           </Link>
 
-          <select
-            className="mt-cat-select"
-            defaultValue=""
-            onChange={handleCategoryChange}
-            aria-label="Categorías"
-          >
-            <option value="" disabled>
-              Categorías
-            </option>
-            <option value="tecnologia">Tecnología</option>
-          </select>
-
           <ul className="mt-menu" aria-label="Menú principal">
             <li>
-              <a href="#" className="mt-link">
-                Trueque
-              </a>
+              <Link to="/productos" className="mt-link">
+                Ver Productos
+              </Link>
             </li>
             <li>
               <a href="#" className="mt-link">

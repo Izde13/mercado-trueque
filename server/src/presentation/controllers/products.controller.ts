@@ -17,7 +17,9 @@ import { GetProductsUseCase } from '../../application/use-cases/get-products.use
 import { GetProductUseCase } from '../../application/use-cases/get-product.use-case';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
+import { ProductFiltersDto } from '../dtos/product-filters.dto';
 import { BusinessRuleException } from '../../domain/errors';
+import { ProductFiltersVO } from '../../domain/value-objects/product-filters.vo';
 
 // Response wrapper interface for OWASP compliance
 interface ApiResponse<T> {
@@ -102,23 +104,57 @@ export class ProductsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(
-    @Query('categoria') categoriaId?: string,
-    @Query('usuario') usuarioId?: string,
-    @Query('estado') estado?: string,
+    @Query() filtersDto: ProductFiltersDto,
   ): Promise<ProductResponseDto[]> {
-    let products;
+    const requestId = this.generateRequestId();
 
-    if (categoriaId) {
-      products = await this.getProductsUseCase.executeByCategory(categoriaId);
-    } else if (usuarioId) {
-      products = await this.getProductsUseCase.executeByUser(usuarioId);
-    } else if (estado) {
-      products = await this.getProductsUseCase.executeByStatus(estado);
-    } else {
-      products = await this.getProductsUseCase.execute();
+    try {
+      let products;
+
+      // Si hay filtros, crear el Value Object y ejecutar con filtros
+      const hasFilters = 
+        (filtersDto.categoria && filtersDto.categoria.length > 0) ||
+        (filtersDto.estado && filtersDto.estado.length > 0) ||
+        filtersDto.ubicacion ||
+        filtersDto.precioMin ||
+        filtersDto.precioMax ||
+        filtersDto.usuario ||
+        filtersDto.estadoPublicacion;
+
+      if (hasFilters) {
+        // Normalizar arrays (NestJS envía string si es único, array si son múltiples)
+        const categoriaIds = filtersDto.categoria 
+          ? (Array.isArray(filtersDto.categoria) ? filtersDto.categoria : [filtersDto.categoria])
+          : undefined;
+        
+        const estadoProductoIds = filtersDto.estado
+          ? (Array.isArray(filtersDto.estado) ? filtersDto.estado : [filtersDto.estado])
+          : undefined;
+
+        // El Value Object se encarga de las validaciones
+        const filters = ProductFiltersVO.create({
+          categoriaIds,
+          estadoProductoIds,
+          ubicacion: filtersDto.ubicacion,
+          precioMin: filtersDto.precioMin ? parseFloat(filtersDto.precioMin) : undefined,
+          precioMax: filtersDto.precioMax ? parseFloat(filtersDto.precioMax) : undefined,
+          usuarioId: filtersDto.usuario,
+          estadoPublicacion: filtersDto.estadoPublicacion,
+        });
+
+        products = await this.getProductsUseCase.executeWithFilters(filters);
+      } else {
+        products = await this.getProductsUseCase.execute();
+      }
+
+      return products.map((product) => new ProductResponseDto(product));
+    } catch (error) {
+      this.logger.error(
+        `Error fetching products - RequestId: ${requestId}, Error: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException('Error al obtener productos');
     }
-
-    return products.map((product) => new ProductResponseDto(product));
   }
 
   @Get(':id')
