@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { CompositeSpecification } from '../../base/composite-specification';
 import { SpecificationResult } from '../../base/specification-result';
 import { ProductPublicationContext } from '../product-publication-context';
-import { PrismaService } from '../../../../infrastructure/services/prisma.service';
+import type { ProductRepository } from '../../../repositories/product.repository';
 
 /**
  * Validación #1: Límites de Publicación según Reputación del Usuario
@@ -18,11 +18,16 @@ import { PrismaService } from '../../../../infrastructure/services/prisma.servic
  * - Incentiva completar intercambios para ganar reputación
  * - Protege calidad del marketplace
  */
+/**
+ * ARQUITECTURA:
+ * - Depende de interfaz ProductRepository (no de PrismaService)
+ * - La implementación se inyecta en tiempo de ejecución desde la capa de infraestructura
+ */
 @Injectable()
 export class UserReputationLimitsRule extends CompositeSpecification<ProductPublicationContext> {
   constructor(
-    @Inject(PrismaService)
-    private readonly prisma: PrismaService,
+    @Inject('ProductRepository')
+    private readonly productRepository: ProductRepository,
   ) {
     super();
   }
@@ -36,12 +41,8 @@ export class UserReputationLimitsRule extends CompositeSpecification<ProductPubl
     const maxProducts = this.calculateMaxProducts(user);
 
     // 2. Contar productos activos del usuario
-    const activeProductsCount = await this.prisma.productos.count({
-      where: {
-        usuario_id: user.id,
-        estado_publicacion: 'disponible',
-      },
-    });
+    const activeProductsCount =
+      await this.productRepository.countActiveByUserId(user.id);
 
     // 3. Verificar límite
     if (activeProductsCount >= maxProducts) {

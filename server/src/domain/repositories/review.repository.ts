@@ -6,8 +6,10 @@ export interface ReviewRepository {
   findAll(): Promise<Review[]>;
   update(review: Review): Promise<Review>;
   delete(id: string): Promise<void>;
-  findByUsuarioCalificadoId(usuarioId: string): Promise<Review[]>;
-  findByUsuarioCalificadorId(usuarioId: string): Promise<Review[]>;
   findByIntercambioId(intercambioId: string): Promise<Review[]>;
-  findVisible(): Promise<Review[]>;
+  existsRating(
+    intercambioId: string,
+    userId: string,
+    ratedUserId: string,
+  ): Promise<boolean>;
 }

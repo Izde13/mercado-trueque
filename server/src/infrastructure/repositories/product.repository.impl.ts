@@ -128,6 +128,30 @@ export class ProductRepositoryImpl implements ProductRepository {
     });
   }
 
+  async countActiveByUserId(userId: string): Promise<number> {
+    return await this.prisma.productos.count({
+      where: {
+        usuario_id: userId,
+        estado_publicacion: 'disponible',
+      },
+    });
+  }
+
+  async findActiveByUserId(userId: string): Promise<Product[]> {
+    const products = await this.prisma.productos.findMany({
+      where: {
+        usuario_id: userId,
+        estado_publicacion: 'disponible',
+      },
+      orderBy: { fecha_publicacion: 'desc' },
+      include: {
+        imagenes_producto: true,
+      },
+    });
+
+    return products.map((product) => this.toDomainEntity(product));
+  }
+
   private toDomainEntity(prismaProduct: any): Product {
     const imagenes =
       prismaProduct.imagenes_producto?.map((img: any) => ({

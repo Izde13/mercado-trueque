@@ -1,5 +1,5 @@
 /**
- * Resultado de una validación de especificación
+ * Resultado de una validaciï¿½n de especificaciï¿½n
  */
 export class SpecificationResult {
   constructor(
@@ -29,7 +29,7 @@ export class SpecificationResult {
   }
 
   /**
-   * Crea una advertencia (válido pero con observaciones)
+   * Crea una advertencia (vï¿½lido pero con observaciones)
    */
   static warning(
     message: string,
@@ -40,7 +40,7 @@ export class SpecificationResult {
   }
 
   /**
-   * Crea información adicional
+   * Crea informaciï¿½n adicional
    */
   static info(
     message: string,
