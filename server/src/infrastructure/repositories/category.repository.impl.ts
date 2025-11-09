@@ -74,6 +74,18 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     });
   }
 
+  async findActiveById(id: string): Promise<Category | null> {
+    const category = await this.prisma.categorias.findUnique({
+      where: { id },
+    });
+
+    if (!category || !category.activo) {
+      return null;
+    }
+
+    return this.toDomainEntity(category);
+  }
+
   private toDomainEntity(prismaCategory: any): Category {
     return new Category(
       prismaCategory.id,

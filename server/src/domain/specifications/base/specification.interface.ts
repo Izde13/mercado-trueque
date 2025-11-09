@@ -6,29 +6,29 @@ import { SpecificationResult } from './specification-result';
  */
 export interface ISpecification<T> {
   /**
-   * Verifica si el objeto satisface la especificación
+   * Verifica si el objeto satisface la especificaciï¿½n
    * @param candidate - Objeto a verificar
-   * @returns Resultado de la validación con detalles
+   * @returns Resultado de la validaciï¿½n con detalles
    */
   isSatisfiedBy(candidate: T): Promise<SpecificationResult>;
 
   /**
-   * Combina esta especificación con otra usando AND lógico
-   * @param other - Otra especificación
-   * @returns Nueva especificación compuesta
+   * Combina esta especificaciï¿½n con otra usando AND lï¿½gico
+   * @param other - Otra especificaciï¿½n
+   * @returns Nueva especificaciï¿½n compuesta
    */
   and(other: ISpecification<T>): ISpecification<T>;
 
   /**
-   * Combina esta especificación con otra usando OR lógico
-   * @param other - Otra especificación
-   * @returns Nueva especificación compuesta
+   * Combina esta especificaciï¿½n con otra usando OR lï¿½gico
+   * @param other - Otra especificaciï¿½n
+   * @returns Nueva especificaciï¿½n compuesta
    */
   or(other: ISpecification<T>): ISpecification<T>;
 
   /**
-   * Niega esta especificación
-   * @returns Nueva especificación negada
+   * Niega esta especificaciï¿½n
+   * @returns Nueva especificaciï¿½n negada
    */
   not(): ISpecification<T>;
 }
