@@ -21,6 +21,8 @@ export class UpdateUserUseCase {
       user.email,
       nombre ?? user.nombre,
       apellido ?? user.apellido,
+      user.contrasena,
+      user.rolId,
       telefono ?? user.telefono,
       user.fechaRegistro,
       estado ?? user.estado,

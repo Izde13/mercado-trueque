@@ -221,22 +221,22 @@ model productos {
   categoria_id             String                     @db.Uuid
   titulo                   String                     @db.VarChar(200)
   descripcion              String?
-  estado_producto_id       String                     @db.Uuid
   valor_estimado           Decimal?                   @db.Decimal(12, 2)
   fecha_publicacion        DateTime?                  @default(now()) @db.Timestamp(6)
   estado_publicacion       String?                    @default("disponible") @db.VarChar(20)
   imagen_principal         String?
   vistas                   Int?                       @default(0)
   popularidad              Int?                       @default(0)
+  estado_producto_id       String?                    @db.Uuid
   alertas_activadas        alertas_activadas[]
   caracteristicas_producto caracteristicas_producto[]
   carrito_trueque          carrito_trueque[]
   envios                   envios[]
   imagenes_producto        imagenes_producto[]
   preguntas_productos      preguntas_productos[]
+  estados_producto         estados_producto?          @relation(fields: [estado_producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_estado_producto")
   categorias               categorias                 @relation(fields: [categoria_id], references: [id], onUpdate: NoAction)
   usuarios                 usuarios                   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  estados_producto         estados_producto           @relation(fields: [estado_producto_id], references: [id], onUpdate: NoAction)
   productos_propuesta      productos_propuesta[]
   propuestas_trueque       propuestas_trueque[]
   revision_productos       revision_productos[]
@@ -383,6 +383,8 @@ model usuarios {
   avatar_url                                       String?
   calificacion_promedio                            Decimal?               @default(0.00) @db.Decimal(3, 2)
   total_intercambios                               Int?                   @default(0)
+  contrasena                                       String                 @default("") @db.VarChar(255)
+  rol_id                                           String?                @db.Uuid
   carrito_trueque                                  carrito_trueque[]
   historias_trueque                                historias_trueque[]
   mensajes_propuesta                               mensajes_propuesta[]
@@ -394,8 +396,37 @@ model usuarios {
   rese_as_rese_as_usuario_calificador_idTousuarios rese_as[]              @relation("rese_as_usuario_calificador_idTousuarios")
   respuestas_preguntas                             respuestas_preguntas[]
   ubicaciones                                      ubicaciones[]
+  roles                                            roles?                 @relation(fields: [rol_id], references: [id], onUpdate: NoAction)
 
   @@index([calificacion_promedio(sort: Desc)], map: "idx_usuarios_calificacion")
   @@index([email], map: "idx_usuarios_email")
   @@index([estado], map: "idx_usuarios_estado")
+}
+
+model permisos {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre       String         @unique @db.VarChar(100)
+  descripcion  String?
+  creado_en    DateTime?      @default(now()) @db.Timestamp(6)
+  rol_permisos rol_permisos[]
+}
+
+model rol_permisos {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rol_id     String    @db.Uuid
+  permiso_id String    @db.Uuid
+  creado_en  DateTime? @default(now()) @db.Timestamp(6)
+  permisos   permisos  @relation(fields: [permiso_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  roles      roles     @relation(fields: [rol_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([rol_id, permiso_id])
+}
+
+model roles {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre       String         @unique @db.VarChar(50)
+  descripcion  String?
+  creado_en    DateTime?      @default(now()) @db.Timestamp(6)
+  rol_permisos rol_permisos[]
+  usuarios     usuarios[]
 }
