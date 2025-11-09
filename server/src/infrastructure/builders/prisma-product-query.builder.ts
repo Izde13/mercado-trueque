@@ -42,7 +42,10 @@ export class PrismaProductQueryBuilder {
     };
   }
 
-  private static addCategoriesFilter(where: any, filters: ProductFiltersVO): void {
+  private static addCategoriesFilter(
+    where: any,
+    filters: ProductFiltersVO,
+  ): void {
     if (filters.categoriaIds.length > 0) {
       where.categorias = {
         nombre: {
@@ -52,7 +55,10 @@ export class PrismaProductQueryBuilder {
     }
   }
 
-  private static addProductStatusFilter(where: any, filters: ProductFiltersVO): void {
+  private static addProductStatusFilter(
+    where: any,
+    filters: ProductFiltersVO,
+  ): void {
     if (filters.estadoProductoIds.length > 0) {
       where.estados_producto = {
         nombre: {
@@ -62,7 +68,10 @@ export class PrismaProductQueryBuilder {
     }
   }
 
-  private static addPriceRangeFilter(where: any, filters: ProductFiltersVO): void {
+  private static addPriceRangeFilter(
+    where: any,
+    filters: ProductFiltersVO,
+  ): void {
     if (filters.hasPriceFilter()) {
       where.valor_estimado = {};
 
@@ -76,7 +85,10 @@ export class PrismaProductQueryBuilder {
     }
   }
 
-  private static addLocationFilter(where: any, filters: ProductFiltersVO): void {
+  private static addLocationFilter(
+    where: any,
+    filters: ProductFiltersVO,
+  ): void {
     if (filters.ubicacion) {
       where.usuarios = {
         ubicaciones: {

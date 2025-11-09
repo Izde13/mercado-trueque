@@ -112,7 +112,7 @@ export class ProductsController {
       let products;
 
       // Si hay filtros, crear el Value Object y ejecutar con filtros
-      const hasFilters = 
+      const hasFilters =
         (filtersDto.categoria && filtersDto.categoria.length > 0) ||
         (filtersDto.estado && filtersDto.estado.length > 0) ||
         filtersDto.ubicacion ||
@@ -123,12 +123,16 @@ export class ProductsController {
 
       if (hasFilters) {
         // Normalizar arrays (NestJS envía string si es único, array si son múltiples)
-        const categoriaIds = filtersDto.categoria 
-          ? (Array.isArray(filtersDto.categoria) ? filtersDto.categoria : [filtersDto.categoria])
+        const categoriaIds = filtersDto.categoria
+          ? Array.isArray(filtersDto.categoria)
+            ? filtersDto.categoria
+            : [filtersDto.categoria]
           : undefined;
-        
+
         const estadoProductoIds = filtersDto.estado
-          ? (Array.isArray(filtersDto.estado) ? filtersDto.estado : [filtersDto.estado])
+          ? Array.isArray(filtersDto.estado)
+            ? filtersDto.estado
+            : [filtersDto.estado]
           : undefined;
 
         // El Value Object se encarga de las validaciones
@@ -136,8 +140,12 @@ export class ProductsController {
           categoriaIds,
           estadoProductoIds,
           ubicacion: filtersDto.ubicacion,
-          precioMin: filtersDto.precioMin ? parseFloat(filtersDto.precioMin) : undefined,
-          precioMax: filtersDto.precioMax ? parseFloat(filtersDto.precioMax) : undefined,
+          precioMin: filtersDto.precioMin
+            ? parseFloat(filtersDto.precioMin)
+            : undefined,
+          precioMax: filtersDto.precioMax
+            ? parseFloat(filtersDto.precioMax)
+            : undefined,
           usuarioId: filtersDto.usuario,
           estadoPublicacion: filtersDto.estadoPublicacion,
         });

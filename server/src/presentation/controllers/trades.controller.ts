@@ -9,6 +9,16 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiTags,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { CreateTradeProposalUseCase } from '../../application/use-cases/create-trade-proposal.use-case';
 import { AcceptTradeProposalUseCase } from '../../application/use-cases/accept-trade-proposal.use-case';
 import { ShipTradeUseCase } from '../../application/use-cases/ship-trade.use-case';
@@ -40,6 +50,7 @@ import {
   RatingResponseDto,
 } from '../../application/dtos/rate-trade.dto';
 
+@ApiTags('Trades')
 @Controller('trades')
 export class TradesController {
   constructor(
@@ -53,18 +64,49 @@ export class TradesController {
 
   /**
    * FASE 1: CREAR PROPUESTA
-   * POST /api/trades/proposals
-   *
-   * Validaciones:
-   * - Producto solicitado activo
-   * - Usuario activo
-   * - Usuario con calificación >= 1.5
-   * - Sin propuesta duplicada pendiente
-   * - No es trueque consigo mismo
-   * - 1-5 productos ofrecidos disponibles
+   * Inicia el proceso de trueque creando una propuesta de intercambio
    */
   @Post('proposals')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'FASE 1: Crear propuesta de trueque',
+    description:
+      'Inicia el proceso de trueque. Juan crea una propuesta para obtener un producto de María, ofreciendo 1-5 de sus productos a cambio.',
+  })
+  @ApiBody({
+    type: CreateTradeProposalDto,
+    examples: {
+      example1: {
+        summary: 'Propuesta simple - 1 producto ofrecido',
+        value: {
+          usuario_oferente_id: 'uuid-juan',
+          producto_solicitado_id: 'uuid-producto-maria',
+          offered_product_ids: ['uuid-producto-juan-1'],
+        },
+      },
+      example2: {
+        summary: 'Propuesta múltiple - 3 productos ofrecidos',
+        value: {
+          usuario_oferente_id: 'uuid-juan',
+          producto_solicitado_id: 'uuid-producto-maria',
+          offered_product_ids: [
+            'uuid-producto-juan-1',
+            'uuid-producto-juan-2',
+            'uuid-producto-juan-3',
+          ],
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: TradeProposalResponseDto,
+    description:
+      'Propuesta creada exitosamente. Está en estado PENDIENTE hasta que María la acepte o rechace.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Error: Producto no disponible, usuario sin calificación, propuesta duplicada, o no hay productos válidos',
+  })
   async createProposal(
     @Body() dto: CreateTradeProposalDto,
   ): Promise<TradeProposalResponseDto> {
@@ -77,17 +119,43 @@ export class TradesController {
 
   /**
    * FASE 2: ACEPTAR PROPUESTA
-   * POST /api/trades/proposals/:proposalId/accept
-   *
-   * Validaciones:
-   * - Eres dueño del producto solicitado
-   * - Propuesta no expirada (< 30 días)
-   * - Productos siguen disponibles
-   * - Ambos usuarios activos
-   * - Centro distribución disponible
+   * María acepta la propuesta de Juan y se crea el intercambio
    */
   @Post('proposals/:proposalId/accept')
   @HttpCode(HttpStatus.CREATED)
+  @ApiParam({
+    name: 'proposalId',
+    description: 'ID único de la propuesta a aceptar',
+    example: 'uuid-propuesta-123',
+  })
+  @ApiOperation({
+    summary: 'FASE 2: Aceptar propuesta de trueque',
+    description:
+      'María (dueña del producto solicitado) acepta la propuesta. Se valida que ambos usuarios estén activos, productos disponibles y se asigna centro de distribución.',
+  })
+  @ApiBody({
+    type: AcceptTradeProposalDto,
+    examples: {
+      example1: {
+        summary: 'María acepta propuesta',
+        value: {
+          usuario_aceptante_id: 'uuid-maria',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: IntercambioResponseDto,
+    description:
+      'Intercambio creado exitosamente. Estado = INICIADO. Ahora ambos usuarios deben enviar sus productos.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Error: No eres dueño del producto, propuesta expirada, productos no disponibles, etc.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Propuesta no encontrada',
+  })
   async acceptProposal(
     @Param('proposalId') proposalId: string,
     @Body() dto: AcceptTradeProposalDto,
@@ -104,16 +172,52 @@ export class TradesController {
 
   /**
    * FASE 3: ENVIAR PRODUCTOS
-   * POST /api/trades/:intercambioId/ship
-   *
-   * Validaciones:
-   * - Intercambio ACEPTADA
-   * - Direcciones válidas
-   * - Genera código de tracking
-   * - Valida costo de envío
+   * Tanto Juan como María envían sus productos al centro de distribución
    */
   @Post(':intercambioId/ship')
   @HttpCode(HttpStatus.CREATED)
+  @ApiParam({
+    name: 'intercambioId',
+    description: 'ID del intercambio que está en estado INICIADO',
+    example: 'uuid-intercambio-456',
+  })
+  @ApiOperation({
+    summary: 'FASE 3: Enviar productos al centro de distribución',
+    description:
+      'Ambos usuarios envían sus productos desde sus direcciones al centro de distribución. Se genera código de tracking automáticamente. Llama 2 veces (una por Juan, otra por María). Estado cambia a PRODUCTOS_ENVIADOS cuando ambos completan.',
+  })
+  @ApiBody({
+    type: ShipTradeDto,
+    examples: {
+      example1: {
+        summary: 'Juan envía sus productos',
+        value: {
+          usuario_id: 'uuid-juan',
+          origen_direccion: 'Calle Principal 123, Bogotá',
+          destino_direccion: 'Centro Distribución - Bogotá',
+          notas: 'Empaquetado con cuidado',
+        },
+      },
+      example2: {
+        summary: 'María envía su producto',
+        value: {
+          usuario_id: 'uuid-maria',
+          origen_direccion: 'Carrera 7 456, Bogotá',
+          destino_direccion: 'Centro Distribución - Bogotá',
+          notas: 'Artículo nuevo sin usar',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: [ShippingResponseDto],
+    description:
+      'Envíos creados. Cuando ambos usuarios completan, estado = PRODUCTOS_ENVIADOS',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Error: Usuario no involucrado en intercambio, intercambio no en estado correcto, etc.',
+  })
   async shipTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: ShipTradeDto,
@@ -128,16 +232,54 @@ export class TradesController {
 
   /**
    * FASE 4: REVISAR PRODUCTOS
-   * POST /api/trades/:intercambioId/products/:productId/review
-   *
-   * Validaciones:
-   * - Producto llegó al centro
-   * - Rating 1-5 (< 3 = rechazado)
-   * - 1-10 fotos
-   * - Observaciones si rating < 4
+   * Centro de distribución revisa los productos recibidos
    */
   @Post(':intercambioId/products/:productId/review')
   @HttpCode(HttpStatus.CREATED)
+  @ApiParam({
+    name: 'intercambioId',
+    description: 'ID del intercambio que está en estado PRODUCTOS_ENVIADOS',
+    example: 'uuid-intercambio-456',
+  })
+  @ApiParam({
+    name: 'productId',
+    description: 'ID del producto a revisar',
+    example: 'uuid-producto-789',
+  })
+  @ApiOperation({
+    summary: 'FASE 4: Revisar producto en centro de distribución',
+    description:
+      'Centro revisa cada producto. Rating < 3 = RECHAZADO, >= 3 = APROBADO. Llamar para TODOS los productos. Cambio a EN_REVISION solo cuando AMBOS usuarios aprueban todos sus productos.',
+  })
+  @ApiBody({
+    type: ReviewProductDto,
+    examples: {
+      example1: {
+        summary: 'Producto aprobado',
+        value: {
+          condition_rating: 5,
+          observations: 'Estado excelente, como nuevo',
+          photos: ['url-foto-1.jpg', 'url-foto-2.jpg'],
+        },
+      },
+      example2: {
+        summary: 'Producto rechazado',
+        value: {
+          condition_rating: 2,
+          observations: 'Daño visible, no cumple requisitos',
+          photos: ['url-foto-dano.jpg'],
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: ReviewResponseDto,
+    description:
+      'Revisión registrada. Cambia a EN_REVISION cuando AMBOS usuarios tienen todos sus productos APROBADOS.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Error: Producto no encontrado, validaciones fallidas, etc.',
+  })
   async reviewProduct(
     @Param('intercambioId') intercambioId: string,
     @Param('productId') productId: string,
@@ -154,16 +296,49 @@ export class TradesController {
 
   /**
    * FASE 5: ENTREGAR PRODUCTOS
-   * POST /api/trades/:intercambioId/deliver
-   *
-   * Validaciones:
-   * - Todas revisiones aprobadas
-   * - Dirección confirmada
-   * - Tracking actualizado
-   * - Alerta si plazo vence (5 días)
+   * Centro distribuye los productos a sus destinos finales
    */
   @Post(':intercambioId/deliver')
   @HttpCode(HttpStatus.CREATED)
+  @ApiParam({
+    name: 'intercambioId',
+    description: 'ID del intercambio que está en estado EN_REVISION',
+    example: 'uuid-intercambio-456',
+  })
+  @ApiOperation({
+    summary: 'FASE 5: Entregar productos a usuarios finales',
+    description:
+      'Centro distribuye productos a cada usuario. Llama 2 veces (Juan marca recibido, María marca recibido). Cuando AMBOS marcan como entregado, estado = COMPLETADO.',
+  })
+  @ApiBody({
+    type: DeliverTradeDto,
+    examples: {
+      example1: {
+        summary: 'Juan marca sus productos como entregados',
+        value: {
+          usuario_id: 'uuid-juan',
+          delivery_address: 'Calle Principal 123, Bogotá',
+          notas: 'Entregado en mano',
+        },
+      },
+      example2: {
+        summary: 'María marca su producto como entregado',
+        value: {
+          usuario_id: 'uuid-maria',
+          delivery_address: 'Carrera 7 456, Bogotá',
+          notas: 'Entregado en mano',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: DeliveryResponseDto,
+    description:
+      'Entrega registrada. Cambia a COMPLETADO cuando AMBOS usuarios marcan como entregado.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Error: Usuario no involucrado, revisiones no aprobadas, etc.',
+  })
   async deliverTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: DeliverTradeDto,
@@ -178,18 +353,54 @@ export class TradesController {
 
   /**
    * FASE 6: CALIFICAR
-   * POST /api/trades/:intercambioId/rate
-   *
-   * Validaciones:
-   * - Intercambio ENTREGADO/COMPLETADO
-   * - Participaste en el intercambio
-   * - No es auto-calificación
-   * - Ratings 1-5
-   * - Comentario si rating < 3 (min 20 caracteres)
-   * - Sin calificación duplicada
+   * Usuarios califican mutuamente al finalizar el intercambio
    */
   @Post(':intercambioId/rate')
   @HttpCode(HttpStatus.CREATED)
+  @ApiParam({
+    name: 'intercambioId',
+    description: 'ID del intercambio que está en estado COMPLETADO',
+    example: 'uuid-intercambio-456',
+  })
+  @ApiOperation({
+    summary: 'FASE 6: Calificar usuario y productos',
+    description:
+      'Ambos usuarios califican mutuamente. Llama 2 veces (Juan califica María, María califica Juan). Actualiza rating/reputación cuando AMBOS califican. Intercambio se queda en COMPLETADO.',
+  })
+  @ApiBody({
+    type: RateTradeDto,
+    examples: {
+      example1: {
+        summary: 'Juan califica a María con 5 estrellas',
+        value: {
+          usuario_id: 'uuid-juan',
+          usuario_calificado_id: 'uuid-maria',
+          calificacion_usuario: 5,
+          calificacion_producto: 5,
+          comentario: 'Excelente usuario, producto en perfecto estado',
+        },
+      },
+      example2: {
+        summary: 'María califica a Juan con 4 estrellas',
+        value: {
+          usuario_id: 'uuid-maria',
+          usuario_calificado_id: 'uuid-juan',
+          calificacion_usuario: 4,
+          calificacion_producto: 4,
+          comentario: 'Buen usuario, comunicación clara',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    type: RatingResponseDto,
+    description:
+      'Calificación registrada. Actualiza reputación de AMBOS cuando el segundo usuario califica.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Error: Usuario no involucrado, ya calificaste, intercambio no completado, etc.',
+  })
   async rateTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: RateTradeDto,
