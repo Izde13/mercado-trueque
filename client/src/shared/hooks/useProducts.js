@@ -42,6 +42,11 @@ export const useProducts = (filters = {}) => {
       // Construir query params desde filtros
       const queryParams = new URLSearchParams();
 
+      // Nombre (búsqueda)
+      if (appliedFilters.nombre) {
+        queryParams.set('nombre', appliedFilters.nombre);
+      }
+
       // Categorías (múltiples)
       if (appliedFilters.categoria && appliedFilters.categoria.length > 0) {
         appliedFilters.categoria.forEach(cat => queryParams.append('categoria', cat));
@@ -83,6 +88,7 @@ export const useProducts = (filters = {}) => {
     fetchProducts(filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    filters.nombre,
     filters.categoria?.join(','),
     filters.estado?.join(','),
     filters.precioMin,

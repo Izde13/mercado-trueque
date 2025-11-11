@@ -6,6 +6,7 @@ export class ProductFiltersVO {
   private constructor(
     public readonly categoriaIds: string[],
     public readonly estadoProductoIds: string[],
+    public readonly nombre: string | undefined,
     public readonly precioMin?: number,
     public readonly precioMax?: number,
     public readonly ubicacion?: string,
@@ -17,6 +18,7 @@ export class ProductFiltersVO {
    * Factory method con validaciones de negocio
    */
   static create(params: {
+    nombre?: string;
     categoriaIds?: string[];
     estadoProductoIds?: string[];
     precioMin?: number;
@@ -45,6 +47,7 @@ export class ProductFiltersVO {
     return new ProductFiltersVO(
       params.categoriaIds || [],
       params.estadoProductoIds || [],
+      params.nombre,
       params.precioMin,
       params.precioMax,
       params.ubicacion,
@@ -58,6 +61,7 @@ export class ProductFiltersVO {
    */
   hasFilters(): boolean {
     return (
+      this.nombre !== undefined ||
       this.categoriaIds.length > 0 ||
       this.estadoProductoIds.length > 0 ||
       this.precioMin !== undefined ||

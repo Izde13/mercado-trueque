@@ -13,6 +13,7 @@ export class PrismaProductQueryBuilder {
       estado_publicacion: filters.estadoPublicacion,
     };
 
+    this.addNameFilter(where, filters);
     this.addCategoriesFilter(where, filters);
     this.addProductStatusFilter(where, filters);
     this.addPriceRangeFilter(where, filters);
@@ -40,6 +41,15 @@ export class PrismaProductQueryBuilder {
           }
         : false,
     };
+  }
+
+  private static addNameFilter(where: any, filters: ProductFiltersVO): void {
+    if (filters.nombre) {
+      where.titulo = {
+        contains: filters.nombre,
+        mode: 'insensitive',
+      };
+    }
   }
 
   private static addCategoriesFilter(
