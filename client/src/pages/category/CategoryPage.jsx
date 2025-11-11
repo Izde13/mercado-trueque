@@ -11,6 +11,7 @@ export default function CategoryPage() {
   // Sistema de filtros integrado
   const {
     filters,
+    setNombre,
     setCategorias,
     setEstados,
     setPrecioMin,
@@ -32,6 +33,9 @@ export default function CategoryPage() {
   // Handler para remover un filtro individual
   const handleRemoveFilter = (type, value) => {
     switch (type) {
+      case 'nombre':
+        setNombre('');
+        break;
       case 'categoria':
         setCategorias(filters.categorias.filter(c => c !== value));
         break;

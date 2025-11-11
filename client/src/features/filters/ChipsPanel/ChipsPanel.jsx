@@ -3,6 +3,15 @@ import './ChipsPanel.css';
 export default function ChipsPanel({ filters, onRemoveFilter }) {
   const chips = [];
 
+  if (filters.nombre) {
+    chips.push({
+      id: 'nombre',
+      label: `Búsqueda: "${filters.nombre}"`,
+      type: 'nombre',
+      value: filters.nombre,
+    });
+  }
+
   if (filters.categorias && filters.categorias.length > 0) {
     filters.categorias.forEach(categoria => {
       chips.push({

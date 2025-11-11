@@ -12,6 +12,16 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 import { CreateProductUseCase } from '../../application/use-cases/create-product.use-case';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
 import { GetProductUseCase } from '../../application/use-cases/get-product.use-case';
@@ -30,6 +40,7 @@ interface ApiResponse<T> {
   requestId?: string;
 }
 
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
@@ -42,6 +53,24 @@ export class ProductsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Crear un nuevo producto',
+    description: 'Crea un nuevo producto en el catálogo del usuario',
+  })
+  @ApiBody({
+    type: CreateProductDto,
+    description: 'Datos del producto a crear',
+  })
+  @ApiCreatedResponse({
+    description: 'Producto creado exitosamente',
+    type: ProductResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Datos de entrada inválidos o regla de negocio violada',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error interno del servidor',
+  })
   async create(
     @Body(ValidationPipe) createProductDto: CreateProductDto,
   ): Promise<ApiResponse<ProductResponseDto>> {
@@ -103,6 +132,18 @@ export class ProductsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener productos con filtros opcionales',
+    description:
+      'Retorna una lista de productos. Se pueden aplicar filtros opcionales por nombre, categoría, estado, ubicación, rango de precio, usuario y estado de publicación.',
+  })
+  @ApiOkResponse({
+    description: 'Lista de productos obtenida exitosamente',
+    type: [ProductResponseDto],
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error al obtener productos',
+  })
   async findAll(
     @Query() filtersDto: ProductFiltersDto,
   ): Promise<ProductResponseDto[]> {
@@ -112,7 +153,8 @@ export class ProductsController {
       let products;
 
       // Si hay filtros, crear el Value Object y ejecutar con filtros
-      const hasFilters = 
+      const hasFilters =
+        filtersDto.nombre ||
         (filtersDto.categoria && filtersDto.categoria.length > 0) ||
         (filtersDto.estado && filtersDto.estado.length > 0) ||
         filtersDto.ubicacion ||
@@ -133,6 +175,7 @@ export class ProductsController {
 
         // El Value Object se encarga de las validaciones
         const filters = ProductFiltersVO.create({
+          nombre: filtersDto.nombre,
           categoriaIds,
           estadoProductoIds,
           ubicacion: filtersDto.ubicacion,
@@ -159,6 +202,20 @@ export class ProductsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener un producto por ID',
+    description: 'Retorna los detalles de un producto específico',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID único del producto',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiOkResponse({
+    description: 'Producto encontrado',
+    type: ProductResponseDto,
+  })
   async findOne(@Param('id') id: string): Promise<ProductResponseDto | null> {
     const product = await this.getProductUseCase.execute(id);
     return product ? new ProductResponseDto(product) : null;

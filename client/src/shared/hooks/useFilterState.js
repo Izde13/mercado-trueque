@@ -10,15 +10,30 @@ export const useFilterState = () => {
 
   // Estado inicial desde URL o valores por defecto
   const [filters, setFilters] = useState(() => ({
+    nombre: searchParams.get('nombre') || '',
     categorias: searchParams.getAll('categoria') || [],
     estados: searchParams.getAll('estado') || [],
     precioMin: searchParams.get('precioMin') || '',
     precioMax: searchParams.get('precioMax') || '',
   }));
 
+  // Sincronizar estado con URL cuando la URL cambia (por navegación externa)
+  useEffect(() => {
+    setFilters({
+      nombre: searchParams.get('nombre') || '',
+      categorias: searchParams.getAll('categoria') || [],
+      estados: searchParams.getAll('estado') || [],
+      precioMin: searchParams.get('precioMin') || '',
+      precioMax: searchParams.get('precioMax') || '',
+    });
+  }, [searchParams]);
+
   // Sincronizar filtros con URL cuando cambien
   useEffect(() => {
     const params = new URLSearchParams();
+
+    // Agregar nombre
+    if (filters.nombre) params.set('nombre', filters.nombre);
 
     // Agregar categorías
     filters.categorias.forEach(cat => params.append('categoria', cat));
@@ -32,6 +47,14 @@ export const useFilterState = () => {
 
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
+
+  // Actualizar nombre (búsqueda)
+  const setNombre = useCallback((nombre) => {
+    setFilters(prev => ({
+      ...prev,
+      nombre: nombre || '',
+    }));
+  }, []);
 
   // Actualizar categorías
   const setCategorias = useCallback((categorias) => {
@@ -97,6 +120,7 @@ export const useFilterState = () => {
   // Limpiar todos los filtros
   const clearAllFilters = useCallback(() => {
     setFilters({
+      nombre: '',
       categorias: [],
       estados: [],
       precioMin: '',
@@ -107,6 +131,7 @@ export const useFilterState = () => {
   // Verificar si hay filtros activos
   const hasActiveFilters = useCallback(() => {
     return (
+      filters.nombre !== '' ||
       filters.categorias.length > 0 ||
       filters.estados.length > 0 ||
       filters.precioMin !== '' ||
@@ -117,6 +142,10 @@ export const useFilterState = () => {
   // Convertir filtros al formato de la API
   const getApiFilters = useCallback(() => {
     const apiFilters = {};
+
+    if (filters.nombre) {
+      apiFilters.nombre = filters.nombre;
+    }
 
     if (filters.categorias.length > 0) {
       apiFilters.categoria = filters.categorias;
@@ -139,6 +168,7 @@ export const useFilterState = () => {
 
   return {
     filters,
+    setNombre,
     setCategorias,
     toggleCategoria,
     setEstados,
