@@ -83,4 +83,16 @@ export class UserRepositoryImpl implements UserRepository {
       prismaUser.total_intercambios,
     );
   }
+
+  async findByEmail(email: string) {
+  return this.prisma.usuarios.findUnique({
+    where: { email },
+  });
+}
+
+async create(data: any) {
+  return this.prisma.usuarios.create({
+    data,
+  });
+}
 }

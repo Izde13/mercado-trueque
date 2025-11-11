@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './infrastructure/services/prisma.service';
 
+
 // Categories
 import { CategoryRepositoryImpl } from './infrastructure/repositories/category.repository.impl';
 import { GetCategoriesUseCase } from './application/use-cases/get-categories.use-case';
@@ -146,9 +147,9 @@ import { RateTradeUseCase } from './application/use-cases/rate-trade.use-case';
 
 // Trade Controllers
 import { TradesController } from './presentation/controllers/trades.controller';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -156,6 +157,7 @@ import { AppService } from './app.service';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    AuthModule, // Integración del módulo de autenticación
   ],
   controllers: [
     AppController,
