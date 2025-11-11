@@ -143,6 +143,8 @@ import { ShipTradeUseCase } from './application/use-cases/ship-trade.use-case';
 import { ReviewTradeUseCase } from './application/use-cases/review-trade.use-case';
 import { DeliverTradeUseCase } from './application/use-cases/deliver-trade.use-case';
 import { RateTradeUseCase } from './application/use-cases/rate-trade.use-case';
+import { GetReceivedProposalsUseCase } from './application/use-cases/get-received-proposals.use-case';
+import { GetUserTradesUseCase } from './application/use-cases/get-user-trades.use-case';
 
 // Trade Controllers
 import { TradesController } from './presentation/controllers/trades.controller';
@@ -338,6 +340,8 @@ import { AppService } from './app.service';
     ReviewTradeUseCase,
     DeliverTradeUseCase,
     RateTradeUseCase,
+    GetReceivedProposalsUseCase,
+    GetUserTradesUseCase,
   ],
 })
 export class AppModule {}

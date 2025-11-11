@@ -13,7 +13,9 @@
       "Bash(pnpm build:*)",
       "Bash(npx tsc:*)",
       "Bash(nul)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)"
     ],
     "deny": [],
     "ask": []

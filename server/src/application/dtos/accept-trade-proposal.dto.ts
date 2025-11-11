@@ -2,15 +2,11 @@ import { IsUUID } from 'class-validator';
 
 export class AcceptTradeProposalDto {
   @IsUUID()
-  proposal_id?: string;
-
-  @IsUUID()
   usuario_aceptante_id: string;
 }
 
 export class RejectTradeProposalDto {
-  @IsUUID()
-  proposal_id: string;
+  // proposal_id viene en la URL, no en el body
 }
 
 export class IntercambioResponseDto {

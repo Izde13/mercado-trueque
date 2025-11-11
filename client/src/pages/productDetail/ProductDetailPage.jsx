@@ -3,26 +3,40 @@ import "./ProductDetailPage.css";
 
 import Gallery from './../../features/productDetail/Gallery/Gallery.jsx'
 import ProductSummary from './../../features/productDetail/ProductSummary/ProductSummary.jsx'
+import { useProductDetail } from '../../shared/hooks/useProductDetail';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
 
-  // TODO: Obtener producto real desde API usando el id
-  // Estructura de BD mock
-  const product = {
-    id,
-    title: "One Life Graphic Camiseta",
-    description: "Camiseta gráfica en perfecto estado. Busco intercambiar por jeans, chaqueta o accesorios deportivos.",
-    estimatedValue: 260,
-    popularity: 4.5,
-    mainImage: "/images/products/ps5.png",
-    views: 125,
-    userId: "u1",
-    categoryId: "c1",
-    publicationDate: "2025-10-14",
-    publicationStatus: "publicado",
-    productStatusId: "ep1"
-  };
+  // Obtener producto real desde API usando el hook
+  const { product, loading, error } = useProductDetail(id);
+
+  // Mostrar loading mientras se carga el producto
+  if (loading) {
+    return (
+      <section className="pdp">
+        <p>Cargando producto...</p>
+      </section>
+    );
+  }
+
+  // Mostrar error si falla la carga
+  if (error) {
+    return (
+      <section className="pdp">
+        <p>Error al cargar el producto: {error}</p>
+      </section>
+    );
+  }
+
+  // Mostrar mensaje si no existe el producto
+  if (!product) {
+    return (
+      <section className="pdp">
+        <p>Producto no encontrado</p>
+      </section>
+    );
+  }
 
   const images = [
     product.mainImage,
@@ -41,6 +55,7 @@ export default function ProductDetailPage() {
           popularity={product.popularity}
           estimatedValue={product.estimatedValue}
           description={product.description}
+          mainImage={product.mainImage}
         />
       </div>
     </section>
