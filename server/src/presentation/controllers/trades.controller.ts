@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Param,
   UseGuards,
@@ -25,6 +26,8 @@ import { ShipTradeUseCase } from '../../application/use-cases/ship-trade.use-cas
 import { ReviewTradeUseCase } from '../../application/use-cases/review-trade.use-case';
 import { DeliverTradeUseCase } from '../../application/use-cases/deliver-trade.use-case';
 import { RateTradeUseCase } from '../../application/use-cases/rate-trade.use-case';
+import { GetReceivedProposalsUseCase } from '../../application/use-cases/get-received-proposals.use-case';
+import { GetUserTradesUseCase } from '../../application/use-cases/get-user-trades.use-case';
 import {
   CreateTradeProposalDto,
   TradeProposalResponseDto,
@@ -60,7 +63,51 @@ export class TradesController {
     private readonly reviewTradeUseCase: ReviewTradeUseCase,
     private readonly deliverTradeUseCase: DeliverTradeUseCase,
     private readonly rateTradeUseCase: RateTradeUseCase,
+    private readonly getReceivedProposalsUseCase: GetReceivedProposalsUseCase,
+    private readonly getUserTradesUseCase: GetUserTradesUseCase,
   ) {}
+
+  /**
+   * OBTENER INTERCAMBIOS DEL USUARIO
+   * Retorna todos los intercambios donde el usuario está involucrado
+   */
+  @Get('user/:userId')
+  @ApiOperation({
+    summary: 'Obtener intercambios del usuario',
+    description:
+      'Retorna todos los intercambios (pasados y actuales) donde el usuario está involucrado, ya sea como oferente o solicitante',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID del usuario',
+    example: 'uuid-juan',
+  })
+  async getUserTrades(
+    @Param('userId') userId: string,
+  ): Promise<any[]> {
+    return await this.getUserTradesUseCase.execute(userId);
+  }
+
+  /**
+   * OBTENER PROPUESTAS RECIBIDAS
+   * Retorna todas las propuestas dirigidas al usuario (donde él es el receptor)
+   */
+  @Get('proposals/received/:userId')
+  @ApiOperation({
+    summary: 'Obtener propuestas recibidas',
+    description:
+      'Retorna todas las propuestas que le han hecho al usuario (aquellas que solicitan sus productos)',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID del usuario receptor',
+    example: 'uuid-maria',
+  })
+  async getReceivedProposals(
+    @Param('userId') userId: string,
+  ): Promise<TradeProposalResponseDto[]> {
+    return await this.getReceivedProposalsUseCase.execute(userId);
+  }
 
   /**
    * FASE 1: CREAR PROPUESTA

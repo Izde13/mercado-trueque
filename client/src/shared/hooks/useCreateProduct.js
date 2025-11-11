@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiService } from '../services/apiAxios';
+import { getCurrentUserId } from '../constants/auth';
 
 export const useCreateProduct = () => {
   const [loading, setLoading] = useState(false);
@@ -10,8 +11,8 @@ export const useCreateProduct = () => {
       setLoading(true);
       setError(null);
 
-      // Hardcoded user ID (UUID) - TODO: Reemplazar con autenticación real
-      const FAKE_USER_ID = "df14ad4a-67df-488d-8f91-8ea2949f16e1";
+      // Obtener user ID del archivo de constantes (mock de autenticación)
+      const userId = getCurrentUserId();
       // TODO: Obtener estadoProductoId real del formulario
       const DEFAULT_ESTADO_ID = "76b22db8-726b-4fdf-b8ed-067493605e8e"; // Deberás obtener esto de la BD
 
@@ -50,7 +51,7 @@ export const useCreateProduct = () => {
       }
 
       const payload = {
-        usuarioId: FAKE_USER_ID,
+        usuarioId: userId,
         categoriaId: productData.categoriaId,
         estadoProductoId: productData.estadoProductoId || DEFAULT_ESTADO_ID,
         titulo: productData.titulo.trim(),

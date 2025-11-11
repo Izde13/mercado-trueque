@@ -1,14 +1,20 @@
 import "./ProposalItem.css";
 
-export default function ProposalItem({ item }){
-  const { 
-    id, 
+export default function ProposalItem({ item, onChange }){
+  const {
+    id,
     title,
     estimatedValue,
     mainImage,
     description,
     checked
   } = item || {};
+
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(id, e.target.checked);
+    }
+  };
 
   return (
     <label htmlFor={`chk-${id}`} className="pr-item">
@@ -20,7 +26,12 @@ export default function ProposalItem({ item }){
         )}
         <div className="pr-price">${estimatedValue}</div>
       </div>
-      <input id={`chk-${id}`} type="checkbox" defaultChecked={checked} />
+      <input
+        id={`chk-${id}`}
+        type="checkbox"
+        checked={checked}
+        onChange={handleChange}
+      />
     </label>
   );
 }

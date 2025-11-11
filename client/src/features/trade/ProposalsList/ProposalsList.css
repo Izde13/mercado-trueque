@@ -1,2 +1,3 @@
 .pr-list{ border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; }
 .pr-stack{ display:grid; gap:12px; }
+.pr-empty{ margin:12px 0; padding:12px; text-align:center; color:#9ca3af; font-size:0.875rem; background:#f9fafb; border-radius:6px; }

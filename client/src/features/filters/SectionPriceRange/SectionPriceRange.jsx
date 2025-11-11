@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './SectionPriceRange.css';
 
 export default function SectionPriceRange({ precioMin = '', precioMax = '', onPriceChange }) {
   const [isOpen, setIsOpen] = useState(true);
   const [localMin, setLocalMin] = useState(precioMin);
   const [localMax, setLocalMax] = useState(precioMax);
+
+  // Sincronizar estado local con props cuando cambien (para "Limpiar todo")
+  useEffect(() => {
+    setLocalMin(precioMin);
+    setLocalMax(precioMax);
+  }, [precioMin, precioMax]);
 
   const handleMinChange = (e) => {
     setLocalMin(e.target.value);

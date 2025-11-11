@@ -1,8 +1,28 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import UserMenu from "../UserMenu/UserMenu";
 import "./Navbar.css";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Sincronizar el input con el parámetro 'nombre' de la URL
+  useEffect(() => {
+    const nombreFromUrl = searchParams.get('nombre') || '';
+    setSearchQuery(nombreFromUrl);
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/productos?nombre=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/productos");
+    }
+  };
+
   return (
     <header className="mt-navbar" role="banner">
       <nav className="mt-nav">
@@ -23,15 +43,15 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <a href="#" className="mt-link">
-                Mis trueques
-              </a>
+              <Link to="/propuestas-recibidas" className="mt-link">
+                Propuestas Recibidas
+              </Link>
             </li>
           </ul>
         </div>
 
         {/* Centro: buscador */}
-        <form className="mt-search" role="search" aria-label="Buscar">
+        <form className="mt-search" role="search" aria-label="Buscar" onSubmit={handleSearch}>
           <svg className="mt-icon" viewBox="0 0 24 24" aria-hidden="true">
             <circle
               cx="11"
@@ -53,6 +73,8 @@ export default function Navbar() {
             type="search"
             placeholder="Buscar artículos para trueque"
             aria-label="Buscar artículos para trueque"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </form>
 
