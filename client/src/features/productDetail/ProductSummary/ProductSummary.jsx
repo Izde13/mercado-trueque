@@ -13,16 +13,8 @@ export default function ProductSummary({
   const navigate = useNavigate();
 
   const handlePropose = () => {
-    navigate("/propuesta", {
-      state: {
-        interest: {
-          id,
-          title,
-          estimatedValue,
-          mainImage,
-        },
-      },
-    });
+    // Navegar a la página de propuesta con el ID del producto en la URL
+    navigate(`/propuesta/${id}`);
   };
 
   return (

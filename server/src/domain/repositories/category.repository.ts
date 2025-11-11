@@ -8,4 +8,10 @@ export interface CategoryRepository {
   delete(id: string): Promise<void>;
   findByNombre(nombre: string): Promise<Category | null>;
   findActive(): Promise<Category[]>;
+
+  /**
+   * Obtiene una categoría por ID y verifica que esté activa
+   * Retorna null si no existe o no está activa
+   */
+  findActiveById(id: string): Promise<Category | null>;
 }

@@ -43,9 +43,9 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <a href="#" className="mt-link">
-                Mis trueques
-              </a>
+              <Link to="/propuestas-recibidas" className="mt-link">
+                Propuestas Recibidas
+              </Link>
             </li>
           </ul>
         </div>

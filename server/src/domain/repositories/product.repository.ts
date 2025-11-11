@@ -11,4 +11,15 @@ export interface ProductRepository {
   findByCategoriaId(categoriaId: string): Promise<Product[]>;
   findByEstadoPublicacion(estado: string): Promise<Product[]>;
   findWithFilters(filters: ProductFiltersVO): Promise<Product[]>;
+
+  /**
+   * Cuenta cuántos productos activos tiene un usuario
+   * Utilizado para validar límites de publicación basados en reputación
+   */
+  countActiveByUserId(userId: string): Promise<number>;
+
+  /**
+   * Obtiene todos los productos activos de un usuario
+   */
+  findActiveByUserId(userId: string): Promise<Product[]>;
 }

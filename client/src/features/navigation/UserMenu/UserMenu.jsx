@@ -22,6 +22,11 @@ export default function UserMenu() {
     setIsOpen(false);
   };
 
+  const handleMyTrades = () => {
+    navigate("/mis-intercambios");
+    setIsOpen(false);
+  };
+
   // Cerrar menú al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -60,7 +65,7 @@ export default function UserMenu() {
         <div className="mt-dropdown">
           <ul className="mt-dropdown-list">
             <li>
-              <button 
+              <button
                 className="mt-dropdown-item mt-dropdown-button"
                 onClick={handleMyAccount}
               >
@@ -72,7 +77,19 @@ export default function UserMenu() {
               </button>
             </li>
             <li>
-              <button 
+              <button
+                className="mt-dropdown-item mt-dropdown-button"
+                onClick={handleMyTrades}
+              >
+                <svg className="mt-dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="M10 13l-3-3m3 3l3 3m-3-3l3-3m-3 3l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Mis intercambios
+              </button>
+            </li>
+            <li>
+              <button
                 className="mt-dropdown-item mt-dropdown-button"
                 onClick={handlePublishProduct}
               >

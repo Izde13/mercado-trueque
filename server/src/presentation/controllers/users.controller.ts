@@ -34,7 +34,9 @@ export class UsersController {
       createUserDto.email,
       createUserDto.nombre,
       createUserDto.apellido,
+      createUserDto.contrasena,
       createUserDto.telefono,
+      createUserDto.rolId,
     );
     return new UserResponseDto(user);
   }

@@ -2,7 +2,7 @@ import { ISpecification } from './specification.interface';
 import { SpecificationResult } from './specification-result';
 
 /**
- * Clase base abstracta para implementar el patrón Specification
+ * Clase base abstracta para implementar el patrï¿½n Specification
  */
 export abstract class CompositeSpecification<T> implements ISpecification<T> {
   abstract isSatisfiedBy(candidate: T): Promise<SpecificationResult>;
@@ -21,7 +21,7 @@ export abstract class CompositeSpecification<T> implements ISpecification<T> {
 }
 
 /**
- * Combina dos especificaciones con AND lógico
+ * Combina dos especificaciones con AND lï¿½gico
  */
 class AndSpecification<T> extends CompositeSpecification<T> {
   constructor(
@@ -47,7 +47,7 @@ class AndSpecification<T> extends CompositeSpecification<T> {
 }
 
 /**
- * Combina dos especificaciones con OR lógico
+ * Combina dos especificaciones con OR lï¿½gico
  */
 class OrSpecification<T> extends CompositeSpecification<T> {
   constructor(
@@ -69,7 +69,7 @@ class OrSpecification<T> extends CompositeSpecification<T> {
 }
 
 /**
- * Niega una especificación
+ * Niega una especificaciï¿½n
  */
 class NotSpecification<T> extends CompositeSpecification<T> {
   constructor(private readonly spec: ISpecification<T>) {
@@ -81,7 +81,7 @@ class NotSpecification<T> extends CompositeSpecification<T> {
 
     if (result.isValid) {
       return SpecificationResult.failure(
-        'Condición negada no se cumple',
+        'Condiciï¿½n negada no se cumple',
         'NOT_SPECIFICATION_FAILED',
       );
     }

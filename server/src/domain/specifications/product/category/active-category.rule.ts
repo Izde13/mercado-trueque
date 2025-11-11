@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { CompositeSpecification } from '../../base/composite-specification';
 import { SpecificationResult } from '../../base/specification-result';
 import { ProductPublicationContext } from '../product-publication-context';
-import { PrismaService } from '../../../../infrastructure/services/prisma.service';
+import type { CategoryRepository } from '../../../repositories/category.repository';
 
 /**
  * Validación #7: Categoría Activa
@@ -16,12 +16,16 @@ import { PrismaService } from '../../../../infrastructure/services/prisma.servic
  * - Mantenibilidad del catálogo
  * - Evita publicaciones en categorías obsoletas
  * - Mejora calidad de datos
+ *
+ * ARQUITECTURA:
+ * - Depende de interfaz CategoryRepository (no de PrismaService)
+ * - La implementación se inyecta en tiempo de ejecución desde la capa de infraestructura
  */
 @Injectable()
 export class ActiveCategoryRule extends CompositeSpecification<ProductPublicationContext> {
   constructor(
-    @Inject(PrismaService)
-    private readonly prisma: PrismaService,
+    @Inject('CategoryRepository')
+    private readonly categoryRepository: CategoryRepository,
   ) {
     super();
   }
@@ -31,38 +35,18 @@ export class ActiveCategoryRule extends CompositeSpecification<ProductPublicatio
   ): Promise<SpecificationResult> {
     const { product } = context;
 
-    // 1. Buscar la categoría
-    const category = await this.prisma.categorias.findUnique({
-      where: { id: product.categoriaId },
-      select: {
-        id: true,
-        nombre: true,
-        activo: true,
-        descripcion: true,
-      },
-    });
+    // 1. Buscar la categoría activa
+    const category = await this.categoryRepository.findActiveById(
+      product.categoriaId,
+    );
 
-    // 2. Verificar que existe
+    // 2. Verificar que existe y está activa
     if (!category) {
       return SpecificationResult.failure(
-        'La categoría seleccionada no existe.',
-        'CATEGORY_NOT_FOUND',
+        'La categoría seleccionada no existe o ha sido desactivada.',
+        'CATEGORY_NOT_FOUND_OR_INACTIVE',
         {
           categoriaId: product.categoriaId,
-        },
-      );
-    }
-
-    // 3. Verificar que está activa
-    if (!category.activo) {
-      return SpecificationResult.failure(
-        `La categoría "${category.nombre}" ya no está disponible para nuevas publicaciones.`,
-        'CATEGORY_INACTIVE',
-        {
-          categoriaId: category.id,
-          categoriaNombre: category.nombre,
-          message:
-            'Esta categoría ha sido desactivada. Por favor selecciona otra categoría para tu producto.',
         },
       );
     }
