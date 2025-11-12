@@ -12,6 +12,8 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Auth } from '../../auth/decorators/auth.decorator';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -52,10 +54,11 @@ export class ProductsController {
   ) {}
 
   @Post()
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear un nuevo producto',
-    description: 'Crea un nuevo producto en el catálogo del usuario',
+    description: 'Crea un nuevo producto en el catálogo del usuario. Requiere autenticación.',
   })
   @ApiBody({
     type: CreateProductDto,
@@ -73,10 +76,18 @@ export class ProductsController {
   })
   async create(
     @Body(ValidationPipe) createProductDto: CreateProductDto,
+    @CurrentUser() user: any,
   ): Promise<ApiResponse<ProductResponseDto>> {
     const requestId = this.generateRequestId();
 
     try {
+      // Validar que el usuario solo puede crear productos para sí mismo
+      if (user.userId !== createProductDto.usuarioId) {
+        throw new BadRequestException(
+          'No puedes crear productos en nombre de otro usuario',
+        );
+      }
+
       // Security logging - Log product creation attempt (without sensitive data)
       this.logger.log(
         `Product creation attempt - User: ${this.sanitizeForLog(createProductDto.usuarioId)}, ` +

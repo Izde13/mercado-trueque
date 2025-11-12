@@ -46,7 +46,14 @@ async login(data: { email: string; contrasena: string }) {
   const isPasswordValid = await bcrypt.compare(data.contrasena, user.contrasena);
   if (!isPasswordValid) throw new UnauthorizedException('Credenciales inválidas');
 
-  const payload = { sub: user.id, email: user.email };
+  // Obtener roles del usuario
+  const roles = user.roles ? [user.roles.nombre] : [];
+
+  const payload = {
+    sub: user.id,
+    email: user.email,
+    roles: roles, // Incluir roles en el JWT
+  };
   const token = this.jwtService.sign(payload);
 
   return {
@@ -57,6 +64,7 @@ async login(data: { email: string; contrasena: string }) {
       email: user.email,
       nombre: user.nombre,
       apellido: user.apellido,
+      rol: user.roles ? user.roles.nombre : null,
     },
   };
 }

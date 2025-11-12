@@ -10,6 +10,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Auth } from '../../auth/decorators/auth.decorator';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import {
   ApiOperation,
   ApiResponse,
@@ -72,10 +74,11 @@ export class TradesController {
    * Retorna todos los intercambios donde el usuario está involucrado
    */
   @Get('user/:userId')
+  @Auth()
   @ApiOperation({
     summary: 'Obtener intercambios del usuario',
     description:
-      'Retorna todos los intercambios (pasados y actuales) donde el usuario está involucrado, ya sea como oferente o solicitante',
+      'Retorna todos los intercambios (pasados y actuales) donde el usuario está involucrado, ya sea como oferente o solicitante. Requiere autenticación.',
   })
   @ApiParam({
     name: 'userId',
@@ -84,7 +87,14 @@ export class TradesController {
   })
   async getUserTrades(
     @Param('userId') userId: string,
+    @CurrentUser() user: any,
   ): Promise<any[]> {
+    // Validar que el usuario solo puede ver sus propios intercambios
+    if (user.userId !== userId) {
+      throw new BadRequestException(
+        'No tienes permiso para ver los intercambios de otro usuario',
+      );
+    }
     return await this.getUserTradesUseCase.execute(userId);
   }
 
@@ -93,10 +103,11 @@ export class TradesController {
    * Retorna todas las propuestas dirigidas al usuario (donde él es el receptor)
    */
   @Get('proposals/received/:userId')
+  @Auth()
   @ApiOperation({
     summary: 'Obtener propuestas recibidas',
     description:
-      'Retorna todas las propuestas que le han hecho al usuario (aquellas que solicitan sus productos)',
+      'Retorna todas las propuestas que le han hecho al usuario (aquellas que solicitan sus productos). Requiere autenticación.',
   })
   @ApiParam({
     name: 'userId',
@@ -105,7 +116,14 @@ export class TradesController {
   })
   async getReceivedProposals(
     @Param('userId') userId: string,
+    @CurrentUser() user: any,
   ): Promise<TradeProposalResponseDto[]> {
+    // Validar que el usuario solo puede ver sus propias propuestas recibidas
+    if (user.userId !== userId) {
+      throw new BadRequestException(
+        'No tienes permiso para ver las propuestas recibidas de otro usuario',
+      );
+    }
     return await this.getReceivedProposalsUseCase.execute(userId);
   }
 
@@ -114,11 +132,12 @@ export class TradesController {
    * Inicia el proceso de trueque creando una propuesta de intercambio
    */
   @Post('proposals')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'FASE 1: Crear propuesta de trueque',
     description:
-      'Inicia el proceso de trueque. Juan crea una propuesta para obtener un producto de María, ofreciendo 1-5 de sus productos a cambio.',
+      'Inicia el proceso de trueque. Juan crea una propuesta para obtener un producto de María, ofreciendo 1-5 de sus productos a cambio. Requiere autenticación.',
   })
   @ApiBody({
     type: CreateTradeProposalDto,
@@ -156,8 +175,15 @@ export class TradesController {
   })
   async createProposal(
     @Body() dto: CreateTradeProposalDto,
+    @CurrentUser() user: any,
   ): Promise<TradeProposalResponseDto> {
     try {
+      // Validar que el usuario solo puede crear propuestas para sí mismo
+      if (user.userId !== dto.usuario_oferente_id) {
+        throw new BadRequestException(
+          'No puedes crear una propuesta en nombre de otro usuario',
+        );
+      }
       return await this.createProposalUseCase.execute(dto);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -169,6 +195,7 @@ export class TradesController {
    * María acepta la propuesta de Juan y se crea el intercambio
    */
   @Post('proposals/:proposalId/accept')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'proposalId',
@@ -178,7 +205,7 @@ export class TradesController {
   @ApiOperation({
     summary: 'FASE 2: Aceptar propuesta de trueque',
     description:
-      'María (dueña del producto solicitado) acepta la propuesta. Se valida que ambos usuarios estén activos, productos disponibles y se asigna centro de distribución.',
+      'María (dueña del producto solicitado) acepta la propuesta. Se valida que ambos usuarios estén activos, productos disponibles y se asigna centro de distribución. Requiere autenticación.',
   })
   @ApiBody({
     type: AcceptTradeProposalDto,
@@ -206,8 +233,15 @@ export class TradesController {
   async acceptProposal(
     @Param('proposalId') proposalId: string,
     @Body() dto: AcceptTradeProposalDto,
+    @CurrentUser() user: any,
   ): Promise<IntercambioResponseDto> {
     try {
+      // Validar que el usuario solo puede aceptar propuestas para sí mismo
+      if (user.userId !== dto.usuario_aceptante_id) {
+        throw new BadRequestException(
+          'No puedes aceptar una propuesta en nombre de otro usuario',
+        );
+      }
       return await this.acceptProposalUseCase.execute(
         dto.usuario_aceptante_id,
         proposalId,
@@ -222,6 +256,7 @@ export class TradesController {
    * Tanto Juan como María envían sus productos al centro de distribución
    */
   @Post(':intercambioId/ship')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -231,7 +266,7 @@ export class TradesController {
   @ApiOperation({
     summary: 'FASE 3: Enviar productos al centro de distribución',
     description:
-      'Ambos usuarios envían sus productos desde sus direcciones al centro de distribución. Se genera código de tracking automáticamente. Llama 2 veces (una por Juan, otra por María). Estado cambia a PRODUCTOS_ENVIADOS cuando ambos completan.',
+      'Ambos usuarios envían sus productos desde sus direcciones al centro de distribución. Se genera código de tracking automáticamente. Llama 2 veces (una por Juan, otra por María). Estado cambia a PRODUCTOS_ENVIADOS cuando ambos completan. Requiere autenticación.',
   })
   @ApiBody({
     type: ShipTradeDto,
@@ -268,8 +303,15 @@ export class TradesController {
   async shipTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: ShipTradeDto,
+    @CurrentUser() user: any,
   ): Promise<ShippingResponseDto[]> {
     try {
+      // Validar que el usuario solo puede enviar en nombre de sí mismo
+      if (user.userId !== dto.usuario_id) {
+        throw new BadRequestException(
+          'No puedes enviar productos en nombre de otro usuario',
+        );
+      }
       dto.intercambio_id = intercambioId;
       return await this.shipTradeUseCase.execute(dto);
     } catch (error) {
@@ -280,8 +322,10 @@ export class TradesController {
   /**
    * FASE 4: REVISAR PRODUCTOS
    * Centro de distribución revisa los productos recibidos
+   * TODO: Proteger con rol 'admin' o 'distributor' cuando esté implementado
    */
   @Post(':intercambioId/products/:productId/review')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -296,7 +340,7 @@ export class TradesController {
   @ApiOperation({
     summary: 'FASE 4: Revisar producto en centro de distribución',
     description:
-      'Centro revisa cada producto. Rating < 3 = RECHAZADO, >= 3 = APROBADO. Llamar para TODOS los productos. Cambio a EN_REVISION solo cuando AMBOS usuarios aprueban todos sus productos.',
+      'Centro revisa cada producto. Rating < 3 = RECHAZADO, >= 3 = APROBADO. Llamar para TODOS los productos. Cambio a EN_REVISION solo cuando AMBOS usuarios aprueban todos sus productos. Requiere autenticación (próximamente solo admin).',
   })
   @ApiBody({
     type: ReviewProductDto,
@@ -346,6 +390,7 @@ export class TradesController {
    * Centro distribuye los productos a sus destinos finales
    */
   @Post(':intercambioId/deliver')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -355,7 +400,7 @@ export class TradesController {
   @ApiOperation({
     summary: 'FASE 5: Entregar productos a usuarios finales',
     description:
-      'Centro distribuye productos a cada usuario. Llama 2 veces (Juan marca recibido, María marca recibido). Cuando AMBOS marcan como entregado, estado = COMPLETADO.',
+      'Centro distribuye productos a cada usuario. Llama 2 veces (Juan marca recibido, María marca recibido). Cuando AMBOS marcan como entregado, estado = COMPLETADO. Requiere autenticación.',
   })
   @ApiBody({
     type: DeliverTradeDto,
@@ -389,8 +434,15 @@ export class TradesController {
   async deliverTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: DeliverTradeDto,
+    @CurrentUser() user: any,
   ): Promise<DeliveryResponseDto> {
     try {
+      // Validar que el usuario solo puede marcar entrega para sí mismo
+      if (user.userId !== dto.usuario_id) {
+        throw new BadRequestException(
+          'No puedes marcar entrega en nombre de otro usuario',
+        );
+      }
       dto.intercambio_id = intercambioId;
       return await this.deliverTradeUseCase.execute(dto);
     } catch (error) {
@@ -403,6 +455,7 @@ export class TradesController {
    * Usuarios califican mutuamente al finalizar el intercambio
    */
   @Post(':intercambioId/rate')
+  @Auth()
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -412,7 +465,7 @@ export class TradesController {
   @ApiOperation({
     summary: 'FASE 6: Calificar usuario y productos',
     description:
-      'Ambos usuarios califican mutuamente. Llama 2 veces (Juan califica María, María califica Juan). Actualiza rating/reputación cuando AMBOS califican. Intercambio se queda en COMPLETADO.',
+      'Ambos usuarios califican mutuamente. Llama 2 veces (Juan califica María, María califica Juan). Actualiza rating/reputación cuando AMBOS califican. Intercambio se queda en COMPLETADO. Requiere autenticación.',
   })
   @ApiBody({
     type: RateTradeDto,
@@ -451,8 +504,15 @@ export class TradesController {
   async rateTrade(
     @Param('intercambioId') intercambioId: string,
     @Body() dto: RateTradeDto,
+    @CurrentUser() user: any,
   ): Promise<RatingResponseDto> {
     try {
+      // Validar que el usuario solo puede calificar en su nombre
+      if (user.userId !== dto.usuario_id) {
+        throw new BadRequestException(
+          'No puedes calificar en nombre de otro usuario',
+        );
+      }
       dto.intercambio_id = intercambioId;
       return await this.rateTradeUseCase.execute(dto);
     } catch (error) {

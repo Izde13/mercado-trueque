@@ -31,6 +31,14 @@ export class UserRepositoryImpl implements UserRepository {
   async findById(id: string): Promise<Usuario | null> {
     const user = await this.prisma.usuarios.findUnique({
       where: { id },
+      include: {
+        roles: {
+          select: {
+            id: true,
+            nombre: true,
+          },
+        },
+      },
     });
 
     return user ? this.toDomainEntity(user) : null;
@@ -85,10 +93,19 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findByEmail(email: string) {
-  return this.prisma.usuarios.findUnique({
-    where: { email },
-  });
-}
+    return this.prisma.usuarios.findUnique({
+      where: { email },
+      include: {
+        roles: {
+          select: {
+            id: true,
+            nombre: true,
+            descripcion: true,
+          },
+        },
+      },
+    });
+  }
 
 async create(data: any) {
   return this.prisma.usuarios.create({
