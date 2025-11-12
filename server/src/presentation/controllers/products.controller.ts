@@ -23,6 +23,7 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CreateProductUseCase } from '../../application/use-cases/create-product.use-case';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
@@ -55,6 +56,7 @@ export class ProductsController {
 
   @Post()
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear un nuevo producto',

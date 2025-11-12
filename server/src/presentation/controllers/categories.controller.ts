@@ -20,7 +20,7 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Categories')
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @Controller('categories')
 export class CategoriesController {
   constructor(

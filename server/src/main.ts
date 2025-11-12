@@ -34,6 +34,17 @@ async function bootstrap() {
     .addTag('Products', 'Gestión de productos del catálogo')
     .addTag('Categories', 'Categorías de productos')
     .addTag('Users', 'Gestión de usuarios y perfiles')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Ingresa el token JWT obtenido del login',
+        in: 'header',
+      },
+      'access-token', // Este es el nombre de la referencia
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

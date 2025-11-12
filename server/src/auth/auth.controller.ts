@@ -6,7 +6,7 @@ import { LoginDto } from '../application/dtos/login-user.dto';
 import { Auth } from './decorators/auth.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -33,6 +33,7 @@ export class AuthController {
    */
   @Get('admin/dashboard')
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Dashboard admin (Solo admin)',
     description: 'Endpoint protegido solo para usuarios con rol admin',
@@ -54,6 +55,7 @@ export class AuthController {
    */
   @Get('moderator/reports')
   @Auth('admin', 'moderator')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Ver reportes (Admin o Moderator)',
     description:
@@ -79,6 +81,7 @@ export class AuthController {
    */
   @Post('admin/assign-role')
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Asignar rol a usuario (Admin only)',
     description: 'Permite a un admin asignar un rol a otro usuario',

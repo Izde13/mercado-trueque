@@ -21,6 +21,7 @@ import {
   ApiCreatedResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CreateTradeProposalUseCase } from '../../application/use-cases/create-trade-proposal.use-case';
 import { AcceptTradeProposalUseCase } from '../../application/use-cases/accept-trade-proposal.use-case';
@@ -75,6 +76,7 @@ export class TradesController {
    */
   @Get('user/:userId')
   @Auth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Obtener intercambios del usuario',
     description:
@@ -104,6 +106,7 @@ export class TradesController {
    */
   @Get('proposals/received/:userId')
   @Auth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Obtener propuestas recibidas',
     description:
@@ -133,6 +136,7 @@ export class TradesController {
    */
   @Post('proposals')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'FASE 1: Crear propuesta de trueque',
@@ -196,6 +200,7 @@ export class TradesController {
    */
   @Post('proposals/:proposalId/accept')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'proposalId',
@@ -257,6 +262,7 @@ export class TradesController {
    */
   @Post(':intercambioId/ship')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -326,6 +332,7 @@ export class TradesController {
    */
   @Post(':intercambioId/products/:productId/review')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -391,6 +398,7 @@ export class TradesController {
    */
   @Post(':intercambioId/deliver')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
@@ -456,6 +464,7 @@ export class TradesController {
    */
   @Post(':intercambioId/rate')
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({
     name: 'intercambioId',
