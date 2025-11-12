@@ -1,33 +1,33 @@
-# 🔄 Mercado Trueque
+# Mercado Trueque
 
 Plataforma de intercambio (trueque) de productos entre usuarios, implementada con NestJS, PostgreSQL y Prisma.
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
-- [Características](#-características)
-- [Arquitectura](#-arquitectura)
-- [Requisitos Previos](#-requisitos-previos)
-- [Instalación](#-instalación)
-- [Variables de Entorno](#-variables-de-entorno)
-- [Comandos Disponibles](#-comandos-disponibles)
-- [Documentación API](#-documentación-api)
-- [Flujo de Trueque](#-flujo-de-trueque)
-- [Autenticación y Autorización](#-autenticación-y-autorización)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Tecnologías Utilizadas](#-tecnologías-utilizadas)
+- [Características](#características)
+- [Arquitectura](#arquitectura)
+- [Requisitos Previos](#requisitos-previos)
+- [Instalación](#instalación)
+- [Variables de Entorno](#variables-de-entorno)
+- [Comandos Disponibles](#comandos-disponibles)
+- [Documentación API](#documentación-api)
+- [Flujo de Trueque](#flujo-de-trueque)
+- [Autenticación y Autorización](#autenticación-y-autorización)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Tecnologías Utilizadas](#tecnologías-utilizadas)
 
-## ✨ Características
+## Características
 
-- 🔐 **Autenticación JWT** con sistema de roles (admin, usuario, vendedor, moderator, revisor)
-- 📦 **Gestión de Productos** con categorías y estados
-- 🔄 **Sistema de Trueque Completo** (6 fases: propuesta → aceptación → envío → revisión → entrega → calificación)
-- 📊 **Documentación Swagger** interactiva con autenticación Bearer
-- 🏗️ **Arquitectura Hexagonal** (Domain-Driven Design)
-- 🛡️ **Seguridad OWASP** con validaciones, sanitización y logging
-- 🎯 **Patrones de Diseño**: Specifications, State Machine, SAGA, Command Pattern
-- 📝 **PostgreSQL** con Prisma ORM
+- **Autenticación JWT** con sistema de roles (admin, usuario, vendedor, moderator, revisor)
+- **Gestión de Productos** con categorías y estados
+- **Sistema de Trueque Completo** (6 fases: propuesta → aceptación → envío → revisión → entrega → calificación)
+- **Documentación Swagger** interactiva con autenticación Bearer
+- **Arquitectura Hexagonal** (Domain-Driven Design)
+- **Seguridad OWASP** con validaciones, sanitización y logging
+- **Patrones de Diseño**: Specifications, State Machine, SAGA, Command Pattern
+- **PostgreSQL** con Prisma ORM
 
-## 🏛️ Arquitectura
+## Arquitectura
 
 Este proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** con Domain-Driven Design:
 
@@ -76,14 +76,14 @@ graph TB
 3. **Domain** (`src/domain`): Lógica de negocio, entidades, VOs, especificaciones
 4. **Infrastructure** (`src/infrastructure`): Implementación de repositorios, configuración
 
-## 📋 Requisitos Previos
+## Requisitos Previos
 
 - **Node.js** >= 18.x
 - **npm** >= 9.x o **pnpm** >= 8.x
 - **PostgreSQL** >= 14.x
 - **Git**
 
-## 🚀 Instalación
+## Instalación
 
 ### 1. Clonar el repositorio
 
@@ -163,10 +163,10 @@ npm run start:prod
 ```
 
 El servidor estará disponible en:
-- 🚀 API: http://localhost:3000/api/v1
-- 📚 Swagger: http://localhost:3000/api-docs
+- API: http://localhost:3000/api/v1
+- Swagger: http://localhost:3000/api-docs
 
-## 🔐 Variables de Entorno
+## Variables de Entorno
 
 | Variable | Descripción | Ejemplo | Requerida |
 |----------|-------------|---------|-----------|
@@ -181,7 +181,7 @@ El servidor estará disponible en:
 | `JWT_EXPIRATION` | Tiempo de expiración del token | `24h` | ❌ |
 | `PORT` | Puerto del servidor | `3000` | ❌ |
 
-## 🛠️ Comandos Disponibles
+## Comandos Disponibles
 
 ### Desarrollo
 
@@ -251,7 +251,7 @@ npx prisma studio
 npx prisma db seed
 ```
 
-## 📖 Documentación API
+## Documentación API
 
 ### Swagger UI
 
@@ -263,7 +263,7 @@ Una vez iniciado el servidor, accede a la documentación interactiva en:
 
 1. Haz login en el endpoint `POST /api/v1/auth/login`
 2. Copia el `access_token` de la respuesta
-3. Haz clic en el botón **"Authorize"** (🔓) en la parte superior derecha
+3. Haz clic en el botón **"Authorize"** en la parte superior derecha
 4. Pega el token en el campo (sin el prefijo "Bearer")
 5. Haz clic en "Authorize"
 6. Ahora puedes acceder a los endpoints protegidos
@@ -274,60 +274,89 @@ Una vez iniciado el servidor, accede a la documentación interactiva en:
 
 - `POST /api/v1/auth/register` - Registrar nuevo usuario
 - `POST /api/v1/auth/login` - Login de usuario (retorna JWT)
-- `GET /api/v1/auth/admin/dashboard` - Dashboard admin (🔒 admin)
-- `POST /api/v1/auth/admin/assign-role` - Asignar rol (🔒 admin)
+- `GET /api/v1/auth/admin/dashboard` - Dashboard admin (requiere rol admin)
+- `POST /api/v1/auth/admin/assign-role` - Asignar rol (requiere rol admin)
 
 #### Productos
 
 - `GET /api/v1/products` - Listar productos (con filtros opcionales)
 - `GET /api/v1/products/:id` - Obtener producto por ID
-- `POST /api/v1/products` - Crear producto (🔒 autenticado)
+- `POST /api/v1/products` - Crear producto (requiere autenticación)
 
 #### Categorías
 
-- `GET /api/v1/categories` - Listar categorías (🔒 admin, usuario, vendedor)
-- `GET /api/v1/categories/:id` - Obtener categoría (🔒 admin, usuario, vendedor)
-- `POST /api/v1/categories` - Crear categoría (🔒 admin)
-- `PUT /api/v1/categories/:id` - Actualizar categoría (🔒 admin)
+- `GET /api/v1/categories` - Listar categorías (requiere autenticación)
+- `GET /api/v1/categories/:id` - Obtener categoría (requiere autenticación)
+- `POST /api/v1/categories` - Crear categoría (requiere rol admin)
+- `PUT /api/v1/categories/:id` - Actualizar categoría (requiere rol admin)
 
 #### Trueques
 
-- `GET /api/v1/trades/user/:userId` - Obtener intercambios del usuario (🔒)
-- `GET /api/v1/trades/proposals/received/:userId` - Propuestas recibidas (🔒)
-- `POST /api/v1/trades/proposals` - Crear propuesta (FASE 1) (🔒)
-- `POST /api/v1/trades/proposals/:id/accept` - Aceptar propuesta (FASE 2) (🔒)
-- `POST /api/v1/trades/:id/ship` - Enviar productos (FASE 3) (🔒)
-- `POST /api/v1/trades/:id/products/:productId/review` - Revisar producto (FASE 4) (🔒)
-- `POST /api/v1/trades/:id/deliver` - Marcar entrega (FASE 5) (🔒)
-- `POST /api/v1/trades/:id/rate` - Calificar intercambio (FASE 6) (🔒)
+- `GET /api/v1/trades/user/:userId` - Obtener intercambios del usuario
+- `GET /api/v1/trades/proposals/received/:userId` - Propuestas recibidas
+- `POST /api/v1/trades/proposals` - Crear propuesta (FASE 1)
+- `POST /api/v1/trades/proposals/:id/accept` - Aceptar propuesta (FASE 2)
+- `POST /api/v1/trades/:id/ship` - Enviar productos (FASE 3)
+- `POST /api/v1/trades/:id/products/:productId/review` - Revisar producto (FASE 4)
+- `POST /api/v1/trades/:id/deliver` - Marcar entrega (FASE 5)
+- `POST /api/v1/trades/:id/rate` - Calificar intercambio (FASE 6)
 
-## 🔄 Flujo de Trueque
+## Flujo de Trueque
 
-El sistema implementa un proceso de trueque de 6 fases con máquina de estados:
+El sistema implementa un proceso completo de trueque con **6 fases** bien definidas, utilizando una **máquina de estados finita** para garantizar la integridad del proceso.
+
+### Máquina de Estados del Intercambio
 
 ```mermaid
 stateDiagram-v2
     [*] --> PENDIENTE: Usuario crea propuesta
+
     PENDIENTE --> INICIADO: Usuario acepta propuesta
     PENDIENTE --> RECHAZADA: Usuario rechaza
-    PENDIENTE --> EXPIRADA: Timeout
+    PENDIENTE --> EXPIRADA: Timeout (7 días)
 
     INICIADO --> PRODUCTOS_ENVIADOS: Ambos usuarios envían productos
+    INICIADO --> CANCELADO: Usuario cancela
 
-    PRODUCTOS_ENVIADOS --> EN_REVISION: Todos productos aprobados
-    PRODUCTOS_ENVIADOS --> CANCELADO: Algún producto rechazado
+    PRODUCTOS_ENVIADOS --> EN_REVISION: Todos productos APROBADOS
+    PRODUCTOS_ENVIADOS --> CANCELADO: Algún producto RECHAZADO
 
     EN_REVISION --> COMPLETADO: Ambos usuarios marcan entrega
 
     COMPLETADO --> CALIFICADO: Ambos usuarios califican
-    COMPLETADO --> [*]
+    COMPLETADO --> [*]: Fin del ciclo
 
     RECHAZADA --> [*]
     EXPIRADA --> [*]
-    CANCELADO --> [*]
+    CANCELADO --> [*]: Productos devueltos
+    CALIFICADO --> [*]
+
+    note right of PENDIENTE
+        Estado inicial
+        Espera aceptación
+    end note
+
+    note right of COMPLETADO
+        Estado final exitoso
+        Puede calificarse
+    end note
 ```
 
-### Descripción de las Fases
+### Estados del Intercambio
+
+| Estado | Descripción | Transiciones Permitidas | Actor |
+|--------|-------------|------------------------|-------|
+| **PENDIENTE** | Propuesta creada, esperando respuesta | → INICIADO, RECHAZADA, EXPIRADA | Receptor |
+| **INICIADO** | Propuesta aceptada, intercambio iniciado | → PRODUCTOS_ENVIADOS, CANCELADO | Ambos usuarios |
+| **PRODUCTOS_ENVIADOS** | Ambos enviaron al centro | → EN_REVISION, CANCELADO | Centro/Sistema |
+| **EN_REVISION** | Productos aprobados, listos para entregar | → COMPLETADO | Ambos usuarios |
+| **COMPLETADO** | Ambos recibieron productos | → CALIFICADO | Ambos usuarios |
+| **CALIFICADO** | Intercambio finalizado con calificaciones | → (fin) | Sistema |
+| **RECHAZADA** | Propuesta rechazada por receptor | → (fin) | - |
+| **EXPIRADA** | Propuesta sin respuesta (7 días) | → (fin) | Sistema |
+| **CANCELADO** | Intercambio cancelado (productos rechazados) | → (fin) | Sistema |
+
+### Diagrama de Secuencia Completo
 
 ```mermaid
 sequenceDiagram
@@ -335,41 +364,358 @@ sequenceDiagram
     participant S as Sistema
     participant M as María (Receptor)
     participant C as Centro Distribución
+    participant DB as Base de Datos
 
-    Note over J,M: FASE 1: Crear Propuesta
-    J->>S: Crear propuesta (ofrece productos por producto de María)
-    S->>M: Notificación de propuesta
+    rect rgb(200, 220, 255)
+    Note over J,S,M: FASE 1: Crear Propuesta de Trueque
+    J->>S: POST /trades/proposals
+    activate S
+    S->>S: Validar productos disponibles
+    S->>S: Validar usuario tiene rating
+    S->>DB: Crear PropuestaTrueque (estado: PENDIENTE)
+    DB-->>S: PropuestaTrueque creada
+    S-->>J: 201 Created - Propuesta creada
+    deactivate S
+    S->>M: Notificación: Nueva propuesta recibida
+    end
 
-    Note over J,M: FASE 2: Aceptar Propuesta
-    M->>S: Acepta propuesta
-    S->>S: Crea Intercambio (estado: INICIADO)
-    S->>J: Notificación de aceptación
-    S->>M: Notificación de aceptación
+    rect rgb(220, 255, 220)
+    Note over J,S,M: FASE 2: Aceptar Propuesta
+    M->>S: POST /trades/proposals/:id/accept
+    activate S
+    S->>S: Validar es dueño del producto
+    S->>S: Validar productos disponibles
+    S->>S: Asignar centro de distribución
+    S->>DB: Crear Intercambio (estado: INICIADO)
+    S->>DB: Actualizar PropuestaTrueque (ACEPTADA)
+    S->>DB: Marcar productos como EN_INTERCAMBIO
+    DB-->>S: Intercambio creado
+    S-->>M: 201 Created - Intercambio iniciado
+    deactivate S
+    S->>J: Propuesta aceptada por María
+    S->>M: Propuesta aceptada, envía tus productos
+    end
 
-    Note over J,M: FASE 3: Enviar Productos
-    J->>C: Envía sus productos
-    M->>C: Envía su producto
-    S->>S: Estado: PRODUCTOS_ENVIADOS
+    rect rgb(255, 240, 200)
+    Note over J,C: FASE 3: Enviar Productos (Juan)
+    J->>S: POST /trades/:id/ship
+    activate S
+    S->>DB: Crear Envio (Juan → Centro)
+    S->>DB: Generar código tracking
+    DB-->>S: Envio creado
+    S-->>J: 201 Created - Envío registrado
+    deactivate S
+    J->>C: Envía productos físicamente
+    end
 
-    Note over J,M: FASE 4: Revisar Productos
-    C->>S: Revisa producto de Juan (calificación)
-    C->>S: Revisa producto de María (calificación)
-    S->>S: Estado: EN_REVISION (si ambos aprobados)
+    rect rgb(255, 240, 200)
+    Note over M,C: FASE 3: Enviar Productos (María)
+    M->>S: POST /trades/:id/ship
+    activate S
+    S->>DB: Crear Envio (María → Centro)
+    S->>DB: Verificar si ambos enviaron
+    S->>DB: Actualizar estado: PRODUCTOS_ENVIADOS
+    DB-->>S: Estado actualizado
+    S-->>M: 201 Created - Envío registrado
+    deactivate S
+    M->>C: Envía producto físicamente
+    S->>J: Ambos productos enviados
+    S->>M: Ambos productos enviados
+    end
 
-    Note over J,M: FASE 5: Entregar Productos
+    rect rgb(255, 220, 220)
+    Note over C,S: FASE 4: Revisar Productos en Centro
+    C->>C: Recibe producto de Juan
+    C->>S: POST /trades/:id/products/:productId/review
+    activate S
+    S->>S: Validar calificación (1-5)
+    S->>DB: Crear RevisionProducto
+    S->>DB: Estado: APROBADO (rating >= 3) o RECHAZADO (< 3)
+    DB-->>S: Revisión registrada
+    S-->>C: 201 Created - Revisión guardada
+    deactivate S
+
+    C->>C: Recibe producto de María
+    C->>S: POST /trades/:id/products/:productId/review
+    activate S
+    S->>DB: Crear RevisionProducto
+    S->>S: Verificar si todos aprobados
+    alt Todos aprobados
+        S->>DB: Actualizar estado: EN_REVISION
+        S->>J: Productos aprobados, en camino
+        S->>M: Productos aprobados, en camino
+    else Alguno rechazado
+        S->>DB: Actualizar estado: CANCELADO
+        S->>J: Intercambio cancelado (productos rechazados)
+        S->>M: Intercambio cancelado (productos rechazados)
+    end
+    S-->>C: 201 Created - Revisión completada
+    deactivate S
+    end
+
+    rect rgb(220, 255, 240)
+    Note over C,M: FASE 5: Entregar Productos (a María)
     C->>M: Entrega productos de Juan
-    M->>S: Marca recibido
-    C->>J: Entrega producto de María
-    J->>S: Marca recibido
-    S->>S: Estado: COMPLETADO
+    M->>S: POST /trades/:id/deliver
+    activate S
+    S->>DB: Crear Entrega (productos Juan → María)
+    S->>DB: Marcar entrega como COMPLETADA
+    DB-->>S: Entrega registrada
+    S-->>M: 201 Created - Entrega confirmada
+    deactivate S
+    end
 
-    Note over J,M: FASE 6: Calificar
-    J->>S: Califica a María y producto
-    M->>S: Califica a Juan y productos
-    S->>S: Actualiza reputación de ambos
+    rect rgb(220, 255, 240)
+    Note over C,J: FASE 5: Entregar Productos (a Juan)
+    C->>J: Entrega producto de María
+    J->>S: POST /trades/:id/deliver
+    activate S
+    S->>DB: Crear Entrega (producto María → Juan)
+    S->>DB: Verificar si ambos recibieron
+    S->>DB: Actualizar estado: COMPLETADO
+    DB-->>S: Intercambio completado
+    S-->>J: 201 Created - Intercambio completado
+    deactivate S
+    S->>J: Intercambio completado, califica
+    S->>M: Intercambio completado, califica
+    end
+
+    rect rgb(240, 220, 255)
+    Note over J,M: FASE 6: Calificar Mutuamente
+    J->>S: POST /trades/:id/rate
+    activate S
+    S->>DB: Crear Calificacion (Juan → María)
+    S->>DB: Calificación usuario: 5/5
+    S->>DB: Calificación producto: 5/5
+    DB-->>S: Calificación guardada
+    S-->>J: 201 Created - Calificación registrada
+    deactivate S
+
+    M->>S: POST /trades/:id/rate
+    activate S
+    S->>DB: Crear Calificacion (María → Juan)
+    S->>DB: Verificar si ambos calificaron
+    S->>DB: Actualizar reputación de Juan
+    S->>DB: Actualizar reputación de María
+    S->>DB: Actualizar estado: CALIFICADO
+    DB-->>S: Reputaciones actualizadas
+    S-->>M: 201 Created - Proceso finalizado
+    deactivate S
+    S->>J: María te calificó
+    S->>M: Juan te calificó
+    end
 ```
 
-## 🔐 Autenticación y Autorización
+### Descripción Detallada de Cada Fase
+
+#### FASE 1: Crear Propuesta de Trueque
+
+**Objetivo**: Usuario oferente (Juan) crea una propuesta para intercambiar sus productos por un producto de otro usuario (María).
+
+**Proceso**:
+1. Juan selecciona el producto de María que desea
+2. Juan selecciona 1-5 de sus productos para ofrecer a cambio
+3. Sistema valida:
+   - Productos disponibles (estado PUBLICADO)
+   - Usuario tiene rating suficiente
+   - No hay propuestas duplicadas
+4. Se crea la propuesta con estado **PENDIENTE**
+5. María recibe notificación
+
+**Endpoint**: `POST /api/v1/trades/proposals`
+
+**Validaciones**:
+- ✅ Producto solicitado existe y está PUBLICADO
+- ✅ Productos ofrecidos están PUBLICADOS
+- ✅ Usuario tiene rating >= requerido
+- ✅ Entre 1 y 5 productos ofrecidos
+- ❌ No se puede hacer propuesta duplicada
+
+---
+
+#### FASE 2: Aceptar Propuesta
+
+**Objetivo**: Usuario receptor (María) acepta la propuesta y se crea el intercambio oficial.
+
+**Proceso**:
+1. María revisa la propuesta recibida
+2. Decide aceptar o rechazar
+3. Si acepta:
+   - Se crea el **Intercambio** con estado **INICIADO**
+   - Se asigna un centro de distribución geográficamente cercano
+   - Productos se marcan como EN_INTERCAMBIO
+   - Ambos usuarios reciben notificación
+
+**Endpoint**: `POST /api/v1/trades/proposals/:id/accept`
+
+**Validaciones**:
+- ✅ Propuesta en estado PENDIENTE
+- ✅ Usuario es el receptor de la propuesta
+- ✅ Ambos usuarios activos
+- ✅ Todos los productos siguen disponibles
+- ✅ Centro de distribución asignado
+
+---
+
+#### FASE 3: Enviar Productos
+
+**Objetivo**: Ambos usuarios envían sus productos al centro de distribución asignado.
+
+**Proceso**:
+1. Cada usuario empaqueta sus productos
+2. Registra el envío en el sistema
+3. Sistema genera código de tracking
+4. Cuando **AMBOS** han enviado:
+   - Estado cambia a **PRODUCTOS_ENVIADOS**
+   - Centro de distribución recibe notificación
+
+**Endpoint**: `POST /api/v1/trades/:id/ship`
+
+**Datos del Envío**:
+- Dirección origen (usuario)
+- Dirección destino (centro)
+- Código de tracking (auto-generado)
+- Fecha de envío
+- Notas opcionales
+
+**Validaciones**:
+- ✅ Intercambio en estado INICIADO
+- ✅ Usuario está involucrado en el intercambio
+- ✅ No ha enviado previamente
+
+---
+
+#### FASE 4: Revisar Productos
+
+**Objetivo**: Centro de distribución inspecciona cada producto recibido y lo califica.
+
+**Proceso**:
+1. Centro recibe productos físicamente
+2. Por CADA producto:
+   - Inspección física del estado
+   - Calificación de condición (1-5 estrellas)
+   - Fotografías del producto
+   - Observaciones
+3. Decisión:
+   - **Rating >= 3**: Producto APROBADO
+   - **Rating < 3**: Producto RECHAZADO
+4. Cuando TODOS los productos de AMBOS usuarios están aprobados:
+   - Estado cambia a **EN_REVISION**
+5. Si algún producto es rechazado:
+   - Estado cambia a **CANCELADO**
+   - Productos se devuelven a sus dueños
+
+**Endpoint**: `POST /api/v1/trades/:id/products/:productId/review`
+
+**Datos de Revisión**:
+- Calificación de condición (1-5)
+- Observaciones del revisor
+- Fotografías del producto
+- Timestamp de revisión
+
+**Validaciones**:
+- ✅ Intercambio en estado PRODUCTOS_ENVIADOS
+- ✅ Producto pertenece al intercambio
+- ✅ Calificación válida (1-5)
+
+---
+
+#### FASE 5: Entregar Productos
+
+**Objetivo**: Centro distribuye los productos aprobados a los destinos finales.
+
+**Proceso**:
+1. Centro envía productos de Juan a María
+2. María recibe y confirma entrega en sistema
+3. Centro envía producto de María a Juan
+4. Juan recibe y confirma entrega en sistema
+5. Cuando **AMBOS** confirman:
+   - Estado cambia a **COMPLETADO**
+   - Sistema habilita calificaciones
+
+**Endpoint**: `POST /api/v1/trades/:id/deliver`
+
+**Datos de Entrega**:
+- Dirección de entrega final
+- Fecha de recepción
+- Notas opcionales
+- Confirmación de recepción
+
+**Validaciones**:
+- ✅ Intercambio en estado EN_REVISION
+- ✅ Usuario está involucrado
+- ✅ No ha confirmado previamente
+
+---
+
+#### FASE 6: Calificar
+
+**Objetivo**: Ambos usuarios califican mutuamente la experiencia del intercambio.
+
+**Proceso**:
+1. Cada usuario califica:
+   - **Al otro usuario** (1-5 estrellas)
+   - **Los productos recibidos** (1-5 estrellas)
+   - Comentario opcional
+2. Cuando **AMBOS** califican:
+   - Se actualiza la reputación de ambos usuarios
+   - Se calcula promedio de calificaciones
+   - Estado cambia a **CALIFICADO**
+   - Intercambio finalizado completamente
+
+**Endpoint**: `POST /api/v1/trades/:id/rate`
+
+**Datos de Calificación**:
+- Calificación al usuario (1-5)
+- Calificación al producto (1-5)
+- Comentario (opcional)
+- Timestamp
+
+**Validaciones**:
+- ✅ Intercambio en estado COMPLETADO
+- ✅ Usuario está involucrado
+- ✅ No ha calificado previamente
+- ✅ Calificaciones válidas (1-5)
+
+**Actualización de Reputación**:
+```typescript
+nuevo_rating = (rating_actual × num_intercambios + nueva_calificacion) / (num_intercambios + 1)
+```
+
+---
+
+### Estados Finales
+
+```mermaid
+graph LR
+    A[Intercambio Iniciado] --> B{¿Resultado?}
+    B -->|Exitoso| C[CALIFICADO]
+    B -->|Rechazada| D[RECHAZADA]
+    B -->|Sin respuesta| E[EXPIRADA]
+    B -->|Producto malo| F[CANCELADO]
+
+    C --> G[Ambos satisfechos]
+    D --> H[Sin intercambio]
+    E --> H
+    F --> I[Productos devueltos]
+
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+    style F fill:#FFA500
+```
+
+### Reglas de Negocio Importantes
+
+1. **Tiempo de expiración**: Propuestas pendientes expiran en 7 días
+2. **Calificación mínima**: Productos con rating < 3 son rechazados
+3. **Límite de productos**: Entre 1 y 5 productos por propuesta
+4. **Estado de productos**: Solo productos PUBLICADOS pueden intercambiarse
+5. **Sincronización**: Muchas transiciones requieren que AMBOS usuarios completen la acción
+6. **Atomicidad**: Si un producto es rechazado, TODO el intercambio se cancela
+7. **Trazabilidad**: Cada fase genera registros de auditoría
+
+## Autenticación y Autorización
 
 ### Roles Disponibles
 
@@ -432,7 +778,7 @@ curl -H "Authorization: Bearer <tu-token>" \
   http://localhost:3000/api/v1/products
 ```
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 server/
@@ -505,21 +851,21 @@ graph TB
     style H fill:#fff4e1
 ```
 
-## 🛡️ Seguridad
+## Seguridad
 
 El proyecto implementa las mejores prácticas de seguridad según OWASP:
 
-- ✅ **Autenticación JWT** con tokens firmados
-- ✅ **Autorización basada en roles** (RBAC)
-- ✅ **Validación de entrada** con class-validator
-- ✅ **Sanitización de logs** para prevenir log injection
-- ✅ **Hashing de contraseñas** con bcrypt
-- ✅ **CORS configurado** para orígenes permitidos
-- ✅ **Rate limiting** (pendiente de implementar)
-- ✅ **SQL Injection prevention** con Prisma ORM
-- ✅ **XSS prevention** con validación de datos
+- **Autenticación JWT** con tokens firmados
+- **Autorización basada en roles** (RBAC)
+- **Validación de entrada** con class-validator
+- **Sanitización de logs** para prevenir log injection
+- **Hashing de contraseñas** con bcrypt
+- **CORS configurado** para orígenes permitidos
+- **Rate limiting** (pendiente de implementar)
+- **SQL Injection prevention** con Prisma ORM
+- **XSS prevention** con validación de datos
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Tests unitarios
@@ -535,7 +881,7 @@ npm run test:e2e
 npm run test:watch
 ```
 
-## 🚀 Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 ### Backend
 
@@ -557,7 +903,7 @@ npm run test:watch
 - **Jest** - Testing framework
 - **Supertest** - Testing de APIs
 
-## 📝 Convenciones de Código
+## Convenciones de Código
 
 ### Nombres de Archivos
 
@@ -580,7 +926,7 @@ refactor: mejorar estructura de repositorios
 test: agregar tests para TradeService
 ```
 
-## 🤝 Contribución
+## Contribución
 
 1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feat/nueva-funcionalidad`)
@@ -588,18 +934,14 @@ test: agregar tests para TradeService
 4. Push a la rama (`git push origin feat/nueva-funcionalidad`)
 5. Abre un Pull Request
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es privado y no tiene licencia pública.
 
-## 👥 Autores
+## Autores
 
 - **Equipo de Desarrollo** - Universidad
 
-## 🆘 Soporte
+## Soporte
 
 Para reportar bugs o solicitar features, abre un issue en el repositorio.
-
----
-
-⭐ Si te gusta este proyecto, dale una estrella en GitHub!
