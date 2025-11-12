@@ -367,7 +367,7 @@ sequenceDiagram
     participant DB as Base de Datos
 
     rect rgb(200, 220, 255)
-    Note over J,S,M: FASE 1: Crear Propuesta de Trueque
+    Note over J,S,M: FASE 1 - Crear Propuesta de Trueque
     J->>S: POST /trades/proposals
     activate S
     S->>S: Validar productos disponibles
@@ -380,7 +380,7 @@ sequenceDiagram
     end
 
     rect rgb(220, 255, 220)
-    Note over J,S,M: FASE 2: Aceptar Propuesta
+    Note over J,S,M: FASE 2 - Aceptar Propuesta
     M->>S: POST /trades/proposals/:id/accept
     activate S
     S->>S: Validar es dueño del producto
@@ -397,7 +397,7 @@ sequenceDiagram
     end
 
     rect rgb(255, 240, 200)
-    Note over J,C: FASE 3: Enviar Productos (Juan)
+    Note over J,C: FASE 3 - Enviar Productos (Juan)
     J->>S: POST /trades/:id/ship
     activate S
     S->>DB: Crear Envio (Juan → Centro)
@@ -409,7 +409,7 @@ sequenceDiagram
     end
 
     rect rgb(255, 240, 200)
-    Note over M,C: FASE 3: Enviar Productos (María)
+    Note over M,C: FASE 3 - Enviar Productos (María)
     M->>S: POST /trades/:id/ship
     activate S
     S->>DB: Crear Envio (María → Centro)
@@ -424,7 +424,7 @@ sequenceDiagram
     end
 
     rect rgb(255, 220, 220)
-    Note over C,S: FASE 4: Revisar Productos en Centro
+    Note over C,S: FASE 4 - Revisar Productos en Centro
     C->>C: Recibe producto de Juan
     C->>S: POST /trades/:id/products/:productId/review
     activate S
@@ -454,7 +454,7 @@ sequenceDiagram
     end
 
     rect rgb(220, 255, 240)
-    Note over C,M: FASE 5: Entregar Productos (a María)
+    Note over C,M: FASE 5 - Entregar Productos (a María)
     C->>M: Entrega productos de Juan
     M->>S: POST /trades/:id/deliver
     activate S
@@ -466,7 +466,7 @@ sequenceDiagram
     end
 
     rect rgb(220, 255, 240)
-    Note over C,J: FASE 5: Entregar Productos (a Juan)
+    Note over C,J: FASE 5 - Entregar Productos (a Juan)
     C->>J: Entrega producto de María
     J->>S: POST /trades/:id/deliver
     activate S
@@ -481,7 +481,7 @@ sequenceDiagram
     end
 
     rect rgb(240, 220, 255)
-    Note over J,M: FASE 6: Calificar Mutuamente
+    Note over J,M: FASE 6 - Calificar Mutuamente
     J->>S: POST /trades/:id/rate
     activate S
     S->>DB: Crear Calificacion (Juan → María)
