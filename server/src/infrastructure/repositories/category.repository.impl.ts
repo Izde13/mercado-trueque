@@ -11,7 +11,6 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     const created = await this.prisma.categorias.create({
       data: {
         id: category.id,
-        codigo: category.codigo,
         nombre: category.nombre,
         descripcion: category.descripcion,
         activo: category.activo,
@@ -58,7 +57,6 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     const updated = await this.prisma.categorias.update({
       where: { id: category.id },
       data: {
-        codigo: category.codigo,
         nombre: category.nombre,
         descripcion: category.descripcion,
         activo: category.activo,

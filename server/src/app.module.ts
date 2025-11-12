@@ -7,6 +7,8 @@ import { PrismaService } from './infrastructure/services/prisma.service';
 import { CategoryRepositoryImpl } from './infrastructure/repositories/category.repository.impl';
 import { GetCategoriesUseCase } from './application/use-cases/get-categories.use-case';
 import { GetCategoryUseCase } from './application/use-cases/get-category.use-case';
+import { CreateCategoryUseCase } from './application/use-cases/create-category.use-case';
+import { UpdateCategoryUseCase } from './application/use-cases/update-category.use-case';
 import { CategoriesController } from './presentation/controllers/categories.controller';
 
 // Products
@@ -178,6 +180,8 @@ import { AuthModule } from './auth/auth.module';
     },
     GetCategoriesUseCase,
     GetCategoryUseCase,
+    CreateCategoryUseCase,
+    UpdateCategoryUseCase,
     // Products
     {
       provide: 'ProductRepository',
