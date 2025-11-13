@@ -366,7 +366,6 @@ sequenceDiagram
     participant C as Centro
     participant DB as BD
 
-    rect rgb(200, 220, 255)
     Note over J,S: FASE 1 Crear Propuesta
     J->>S: POST /trades/proposals
     activate S
@@ -377,9 +376,7 @@ sequenceDiagram
     S-->>J: 201 Created
     deactivate S
     S->>M: Notificación
-    end
 
-    rect rgb(220, 255, 220)
     Note over M,S: FASE 2 Aceptar Propuesta
     M->>S: POST /trades/proposals/:id/accept
     activate S
@@ -392,9 +389,7 @@ sequenceDiagram
     S-->>M: 201 Created
     deactivate S
     S->>J: Notificación aceptación
-    end
 
-    rect rgb(255, 240, 200)
     Note over J,S: FASE 3 Enviar Productos Juan
     J->>S: POST /trades/:id/ship
     activate S
@@ -404,9 +399,7 @@ sequenceDiagram
     S-->>J: 201 Created
     deactivate S
     J->>C: Envía productos
-    end
 
-    rect rgb(255, 240, 200)
     Note over M,S: FASE 3 Enviar Productos María
     M->>S: POST /trades/:id/ship
     activate S
@@ -417,9 +410,7 @@ sequenceDiagram
     S-->>M: 201 Created
     deactivate S
     M->>C: Envía productos
-    end
 
-    rect rgb(255, 220, 220)
     Note over C,S: FASE 4 Revisar Productos
     C->>S: POST /trades/:id/products/:id/review
     activate S
@@ -432,9 +423,7 @@ sequenceDiagram
     end
     S-->>C: 201 Created
     deactivate S
-    end
 
-    rect rgb(220, 255, 240)
     Note over C,M: FASE 5 Entregar a María
     C->>M: Entrega productos
     M->>S: POST /trades/:id/deliver
@@ -443,9 +432,7 @@ sequenceDiagram
     DB-->>S: Entrega registrada
     S-->>M: 201 Created
     deactivate S
-    end
 
-    rect rgb(220, 255, 240)
     Note over C,J: FASE 5 Entregar a Juan
     C->>J: Entrega productos
     J->>S: POST /trades/:id/deliver
@@ -456,9 +443,7 @@ sequenceDiagram
     DB-->>S: Completado
     S-->>J: 201 Created
     deactivate S
-    end
 
-    rect rgb(240, 220, 255)
     Note over J,S: FASE 6 Calificar
     J->>S: POST /trades/:id/rate
     activate S
@@ -475,7 +460,6 @@ sequenceDiagram
     DB-->>S: Proceso finalizado
     S-->>M: 201 Created
     deactivate S
-    end
 ```
 
 ### Descripción Detallada de Cada Fase
