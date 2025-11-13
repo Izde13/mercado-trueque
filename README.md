@@ -360,149 +360,121 @@ stateDiagram-v2
 
 ```mermaid
 sequenceDiagram
-    participant J as Juan (Oferente)
+    participant J as Juan
     participant S as Sistema
-    participant M as María (Receptor)
-    participant C as Centro Distribución
-    participant DB as Base de Datos
+    participant M as María
+    participant C as Centro
+    participant DB as BD
 
     rect rgb(200, 220, 255)
-    Note over J,S,M: FASE 1 - Crear Propuesta de Trueque
+    Note over J,S: FASE 1 Crear Propuesta
     J->>S: POST /trades/proposals
     activate S
     S->>S: Validar productos disponibles
     S->>S: Validar usuario tiene rating
-    S->>DB: Crear PropuestaTrueque (estado: PENDIENTE)
-    DB-->>S: PropuestaTrueque creada
-    S-->>J: 201 Created - Propuesta creada
+    S->>DB: Crear PropuestaTrueque
+    DB-->>S: Propuesta creada
+    S-->>J: 201 Created
     deactivate S
-    S->>M: Notificación: Nueva propuesta recibida
+    S->>M: Notificación
     end
 
     rect rgb(220, 255, 220)
-    Note over J,S,M: FASE 2 - Aceptar Propuesta
+    Note over M,S: FASE 2 Aceptar Propuesta
     M->>S: POST /trades/proposals/:id/accept
     activate S
-    S->>S: Validar es dueño del producto
+    S->>S: Validar dueño del producto
     S->>S: Validar productos disponibles
-    S->>S: Asignar centro de distribución
-    S->>DB: Crear Intercambio (estado: INICIADO)
-    S->>DB: Actualizar PropuestaTrueque (ACEPTADA)
-    S->>DB: Marcar productos como EN_INTERCAMBIO
+    S->>DB: Crear Intercambio
+    S->>DB: Actualizar Propuesta
+    S->>DB: Marcar productos EN_INTERCAMBIO
     DB-->>S: Intercambio creado
-    S-->>M: 201 Created - Intercambio iniciado
+    S-->>M: 201 Created
     deactivate S
-    S->>J: Propuesta aceptada por María
-    S->>M: Propuesta aceptada, envía tus productos
+    S->>J: Notificación aceptación
     end
 
     rect rgb(255, 240, 200)
-    Note over J,C: FASE 3 - Enviar Productos (Juan)
+    Note over J,S: FASE 3 Enviar Productos Juan
     J->>S: POST /trades/:id/ship
     activate S
-    S->>DB: Crear Envio (Juan → Centro)
-    S->>DB: Generar código tracking
+    S->>DB: Crear Envio
+    S->>DB: Generar tracking
     DB-->>S: Envio creado
-    S-->>J: 201 Created - Envío registrado
+    S-->>J: 201 Created
     deactivate S
-    J->>C: Envía productos físicamente
+    J->>C: Envía productos
     end
 
     rect rgb(255, 240, 200)
-    Note over M,C: FASE 3 - Enviar Productos (María)
+    Note over M,S: FASE 3 Enviar Productos María
     M->>S: POST /trades/:id/ship
     activate S
-    S->>DB: Crear Envio (María → Centro)
-    S->>DB: Verificar si ambos enviaron
-    S->>DB: Actualizar estado: PRODUCTOS_ENVIADOS
+    S->>DB: Crear Envio
+    S->>DB: Verificar ambos enviaron
+    S->>DB: Estado PRODUCTOS_ENVIADOS
     DB-->>S: Estado actualizado
-    S-->>M: 201 Created - Envío registrado
+    S-->>M: 201 Created
     deactivate S
-    M->>C: Envía producto físicamente
-    S->>J: Ambos productos enviados
-    S->>M: Ambos productos enviados
+    M->>C: Envía productos
     end
 
     rect rgb(255, 220, 220)
-    Note over C,S: FASE 4 - Revisar Productos en Centro
-    C->>C: Recibe producto de Juan
-    C->>S: POST /trades/:id/products/:productId/review
-    activate S
-    S->>S: Validar calificación (1-5)
-    S->>DB: Crear RevisionProducto
-    S->>DB: Estado: APROBADO (rating >= 3) o RECHAZADO (< 3)
-    DB-->>S: Revisión registrada
-    S-->>C: 201 Created - Revisión guardada
-    deactivate S
-
-    C->>C: Recibe producto de María
-    C->>S: POST /trades/:id/products/:productId/review
+    Note over C,S: FASE 4 Revisar Productos
+    C->>S: POST /trades/:id/products/:id/review
     activate S
     S->>DB: Crear RevisionProducto
-    S->>S: Verificar si todos aprobados
+    S->>S: Verificar todos aprobados
     alt Todos aprobados
-        S->>DB: Actualizar estado: EN_REVISION
-        S->>J: Productos aprobados, en camino
-        S->>M: Productos aprobados, en camino
+        S->>DB: Estado EN_REVISION
     else Alguno rechazado
-        S->>DB: Actualizar estado: CANCELADO
-        S->>J: Intercambio cancelado (productos rechazados)
-        S->>M: Intercambio cancelado (productos rechazados)
+        S->>DB: Estado CANCELADO
     end
-    S-->>C: 201 Created - Revisión completada
+    S-->>C: 201 Created
     deactivate S
     end
 
     rect rgb(220, 255, 240)
-    Note over C,M: FASE 5 - Entregar Productos (a María)
-    C->>M: Entrega productos de Juan
+    Note over C,M: FASE 5 Entregar a María
+    C->>M: Entrega productos
     M->>S: POST /trades/:id/deliver
     activate S
-    S->>DB: Crear Entrega (productos Juan → María)
-    S->>DB: Marcar entrega como COMPLETADA
+    S->>DB: Crear Entrega
     DB-->>S: Entrega registrada
-    S-->>M: 201 Created - Entrega confirmada
+    S-->>M: 201 Created
     deactivate S
     end
 
     rect rgb(220, 255, 240)
-    Note over C,J: FASE 5 - Entregar Productos (a Juan)
-    C->>J: Entrega producto de María
+    Note over C,J: FASE 5 Entregar a Juan
+    C->>J: Entrega productos
     J->>S: POST /trades/:id/deliver
     activate S
-    S->>DB: Crear Entrega (producto María → Juan)
-    S->>DB: Verificar si ambos recibieron
-    S->>DB: Actualizar estado: COMPLETADO
-    DB-->>S: Intercambio completado
-    S-->>J: 201 Created - Intercambio completado
+    S->>DB: Crear Entrega
+    S->>DB: Verificar ambos recibieron
+    S->>DB: Estado COMPLETADO
+    DB-->>S: Completado
+    S-->>J: 201 Created
     deactivate S
-    S->>J: Intercambio completado, califica
-    S->>M: Intercambio completado, califica
     end
 
     rect rgb(240, 220, 255)
-    Note over J,M: FASE 6 - Calificar Mutuamente
+    Note over J,S: FASE 6 Calificar
     J->>S: POST /trades/:id/rate
     activate S
-    S->>DB: Crear Calificacion (Juan → María)
-    S->>DB: Calificación usuario: 5/5
-    S->>DB: Calificación producto: 5/5
+    S->>DB: Crear Calificacion
     DB-->>S: Calificación guardada
-    S-->>J: 201 Created - Calificación registrada
+    S-->>J: 201 Created
     deactivate S
 
     M->>S: POST /trades/:id/rate
     activate S
-    S->>DB: Crear Calificacion (María → Juan)
-    S->>DB: Verificar si ambos calificaron
-    S->>DB: Actualizar reputación de Juan
-    S->>DB: Actualizar reputación de María
-    S->>DB: Actualizar estado: CALIFICADO
-    DB-->>S: Reputaciones actualizadas
-    S-->>M: 201 Created - Proceso finalizado
+    S->>DB: Crear Calificacion
+    S->>DB: Actualizar reputaciones
+    S->>DB: Estado CALIFICADO
+    DB-->>S: Proceso finalizado
+    S-->>M: 201 Created
     deactivate S
-    S->>J: María te calificó
-    S->>M: Juan te calificó
     end
 ```
 
