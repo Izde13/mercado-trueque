@@ -56,6 +56,8 @@ async function bootstrap() {
       showRequestHeaders: true,
       docExpansion: 'list',
     },
+    jsonDocumentUrl: '/api-docs/openapi.json', // URL para descargar el JSON
+    yamlDocumentUrl: '/api-docs/openapi.yaml', // URL para descargar el YAML
   });
 
   app.enableCors({
@@ -68,5 +70,7 @@ async function bootstrap() {
 
   console.log('🚀 API running on: http://localhost:3000/api/v1');
   console.log('📚 Swagger docs: http://localhost:3000/api-docs');
+  console.log('📄 OpenAPI JSON: http://localhost:3000/api-docs/openapi.json');
+  console.log('📄 OpenAPI YAML: http://localhost:3000/api-docs/openapi.yaml');
 }
 bootstrap();
