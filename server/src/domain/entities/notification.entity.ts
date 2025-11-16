@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 export class Notification {
   constructor(
     public readonly id: string,
@@ -19,7 +21,7 @@ export class Notification {
     referenciaId?: string,
     referenciaTipo?: string,
   ): Notification {
-    const id = crypto.randomUUID();
+    const id = randomUUID();
     const now = new Date();
     return new Notification(
       id,

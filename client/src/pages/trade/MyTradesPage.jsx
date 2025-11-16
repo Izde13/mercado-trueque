@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import { useUserTrades } from "../../shared/hooks/useUserTrades";
-import { getCurrentUserId } from "../../shared/constants/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MyTradesPage() {
   const navigate = useNavigate();
-  const userId = getCurrentUserId();
+  const { user } = useAuth();
+  const userId = user?.id;
   const { trades, loading } = useUserTrades(userId);
 
   // Estado para filtro de estado

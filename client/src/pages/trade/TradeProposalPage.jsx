@@ -9,14 +9,15 @@ import SummaryBox from "./../../features/trade/SummaryBox/SummaryBox.jsx";
 import { useUserProducts } from "../../shared/hooks/useUserProducts";
 import { useProductDetail } from "../../shared/hooks/useProductDetail";
 import { useTradeProposal } from "../../shared/hooks/useTradeProposal";
-import { getCurrentUserId } from "../../shared/constants/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function TradeProposalPage(){
   const { productId } = useParams();
   const navigate = useNavigate();
 
-  // Obtener userId del archivo de constantes (mock de autenticación)
-  const userId = getCurrentUserId();
+  // Obtener userId del contexto de autenticación
+  const { user } = useAuth();
+  const userId = user?.id;
 
   // Estado de productos seleccionados para la propuesta
   const [selectedProducts, setSelectedProducts] = useState([]);

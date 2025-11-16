@@ -10,10 +10,7 @@ export class CreateCategoryUseCase {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
-  async execute(
-    nombre: string,
-    descripcion?: string,
-  ): Promise<Category> {
+  async execute(nombre: string, descripcion?: string): Promise<Category> {
     // Validar que el nombre no esté vacío
     if (!nombre || nombre.trim().length === 0) {
       throw new BadRequestException('El nombre de la categoría es requerido');

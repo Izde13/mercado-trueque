@@ -16,13 +16,16 @@ import type { EnvioRepository } from '../../domain/repositories/envio.repository
 import type { TradeProposalRepository } from '../../domain/repositories/trade-proposal.repository';
 import type { ProductoPropuestaRepository } from '../../domain/repositories/producto-propuesta.repository';
 import type { ProductRepository } from '../../domain/repositories/product.repository';
+import type { UserRepository } from '../../domain/repositories/user.repository';
 import { EstadoEnvio } from '../../domain/entities/envio.entity';
 import { EstadoIntercambio } from '../../domain/entities/intercambio.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class DeliverTradeUseCase {
   constructor(
     private readonly deliveryValidator: DeliveryPhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('IntercambioRepository')
     private readonly intercambioRepository: IntercambioRepository,
     @Inject('RevisionProductoRepository')
@@ -35,10 +38,11 @@ export class DeliverTradeUseCase {
     private readonly productoPropuestaRepository: ProductoPropuestaRepository,
     @Inject('ProductRepository')
     private readonly productRepository: ProductRepository,
+    @Inject('UserRepository')
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(input: DeliverTradeDto): Promise<DeliveryResponseDto> {
-    // 1. Obtener intercambio
     const intercambio = await this.intercambioRepository.findById(
       input.intercambio_id,
     );
@@ -47,7 +51,6 @@ export class DeliverTradeUseCase {
       throw new NotFoundException('Intercambio no encontrado');
     }
 
-    // 2. Obtener propuesta
     const propuesta = await this.tradeProposalRepository.findByIdWithRelations(
       intercambio.propuestaId,
     );
@@ -56,38 +59,30 @@ export class DeliverTradeUseCase {
       throw new NotFoundException('Propuesta no encontrada');
     }
 
-    // 3. Obtener producto solicitado para identificar al receptor
-    const productoSolicitado = await this.productRepository.findById(
-      propuesta.productoSolicitadoId,
-    );
-
-    if (!productoSolicitado) {
-      throw new NotFoundException('Producto solicitado no encontrado');
-    }
-
-    // 4. Obtener productos ofrecidos por el OFERENTE
-    const productosOfrecidos =
-      await this.productoPropuestaRepository.findByPropuestaId(
-        intercambio.propuestaId,
-      );
-
-    // 5. Determinar qué productos debe marcar como entregado el usuario actual
     const productosAMarcar: string[] = [];
 
-    // Si el usuario es el OFERENTE (Juan) - marca sus productos como entregados
     if (input.usuario_id === propuesta.usuarioOferenteId) {
+      const productosOfrecidos =
+        await this.productoPropuestaRepository.findByPropuestaId(
+          intercambio.propuestaId,
+        );
       productosAMarcar.push(...productosOfrecidos.map((p) => p.productoId));
-    }
-    // Si el usuario es el RECEPTOR (María) - marca el producto solicitado como entregado
-    else if (input.usuario_id === productoSolicitado.usuarioId) {
-      productosAMarcar.push(propuesta.productoSolicitadoId);
     } else {
-      throw new BadRequestException(
-        'El usuario no está involucrado en este intercambio',
+      const productoSolicitado = await this.productRepository.findById(
+        propuesta.productoSolicitadoId,
       );
+      if (!productoSolicitado) {
+        throw new NotFoundException('Producto solicitado no encontrado');
+      }
+      if (input.usuario_id === productoSolicitado.usuarioId) {
+        productosAMarcar.push(propuesta.productoSolicitadoId);
+      } else {
+        throw new BadRequestException(
+          'El usuario no está involucrado en este intercambio',
+        );
+      }
     }
 
-    // 6. Crear contexto para validación
     const context: DeliveryContext = {
       userId: input.usuario_id,
       userStatus: 'activo',
@@ -95,12 +90,11 @@ export class DeliverTradeUseCase {
       userTotalTrades: 0,
       timestamp: new Date(),
       intercambioId: input.intercambio_id,
-      productoId: '', // No es requerido para esta validación
+      productoId: '',
       deliveryAddress: input.delivery_address,
       estimatedDeliveryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
     };
 
-    // 7. Validar entrega
     const validation = await this.deliveryValidator.validate(context);
 
     if (!validation.isValid && validation.severity === 'error') {
@@ -110,12 +104,10 @@ export class DeliverTradeUseCase {
       });
     }
 
-    // 8. Obtener todos los envios del intercambio
     const todosLosEnvios = await this.envioRepository.findByIntercambioId(
       input.intercambio_id,
     );
 
-    // 9. Marcar como ENTREGADO solo los envios del usuario actual
     for (const productoId of productosAMarcar) {
       const envio = todosLosEnvios.find((e) => e.productoId === productoId);
       if (envio) {
@@ -124,12 +116,15 @@ export class DeliverTradeUseCase {
       }
     }
 
-    // 10. Verificar si ambos usuarios completaron sus entregas
     const enviosActualizados = await this.envioRepository.findByIntercambioId(
       input.intercambio_id,
     );
 
-    // Verificar si el OFERENTE (Juan) entregó TODOS sus productos
+    const productosOfrecidos =
+      await this.productoPropuestaRepository.findByPropuestaId(
+        intercambio.propuestaId,
+      );
+
     const enviosOferente = enviosActualizados.filter((e) =>
       productosOfrecidos.some((pp) => pp.productoId === e.productoId),
     );
@@ -137,14 +132,20 @@ export class DeliverTradeUseCase {
       enviosOferente.length === productosOfrecidos.length &&
       enviosOferente.every((e) => e.estadoEnvio === EstadoEnvio.ENTREGADO);
 
-    // Verificar si el RECEPTOR (María) entregó su producto
+    const productoSolicitado = await this.productRepository.findById(
+      propuesta.productoSolicitadoId,
+    );
+
+    if (!productoSolicitado) {
+      throw new NotFoundException('Producto solicitado no encontrado');
+    }
+
     const envioReceptor = enviosActualizados.find(
       (e) => e.productoId === propuesta.productoSolicitadoId,
     );
     const receptorCompletó =
       envioReceptor && envioReceptor.estadoEnvio === EstadoEnvio.ENTREGADO;
 
-    // 11. Solo cambiar estado a COMPLETADO si AMBOS completaron
     let estado = intercambio.estado;
     if (oferenteCompletó && receptorCompletó) {
       const intercambioActualizado = intercambio.cambiarEstado(
@@ -152,6 +153,38 @@ export class DeliverTradeUseCase {
       );
       await this.intercambioRepository.update(intercambioActualizado);
       estado = EstadoIntercambio.COMPLETADO;
+
+      try {
+        const oferente = await this.userRepository.findById(
+          propuesta.usuarioOferenteId,
+        );
+        const receptor = await this.userRepository.findById(
+          productoSolicitado.usuarioId,
+        );
+
+        if (oferente && receptor) {
+          const offerentFullName = (
+            oferente.nombre +
+            ' ' +
+            oferente.apellido
+          ).trim();
+          const receptorFullName = (
+            receptor.nombre +
+            ' ' +
+            receptor.apellido
+          ).trim();
+
+          await this.notificationService.notifyTradeCompleted(
+            oferente.id,
+            receptor.id,
+            intercambio.id,
+            offerentFullName,
+            receptorFullName,
+          );
+        }
+      } catch (error) {
+        console.error('Error creating trade completed notifications:', error);
+      }
     }
 
     return {

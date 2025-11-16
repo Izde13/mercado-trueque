@@ -40,7 +40,7 @@ export const useShipTrade = () => {
 
       // POST a endpoint de envío
       const response = await apiService.post(
-        `/api/v1/trades/${intercambioId}/ship`,
+        `/trades/${intercambioId}/ship`,
         payload
       );
 

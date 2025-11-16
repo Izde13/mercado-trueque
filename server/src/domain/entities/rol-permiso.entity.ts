@@ -14,17 +14,9 @@ export class RolPermiso {
     }
   }
 
-  static create(
-    rolId: string,
-    permisoId: string,
-  ): RolPermiso {
+  static create(rolId: string, permisoId: string): RolPermiso {
     const id = crypto.randomUUID();
     const now = new Date();
-    return new RolPermiso(
-      id,
-      rolId,
-      permisoId,
-      now,
-    );
+    return new RolPermiso(id, rolId, permisoId, now);
   }
 }

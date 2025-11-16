@@ -12,6 +12,4 @@ export class RegisterUserDto {
 
   @MinLength(6)
   contrasena: string;
-
-
 }

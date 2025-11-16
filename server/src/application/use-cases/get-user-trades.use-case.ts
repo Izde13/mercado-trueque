@@ -32,27 +32,32 @@ export class GetUserTradesUseCase {
 
     for (const intercambio of allIntercambios) {
       // Obtener la propuesta asociada
-      const propuesta = await this.tradeProposalRepository.findByIdWithRelations(
-        intercambio.propuestaId,
-      );
+      const propuesta =
+        await this.tradeProposalRepository.findByIdWithRelations(
+          intercambio.propuestaId,
+        );
 
       if (!propuesta) continue;
 
       // Verificar si el usuario es parte de este intercambio
       const isOfferingUser = propuesta.usuarioOferenteId === usuarioId;
       const isRequestingUser = propuesta.productoSolicitadoId
-        ? (await this.productRepository.findById(
-            propuesta.productoSolicitadoId,
-          ))?.usuarioId === usuarioId
+        ? (
+            await this.productRepository.findById(
+              propuesta.productoSolicitadoId,
+            )
+          )?.usuarioId === usuarioId
         : false;
 
       if (!isOfferingUser && !isRequestingUser) continue;
 
       // Enriquecer datos del intercambio
       const otroUsuarioId = isOfferingUser
-        ? (await this.productRepository.findById(
-            propuesta.productoSolicitadoId,
-          ))?.usuarioId
+        ? (
+            await this.productRepository.findById(
+              propuesta.productoSolicitadoId,
+            )
+          )?.usuarioId
         : propuesta.usuarioOferenteId;
 
       const otroUsuario = otroUsuarioId
@@ -61,9 +66,7 @@ export class GetUserTradesUseCase {
 
       // Obtener productos ofrecidos
       const productosPropuesta =
-        await this.productoPropuestaRepository.findByPropuestaId(
-          propuesta.id,
-        );
+        await this.productoPropuestaRepository.findByPropuestaId(propuesta.id);
 
       let productosOfrecidos: any[] = [];
       let totalValorOfrecido = 0;

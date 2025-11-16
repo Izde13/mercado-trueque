@@ -24,38 +24,46 @@ export class GetReceivedProposalsUseCase {
 
   async execute(usuarioId: string, estado?: string): Promise<any[]> {
     // Obtener todos los productos del usuario
-    const userProducts = await this.productRepository.findByUsuarioId(usuarioId);
-    const userProductIds = userProducts.map(p => p.id);
+    const userProducts =
+      await this.productRepository.findByUsuarioId(usuarioId);
+    const userProductIds = userProducts.map((p) => p.id);
 
     // Obtener todas las propuestas
     const allProposals = await this.tradeProposalRepository.findAll();
 
     // Filtrar propuestas que solicitan los productos del usuario
-    let receivedProposals = allProposals.filter(proposal =>
+    let receivedProposals = allProposals.filter((proposal) =>
       userProductIds.includes(proposal.productoSolicitadoId),
     );
 
     // Filtrar por estado si se proporciona
     if (estado) {
-      receivedProposals = receivedProposals.filter(p => p.estado === estado);
+      receivedProposals = receivedProposals.filter((p) => p.estado === estado);
     }
 
     // Enriquecer propuestas con datos del usuario oferente y productos
     const enrichedProposals = await Promise.all(
-      receivedProposals.map(async proposal => {
-        const offeringUser = await this.userRepository.findById(proposal.usuarioOferenteId);
-        const requestedProduct = await this.productRepository.findById(proposal.productoSolicitadoId);
+      receivedProposals.map(async (proposal) => {
+        const offeringUser = await this.userRepository.findById(
+          proposal.usuarioOferenteId,
+        );
+        const requestedProduct = await this.productRepository.findById(
+          proposal.productoSolicitadoId,
+        );
 
         // Obtener los productos ofrecidos en la propuesta
-        const productosProuesta = await this.productoPropuestaRepository.findByPropuestaId(proposal.id);
+        const productosProuesta =
+          await this.productoPropuestaRepository.findByPropuestaId(proposal.id);
 
         let productosOfrecidos: any[] = [];
         let totalValorOfrecido = 0;
 
         if (productosProuesta && productosProuesta.length > 0) {
           productosOfrecidos = await Promise.all(
-            productosProuesta.map(async pp => {
-              const producto = await this.productRepository.findById(pp.productoId);
+            productosProuesta.map(async (pp) => {
+              const producto = await this.productRepository.findById(
+                pp.productoId,
+              );
               return {
                 id: producto?.id,
                 title: producto?.titulo || 'Producto Desconocido',
@@ -64,7 +72,10 @@ export class GetReceivedProposalsUseCase {
               };
             }),
           );
-          totalValorOfrecido = productosOfrecidos.reduce((sum, p) => sum + (p.estimatedValue || 0), 0);
+          totalValorOfrecido = productosOfrecidos.reduce(
+            (sum, p) => sum + (p.estimatedValue || 0),
+            0,
+          );
         }
 
         return {

@@ -45,7 +45,7 @@ export const useUserProposals = (userId, estado = null) => {
       setError(null);
 
       // Llamar al endpoint para obtener propuestas recibidas por el usuario
-      const url = `/api/v1/trades/proposals/received/${userId}`;
+      const url = `/trades/proposals/received/${userId}`;
 
       const data = await apiService.get(url);
 

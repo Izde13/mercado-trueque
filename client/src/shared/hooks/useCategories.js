@@ -11,7 +11,7 @@ export const useCategories = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await apiService.get('/api/v1/categories');
+        const data = await apiService.get('/categories');
         setCategories(data || []);
       } catch (err) {
         console.error('Error fetching categories:', err);
@@ -34,7 +34,7 @@ export const useCategories = () => {
         try {
           setLoading(true);
           setError(null);
-          const data = await apiService.get('/api/v1/categories');
+          const data = await apiService.get('/categories');
           setCategories(data || []);
         } catch (err) {
           console.error('Error fetching categories:', err);

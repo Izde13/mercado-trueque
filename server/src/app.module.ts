@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './infrastructure/services/prisma.service';
 
-
 // Categories
 import { CategoryRepositoryImpl } from './infrastructure/repositories/category.repository.impl';
 import { GetCategoriesUseCase } from './application/use-cases/get-categories.use-case';
@@ -71,6 +70,9 @@ import { TradeProposalRepositoryImpl } from './infrastructure/repositories/trade
 // Reviews
 import { ReviewRepositoryImpl } from './infrastructure/repositories/review.repository.impl';
 
+// Notifications
+import { NotificationRepositoryImpl } from './infrastructure/repositories/notification.repository.impl';
+import { NotificationService } from './application/services/notification.service';
 // Product Validations
 import { ProductPublicationValidator } from './domain/specifications/product/product-publication.validator';
 import { UserReputationLimitsRule } from './domain/specifications/product/user/user-reputation-limits.rule';
@@ -149,8 +151,12 @@ import { RateTradeUseCase } from './application/use-cases/rate-trade.use-case';
 import { GetReceivedProposalsUseCase } from './application/use-cases/get-received-proposals.use-case';
 import { GetUserTradesUseCase } from './application/use-cases/get-user-trades.use-case';
 
+// Notifications Use Cases
+import { GetUserNotificationsUseCase } from './application/use-cases/get-user-notifications.use-case';
+
 // Trade Controllers
 import { TradesController } from './presentation/controllers/trades.controller';
+import { NotificationsController } from './presentation/controllers/notifications.controller';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -169,6 +175,7 @@ import { AuthModule } from './auth/auth.module';
     ProductsController,
     EstadosProductoController,
     TradesController,
+    NotificationsController,
   ],
   providers: [
     AppService,
@@ -285,6 +292,12 @@ import { AuthModule } from './auth/auth.module';
       provide: 'ReviewRepository',
       useClass: ReviewRepositoryImpl,
     },
+    // Notifications
+    {
+      provide: 'NotificationRepository',
+      useClass: NotificationRepositoryImpl,
+    },
+    NotificationService,
     // Product Validations
     ProductPublicationValidator,
     UserReputationLimitsRule,
@@ -348,6 +361,8 @@ import { AuthModule } from './auth/auth.module';
     RateTradeUseCase,
     GetReceivedProposalsUseCase,
     GetUserTradesUseCase,
+    // Notifications Use Cases
+    GetUserNotificationsUseCase,
   ],
 })
 export class AppModule {}

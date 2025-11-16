@@ -69,7 +69,7 @@ export const useProducts = (filters = {}) => {
 
       // Llamada a la API con query params
       const queryString = queryParams.toString();
-      const url = `/api/v1/products${queryString ? `?${queryString}` : ''}`;
+      const url = `/products${queryString ? `?${queryString}` : ''}`;
       const data = await apiService.get(url);
 
       // Mapear los productos al formato del frontend
@@ -123,7 +123,7 @@ export const useAllProducts = () => {
         setError(null);
 
         // Llamada a la API
-        const apiData = await apiService.get('/api/v1/products');
+        const apiData = await apiService.get('/products');
 
         // Mapear los productos al formato del frontend
         const mappedProducts = apiData.map(mapProductFromAPI);

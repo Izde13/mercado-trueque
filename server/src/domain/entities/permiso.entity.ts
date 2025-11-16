@@ -14,17 +14,9 @@ export class Permiso {
     }
   }
 
-  static create(
-    nombre: string,
-    descripcion?: string,
-  ): Permiso {
+  static create(nombre: string, descripcion?: string): Permiso {
     const id = crypto.randomUUID();
     const now = new Date();
-    return new Permiso(
-      id,
-      nombre,
-      descripcion,
-      now,
-    );
+    return new Permiso(id, nombre, descripcion, now);
   }
 }

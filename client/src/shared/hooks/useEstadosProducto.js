@@ -16,7 +16,7 @@ export const useEstadosProducto = () => {
         setLoading(true);
         setError(null);
 
-        const response = await apiService.get('/api/v1/estados-producto');
+        const response = await apiService.get('/estados-producto');
         setEstados(response || []);
       } catch (err) {
         console.error('Error fetching estados de producto:', err);

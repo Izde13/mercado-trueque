@@ -14,11 +14,13 @@ import type { UserRepository } from '../../domain/repositories/user.repository';
 import { Review } from '../../domain/entities/review.entity';
 import { EstadoIntercambio } from '../../domain/entities/intercambio.entity';
 import { Usuario } from '../../domain/entities/user.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class RateTradeUseCase {
   constructor(
     private readonly ratingValidator: RatingPhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('IntercambioRepository')
     private readonly intercambioRepository: IntercambioRepository,
     @Inject('TradeProposalRepository')
@@ -30,7 +32,6 @@ export class RateTradeUseCase {
   ) {}
 
   async execute(input: RateTradeDto): Promise<RatingResponseDto> {
-    // 1. Obtener intercambio
     const intercambio = await this.intercambioRepository.findById(
       input.intercambio_id,
     );
@@ -39,7 +40,6 @@ export class RateTradeUseCase {
       throw new NotFoundException('Intercambio no encontrado');
     }
 
-    // 2. Obtener propuesta
     const propuesta = await this.tradeProposalRepository.findByIdWithRelations(
       intercambio.propuestaId,
     );
@@ -48,9 +48,8 @@ export class RateTradeUseCase {
       throw new NotFoundException('Propuesta no encontrada');
     }
 
-    // 3. Validar que el usuario_id sea uno de los usuarios del intercambio
     const esOferente = input.usuario_id === propuesta.usuarioOferenteId;
-    const esReceptor = input.usuario_id !== propuesta.usuarioOferenteId; // El otro usuario
+    const esReceptor = input.usuario_id !== propuesta.usuarioOferenteId;
 
     if (!esOferente && !esReceptor) {
       throw new BadRequestException(
@@ -58,7 +57,6 @@ export class RateTradeUseCase {
       );
     }
 
-    // 4. Validar que no haya calificado antes
     const yaCalfico = await this.reviewRepository.existsRating(
       input.intercambio_id,
       input.usuario_id,
@@ -69,7 +67,6 @@ export class RateTradeUseCase {
       throw new BadRequestException('Ya has calificado este intercambio');
     }
 
-    // 5. Crear contexto para validación
     const context: RatingContext = {
       userId: input.usuario_id,
       userStatus: 'activo',
@@ -84,7 +81,6 @@ export class RateTradeUseCase {
       images: undefined,
     };
 
-    // 6. Validar calificación
     const validation = await this.ratingValidator.validate(context);
 
     if (!validation.isValid && validation.severity === 'error') {
@@ -94,7 +90,6 @@ export class RateTradeUseCase {
       });
     }
 
-    // 7. Crear calificación
     const review = Review.create(
       input.intercambio_id,
       input.usuario_id,
@@ -106,20 +101,15 @@ export class RateTradeUseCase {
 
     const savedReview = await this.reviewRepository.save(review);
 
-    // 8. Verificar si ambos usuarios han calificado
     const reviews = await this.reviewRepository.findByIntercambioId(
       input.intercambio_id,
     );
 
     if (reviews.length >= 2) {
-      // Ambos han calificado, actualizar reputación de ambos usuarios
-
-      // Actualizar reputación del usuario que fue calificado
       const usuario = await this.userRepository.findById(
         input.usuario_calificado_id,
       );
       if (usuario) {
-        // Calcular promedio de calificaciones recibidas
         const calificacionesRecibidas = reviews.filter(
           (r) => r.usuarioCalificadoId === input.usuario_calificado_id,
         );
@@ -144,11 +134,24 @@ export class RateTradeUseCase {
           usuario.totalIntercambios,
         );
         await this.userRepository.update(usuarioActualizado);
+
+        try {
+          const rater = await this.userRepository.findById(input.usuario_id);
+          if (rater) {
+            const raterFullName = (rater.nombre + ' ' + rater.apellido).trim();
+
+            await this.notificationService.notifyRatingReceived(
+              input.usuario_calificado_id,
+              input.intercambio_id,
+              raterFullName,
+              input.calificacion_usuario,
+            );
+          }
+        } catch (error) {
+          console.error('Error creating rating notification:', error);
+        }
       }
 
-      // Actualizar reputación del otro usuario también
-      // Si el usuario actual es el OFERENTE, el otro es el usuario_calificado_id
-      // Si el usuario actual es el RECEPTOR, el otro es el OFERENTE
       const otroUsuarioId = esOferente
         ? input.usuario_calificado_id
         : propuesta.usuarioOferenteId;

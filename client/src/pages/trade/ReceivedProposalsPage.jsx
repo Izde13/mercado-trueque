@@ -7,13 +7,14 @@ import ProposalCard from "../../features/trade/ProposalCard/ProposalCard.jsx";
 import { useUserProposals } from "../../shared/hooks/useUserProposals";
 import { useAcceptTradeProposal } from "../../shared/hooks/useAcceptTradeProposal";
 import { useRejectTradeProposal } from "../../shared/hooks/useRejectTradeProposal";
-import { getCurrentUserId } from "../../shared/constants/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ReceivedProposalsPage() {
   const navigate = useNavigate();
 
-  // Obtener userId del archivo de constantes (mock de autenticación)
-  const userId = getCurrentUserId();
+  // Obtener userId del contexto de autenticación
+  const { user } = useAuth();
+  const userId = user?.id;
 
   // Estado de propuestas pendientes
   const { proposals, loading: proposalsLoading, refetch } = useUserProposals(userId, "PROPUESTA");

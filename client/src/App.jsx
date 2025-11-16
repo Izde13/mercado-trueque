@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./app/routes/ProtectedRoute";
 import MainLayout from "./app/layouts/MainLayout";
 
 // Páginas principales
@@ -18,23 +20,70 @@ import RegisterPage from "./pages/register/Registerpage";
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* 🟢 Rutas públicas (sin layout) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <AuthProvider>
+        <Routes>
+          {/* 🟢 Rutas públicas (sin layout) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-        {/* 🔵 Rutas principales (con layout general) */}
-        <Route element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="producto/:id" element={<ProductDetailPage />} />
-          <Route path="productos" element={<CategoryPage />} />
-          <Route path="propuesta/:productId" element={<TradeProposalPage />} />
-          <Route path="propuestas-recibidas" element={<ReceivedProposalsPage />} />
-          <Route path="mis-intercambios" element={<MyTradesPage />} />
-          <Route path="trueque/:intercambioId/enviar" element={<ShipTradeProposalPage />} />
-          <Route path="publicar" element={<PublishProduct />} />
-        </Route>
-      </Routes>
+          {/* 🔵 Rutas principales (con layout general y protegidas) */}
+          <Route element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            
+            {/* Ruta pública de detalles de producto */}
+            <Route path="producto/:id" element={<ProductDetailPage />} />
+            
+            {/* Ruta pública de categorías */}
+            <Route path="productos" element={<CategoryPage />} />
+            
+            {/* Rutas protegidas - requieren autenticación */}
+            <Route
+              path="propuesta/:productId"
+              element={
+                <ProtectedRoute
+                  element={<TradeProposalPage />}
+                />
+              }
+            />
+            
+            <Route
+              path="propuestas-recibidas"
+              element={
+                <ProtectedRoute
+                  element={<ReceivedProposalsPage />}
+                />
+              }
+            />
+            
+            <Route
+              path="mis-intercambios"
+              element={
+                <ProtectedRoute
+                  element={<MyTradesPage />}
+                />
+              }
+            />
+            
+            <Route
+              path="trueque/:intercambioId/enviar"
+              element={
+                <ProtectedRoute
+                  element={<ShipTradeProposalPage />}
+                />
+              }
+            />
+            
+            <Route
+              path="publicar"
+              element={
+                <ProtectedRoute
+                  element={<PublishProduct />}
+                />
+              }
+            />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

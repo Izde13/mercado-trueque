@@ -14,17 +14,9 @@ export class Rol {
     }
   }
 
-  static create(
-    nombre: string,
-    descripcion?: string,
-  ): Rol {
+  static create(nombre: string, descripcion?: string): Rol {
     const id = crypto.randomUUID();
     const now = new Date();
-    return new Rol(
-      id,
-      nombre,
-      descripcion,
-      now,
-    );
+    return new Rol(id, nombre, descripcion, now);
   }
 }

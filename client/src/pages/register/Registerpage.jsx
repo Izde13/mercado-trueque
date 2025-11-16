@@ -1,111 +1,181 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { registerUser } from '../../auth/authService';
+import './Registerpage.css';
 
-function RegisterPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    email: "",
-    contrasena: "",
-    rolId: "", // ✅ Nuevo campo
+    nombre: '',
+    apellido: '',
+    email: '',
+    contrasena: '',
   });
 
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validaciones básicas
+    if (!formData.nombre.trim()) {
+      setMessage('El nombre es requerido');
+      setMessageType('error');
+      return;
+    }
+
+    if (!formData.apellido.trim()) {
+      setMessage('El apellido es requerido');
+      setMessageType('error');
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setMessage('El email es requerido');
+      setMessageType('error');
+      return;
+    }
+
+    if (formData.contrasena.length < 6) {
+      setMessage('La contraseña debe tener mínimo 6 caracteres');
+      setMessageType('error');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await registerUser(formData);
 
-      const data = await response.json();
+      setMessage('Registro exitoso. Redirigiendo a login...');
+      setMessageType('success');
 
-      if (response.ok) {
-        alert("✅ Usuario registrado exitosamente");
-        console.log("Usuario:", data.user);
-      } else {
-        alert(`⚠️ Error: ${data.message || "No se pudo registrar"}`);
-        console.error(data);
-      }
+      // Redirigir a login después de 2 segundos
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
-      alert("❌ Error de conexión con el servidor");
-      console.error(error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Error al registrarse';
+      setMessage(errorMessage);
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-6 w-96"
-      >
-        <h2 className="text-xl font-bold mb-4 text-center">Registro</h2>
+    <div className="register-container">
+      <div className="register-wrapper">
+        {/* Encabezado */}
+        <div className="register-header">
+          <h1>Crear tu cuenta</h1>
+          <p>Únete a Mercado Trueque y comienza a intercambiar</p>
+        </div>
 
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre"
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-3"
-          required
-        />
+        {/* Mensaje de estado */}
+        {message && (
+          <div className={`message ${messageType}`}>
+            {message}
+          </div>
+        )}
 
-        <input
-          type="text"
-          name="apellido"
-          placeholder="Apellido"
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-3"
-          required
-        />
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="form-group">
+            <label htmlFor="nombre" className="form-label">
+              Nombre
+            </label>
+            <input
+              id="nombre"
+              type="text"
+              name="nombre"
+              className="form-input"
+              placeholder="Ej: Juan"
+              value={formData.nombre}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-3"
-          required
-        />
+          <div className="form-group">
+            <label htmlFor="apellido" className="form-label">
+              Apellido
+            </label>
+            <input
+              id="apellido"
+              type="text"
+              name="apellido"
+              className="form-input"
+              placeholder="Ej: Pérez"
+              value={formData.apellido}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
 
-        <input
-          type="password"
-          name="contrasena"
-          placeholder="Contraseña"
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-3"
-          required
-        />
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Correo Electrónico
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              className="form-input"
+              placeholder="Ej: usuario@ejemplo.com"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
 
-        {/* ✅ Nuevo campo para seleccionar el rol */}
-        <select
-          name="rolId"
-          value={formData.rolId}
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-3"
-          required
-        >
-          <option value="">Seleccione un rol</option>
-          <option value="administrador">Administrador</option>
-          <option value="vendedor">Vendedor</option>
-          <option value="comprador">Comprador</option>
-          <option value="visitante">Visitante</option>
-        </select>
+          <div className="form-group">
+            <label htmlFor="contrasena" className="form-label">
+              Contraseña
+            </label>
+            <input
+              id="contrasena"
+              type="password"
+              name="contrasena"
+              className="form-input"
+              placeholder="Mínimo 6 caracteres"
+              value={formData.contrasena}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700"
-        >
-          Registrarse
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="register-btn"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
+          </button>
+        </form>
+
+        {/* Enlace a login */}
+        <div style={{ textAlign: 'center', marginTop: '24px' }}>
+          <p style={{ fontSize: '14px', color: '#6b727a', marginBottom: '8px' }}>
+            ¿Ya tienes cuenta?
+          </p>
+          <Link to="/login" className="login-link">
+            Inicia sesión aquí
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default RegisterPage;

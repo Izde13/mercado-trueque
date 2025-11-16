@@ -36,7 +36,7 @@ export const useTradeProposal = () => {
       };
 
       // Hacer POST a la API
-      const response = await apiService.post('/api/v1/trades/proposals', payload);
+      const response = await apiService.post('/trades/proposals', payload);
 
       setResult(response);
       setSuccess(true);

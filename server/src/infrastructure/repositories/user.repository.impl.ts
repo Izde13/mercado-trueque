@@ -107,9 +107,9 @@ export class UserRepositoryImpl implements UserRepository {
     });
   }
 
-async create(data: any) {
-  return this.prisma.usuarios.create({
-    data,
-  });
-}
+  async create(data: any) {
+    return this.prisma.usuarios.create({
+      data,
+    });
+  }
 }

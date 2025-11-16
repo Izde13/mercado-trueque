@@ -3,14 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { useShipTrade } from "../../shared/hooks/useShipTrade";
-import { getCurrentUserId } from "../../shared/constants/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ShipTradeProposalPage() {
   const { intercambioId } = useParams();
   const navigate = useNavigate();
 
-  // Obtener userId del archivo de constantes (mock de autenticación)
-  const userId = getCurrentUserId();
+  // Obtener userId del contexto de autenticación
+  const { user } = useAuth();
+  const userId = user?.id;
 
   // Estados para el envío
   const [origenDireccion, setOrigenDireccion] = useState("");
@@ -185,17 +186,17 @@ export default function ShipTradeProposalPage() {
             </ol>
 
             <div className="ship-info-box">
-              <h4>⏱️ Tiempo Estimado</h4>
+              <h4>Tiempo Estimado</h4>
               <p>3-5 días hábiles desde el envío</p>
             </div>
 
             <div className="ship-info-box">
-              <h4>🚚 Transportista</h4>
+              <h4>Transportista</h4>
               <p>Servicio de mensajería estándar</p>
             </div>
 
             <div className="ship-info-box">
-              <h4>📍 Centro de Distribución</h4>
+              <h4>Centro de Distribución</h4>
               <p>Bogotá - Cra. 7 con Calle 45</p>
             </div>
           </div>

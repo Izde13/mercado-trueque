@@ -1,4 +1,9 @@
-import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Category } from '../../domain/entities/category.entity';
 import type { CategoryRepository } from '../../domain/repositories/category.repository';
 
@@ -23,7 +28,9 @@ export class UpdateCategoryUseCase {
 
     // Validar nombre si se proporciona
     if (nombre && nombre.trim().length === 0) {
-      throw new BadRequestException('El nombre de la categoría no puede estar vacío');
+      throw new BadRequestException(
+        'El nombre de la categoría no puede estar vacío',
+      );
     }
 
     // Validar que no exista otra categoría con el mismo nombre
@@ -43,7 +50,9 @@ export class UpdateCategoryUseCase {
       existingCategory.id,
       existingCategory.codigo,
       nombre ? nombre.trim() : existingCategory.nombre,
-      descripcion !== undefined ? (descripcion?.trim() || undefined) : existingCategory.descripcion,
+      descripcion !== undefined
+        ? descripcion?.trim() || undefined
+        : existingCategory.descripcion,
       activo !== undefined ? activo : existingCategory.activo,
     );
 

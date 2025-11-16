@@ -11,11 +11,13 @@ import type { TradeProposalRepository } from '../../domain/repositories/trade-pr
 import type { ProductoPropuestaRepository } from '../../domain/repositories/producto-propuesta.repository';
 import { TradeProposal } from '../../domain/entities/trade-proposal.entity';
 import { ProductoPropuesta } from '../../domain/entities/producto-propuesta.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class CreateTradeProposalUseCase {
   constructor(
     private readonly proposalValidator: ProposalPhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     @Inject('ProductRepository')
@@ -148,6 +150,20 @@ export class CreateTradeProposalUseCase {
       const savedProductoPropuesta =
         await this.productoPropuestaRepository.save(productoPropuesta);
       productosAsociados.push(savedProductoPropuesta);
+    }
+
+    // 9. NOTIFICACIÓN: Avisar al dueño del producto solicitado
+    try {
+      const offerentFullName = `${oferente.nombre} ${oferente.apellido}`.trim();
+      await this.notificationService.notifyProposalCreated(
+        productSolicitado.usuarioId,
+        savedProposal.id,
+        offerentFullName,
+        productSolicitado.titulo,
+      );
+    } catch (error) {
+      // Log error pero no fallar la creación de la propuesta
+      console.error('Error creating notification for proposal:', error);
     }
 
     return {

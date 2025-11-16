@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { apiService } from '../services/apiAxios';
-import { getCurrentUserId } from '../constants/auth';
+import { useAuth } from '../../context/AuthContext';
 
 export const useCreateProduct = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   const createProduct = async (productData, images = []) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Obtener user ID del archivo de constantes (mock de autenticación)
-      const userId = getCurrentUserId();
+      // Obtener user ID del contexto de autenticación
+      const userId = user?.id;
       // TODO: Obtener estadoProductoId real del formulario
       const DEFAULT_ESTADO_ID = "76b22db8-726b-4fdf-b8ed-067493605e8e"; // Deberás obtener esto de la BD
 
@@ -25,7 +26,7 @@ export const useCreateProduct = () => {
           // Es un archivo File del componente UploadMedia
           url = URL.createObjectURL(img);
           // TODO: Aquí deberías subir la imagen a un servidor (AWS S3, Cloudinary, etc.)
-          console.warn('⚠️ Usando URL temporal. Implementar subida de imágenes a servidor.');
+          console.warn('Usando URL temporal. Implementar subida de imágenes a servidor.');
         } else if (typeof img === 'string') {
           // Es una URL directa
           url = img;
@@ -60,7 +61,7 @@ export const useCreateProduct = () => {
         imagenes: imagenesFormateadas
       };
 
-      const result = await apiService.post('/api/v1/products', payload);
+      const result = await apiService.post('/products', payload);
 
       // Handle the new API response structure
       return {

@@ -22,7 +22,7 @@ export const useUserTrades = (userId) => {
       }
 
       // Obtener todos los intercambios del usuario
-      const response = await apiService.get(`/api/v1/trades/user/${userId}`);
+      const response = await apiService.get(`/trades/user/${userId}`);
       setTrades(response || []);
     } catch (err) {
       console.error('Error fetching user trades:', err);

@@ -28,7 +28,7 @@ export const useRejectTradeProposal = () => {
       // POST a endpoint de rechazar propuesta
       // TODO: Verificar endpoint exacto en backend
       const response = await apiService.post(
-        `/api/v1/trades/proposals/${proposalId}/reject`,
+        `/trades/proposals/${proposalId}/reject`,
         payload
       );
 

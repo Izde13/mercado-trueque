@@ -14,7 +14,14 @@ export class CreateUserUseCase {
     telefono?: string,
     rolId?: string,
   ): Promise<Usuario> {
-    const user = Usuario.create(email, nombre, apellido, contrasena, rolId, telefono);
+    const user = Usuario.create(
+      email,
+      nombre,
+      apellido,
+      contrasena,
+      rolId,
+      telefono,
+    );
     return this.userRepository.save(user);
   }
 }

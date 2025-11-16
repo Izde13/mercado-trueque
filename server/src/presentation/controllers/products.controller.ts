@@ -58,7 +58,8 @@ export class ProductsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear un nuevo producto',
-    description: 'Crea un nuevo producto en el catálogo del usuario. Requiere autenticación.',
+    description:
+      'Crea un nuevo producto en el catálogo del usuario. Requiere autenticación.',
   })
   @ApiBody({
     type: CreateProductDto,

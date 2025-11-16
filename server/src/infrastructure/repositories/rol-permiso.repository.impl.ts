@@ -60,7 +60,10 @@ export class RolPermisoRepositoryImpl implements RolPermisoRepository {
     });
   }
 
-  async deleteByRolIdAndPermisoId(rolId: string, permisoId: string): Promise<void> {
+  async deleteByRolIdAndPermisoId(
+    rolId: string,
+    permisoId: string,
+  ): Promise<void> {
     await this.prisma.rol_permisos.deleteMany({
       where: {
         rol_id: rolId,

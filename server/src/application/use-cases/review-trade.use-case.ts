@@ -13,16 +13,19 @@ import type { EnvioRepository } from '../../domain/repositories/envio.repository
 import type { RevisionProductoRepository } from '../../domain/repositories/revision-producto.repository';
 import type { TradeProposalRepository } from '../../domain/repositories/trade-proposal.repository';
 import type { ProductoPropuestaRepository } from '../../domain/repositories/producto-propuesta.repository';
+import type { UserRepository } from '../../domain/repositories/user.repository';
 import {
   RevisionProducto,
   EstadoRevision,
 } from '../../domain/entities/revision-producto.entity';
 import { EstadoIntercambio } from '../../domain/entities/intercambio.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class ReviewTradeUseCase {
   constructor(
     private readonly reviewValidator: ReviewPhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('IntercambioRepository')
     private readonly intercambioRepository: IntercambioRepository,
     @Inject('ProductRepository')
@@ -35,10 +38,11 @@ export class ReviewTradeUseCase {
     private readonly tradeProposalRepository: TradeProposalRepository,
     @Inject('ProductoPropuestaRepository')
     private readonly productoPropuestaRepository: ProductoPropuestaRepository,
+    @Inject('UserRepository')
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(input: ReviewProductDto): Promise<ReviewResponseDto> {
-    // 1. Obtener intercambio
     const intercambio = await this.intercambioRepository.findById(
       input.intercambio_id,
     );
@@ -47,14 +51,12 @@ export class ReviewTradeUseCase {
       throw new NotFoundException('Intercambio no encontrado');
     }
 
-    // 2. Obtener producto
     const producto = await this.productRepository.findById(input.producto_id);
 
     if (!producto) {
       throw new NotFoundException('Producto no encontrado');
     }
 
-    // 3. Obtener envío
     const envios = await this.envioRepository.findByIntercambioId(
       input.intercambio_id,
     );
@@ -63,9 +65,8 @@ export class ReviewTradeUseCase {
       throw new NotFoundException('Envío no encontrado');
     }
 
-    // 4. Crear contexto para validación
     const context: ReviewContext = {
-      userId: '', // Será el centro distribución
+      userId: '',
       userStatus: 'activo',
       userRating: 0,
       userTotalTrades: 0,
@@ -77,7 +78,6 @@ export class ReviewTradeUseCase {
       photos: input.photos,
     };
 
-    // 5. Validar revisión
     const validation = await this.reviewValidator.validate(context);
 
     if (!validation.isValid && validation.severity === 'error') {
@@ -87,13 +87,11 @@ export class ReviewTradeUseCase {
       });
     }
 
-    // 6. Crear registro de revisión
     const revision = RevisionProducto.create(
       input.intercambio_id,
       input.producto_id,
     );
 
-    // Aprobar o rechazar basado en rating
     let savedRevision: RevisionProducto;
     if (input.condition_rating >= 3) {
       const revisionAprobada = revision.aprobar(
@@ -111,16 +109,12 @@ export class ReviewTradeUseCase {
         await this.revisionProductoRepository.save(revisionRechazada);
     }
 
-    // 7. Validar estado del intercambio según revisiones de ambos usuarios
     if (input.condition_rating < 3) {
-      // Si está rechazado, cambiar estado del intercambio a RECHAZADO_REVISION
       const intercambioActualizado = intercambio.cambiarEstado(
         EstadoIntercambio.RECHAZADO_REVISION,
       );
       await this.intercambioRepository.update(intercambioActualizado);
     } else {
-      // Si está aprobado, verificar si AMBOS usuarios completaron sus revisiones
-      // Obtener propuesta
       const propuesta =
         await this.tradeProposalRepository.findByIdWithRelations(
           intercambio.propuestaId,
@@ -130,19 +124,16 @@ export class ReviewTradeUseCase {
         throw new NotFoundException('Propuesta no encontrada');
       }
 
-      // Obtener productos ofrecidos por el OFERENTE (Juan)
       const productosOfrecidos =
         await this.productoPropuestaRepository.findByPropuestaId(
           intercambio.propuestaId,
         );
 
-      // Obtener todas las revisiones del intercambio
       const todasLasRevisiones =
         await this.revisionProductoRepository.findByIntercambioId(
           input.intercambio_id,
         );
 
-      // Verificar si el OFERENTE (Juan) ha revisado TODOS sus productos y están APROBADOS
       const revisionesOferente = todasLasRevisiones.filter((r) =>
         productosOfrecidos.some((pp) => pp.productoId === r.productoId),
       );
@@ -152,7 +143,6 @@ export class ReviewTradeUseCase {
           (r) => r.estadoRevision === EstadoRevision.APROBADO,
         );
 
-      // Verificar si el RECEPTOR (María) ha revisado su producto y está APROBADO
       const revisionReceptor = todasLasRevisiones.find(
         (r) => r.productoId === propuesta.productoSolicitadoId,
       );
@@ -160,12 +150,46 @@ export class ReviewTradeUseCase {
         revisionReceptor &&
         revisionReceptor.estadoRevision === EstadoRevision.APROBADO;
 
-      // Solo cambiar estado a EN_REVISION si AMBOS completaron sus revisiones
       if (oferenteCompletó && receptorCompletó) {
         const intercambioActualizado = intercambio.cambiarEstado(
           EstadoIntercambio.EN_REVISION,
         );
         await this.intercambioRepository.update(intercambioActualizado);
+
+        try {
+          const productoSolicitado = await this.productRepository.findById(
+            propuesta.productoSolicitadoId,
+          );
+          const oferente = await this.userRepository.findById(
+            propuesta.usuarioOferenteId,
+          );
+          const receptor = productoSolicitado
+            ? await this.userRepository.findById(productoSolicitado.usuarioId)
+            : null;
+
+          if (oferente && receptor) {
+            const offerentFullName = (
+              oferente.nombre +
+              ' ' +
+              oferente.apellido
+            ).trim();
+            const receptorFullName = (
+              receptor.nombre +
+              ' ' +
+              receptor.apellido
+            ).trim();
+
+            await this.notificationService.notifyReviewCompleted(
+              oferente.id,
+              receptor.id,
+              intercambio.id,
+              offerentFullName,
+              receptorFullName,
+            );
+          }
+        } catch (error) {
+          console.error('Error creating review notifications:', error);
+        }
       }
     }
 

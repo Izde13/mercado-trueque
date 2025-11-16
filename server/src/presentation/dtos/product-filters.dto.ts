@@ -16,7 +16,8 @@ export class ProductFiltersDto {
   nombre?: string;
 
   @ApiPropertyOptional({
-    description: 'ID(s) de categoría para filtrar productos. Para un solo valor usa: categoria=Deportes. Para múltiples valores usa: categoria=Deportes&categoria=Tecnologia',
+    description:
+      'ID(s) de categoría para filtrar productos. Para un solo valor usa: categoria=Deportes. Para múltiples valores usa: categoria=Deportes&categoria=Tecnologia',
     example: ['Deportes', 'Tecnologia'],
     isArray: true,
     type: String,
@@ -25,7 +26,8 @@ export class ProductFiltersDto {
   categoria?: string | string[];
 
   @ApiPropertyOptional({
-    description: 'ID(s) de estado del producto para filtrar. Para un solo valor usa: estado=Nuevo. Para múltiples valores usa: estado=Nuevo&estado=Usado',
+    description:
+      'ID(s) de estado del producto para filtrar. Para un solo valor usa: estado=Nuevo. Para múltiples valores usa: estado=Nuevo&estado=Usado',
     example: ['Nuevo', 'Usado'],
     isArray: true,
     type: String,

@@ -13,12 +13,15 @@ import type { TradeProposalRepository } from '../../domain/repositories/trade-pr
 import type { EnvioRepository } from '../../domain/repositories/envio.repository';
 import type { ProductoPropuestaRepository } from '../../domain/repositories/producto-propuesta.repository';
 import type { ProductRepository } from '../../domain/repositories/product.repository';
+import type { UserRepository } from '../../domain/repositories/user.repository';
 import { Envio, EstadoEnvio } from '../../domain/entities/envio.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class ShipTradeUseCase {
   constructor(
     private readonly shippingValidator: ShippingPhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('IntercambioRepository')
     private readonly intercambioRepository: IntercambioRepository,
     @Inject('TradeProposalRepository')
@@ -29,10 +32,11 @@ export class ShipTradeUseCase {
     private readonly productoPropuestaRepository: ProductoPropuestaRepository,
     @Inject('ProductRepository')
     private readonly productRepository: ProductRepository,
+    @Inject('UserRepository')
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(input: ShipTradeDto): Promise<ShippingResponseDto[]> {
-    // 1. Obtener intercambio
     const intercambio = await this.intercambioRepository.findById(
       input.intercambio_id,
     );
@@ -41,9 +45,8 @@ export class ShipTradeUseCase {
       throw new NotFoundException('Intercambio no encontrado');
     }
 
-    // 2. Crear contexto para validación
     const context: ShippingContext = {
-      userId: '', // Se obtiene de la propuesta
+      userId: '',
       userStatus: 'activo',
       userRating: 0,
       userTotalTrades: 0,
@@ -60,7 +63,6 @@ export class ShipTradeUseCase {
       },
     };
 
-    // 3. Validar envío
     const validation = await this.shippingValidator.validate(context);
 
     if (!validation.isValid && validation.severity === 'error') {
@@ -70,7 +72,6 @@ export class ShipTradeUseCase {
       });
     }
 
-    // 4. Obtener propuesta con productos
     const propuesta = await this.tradeProposalRepository.findByIdWithRelations(
       intercambio.propuestaId,
     );
@@ -79,7 +80,6 @@ export class ShipTradeUseCase {
       throw new NotFoundException('Propuesta no encontrada');
     }
 
-    // 5. Obtener producto solicitado para saber quién es el receptor
     const productoSolicitado = await this.productRepository.findById(
       propuesta.productoSolicitadoId,
     );
@@ -88,20 +88,23 @@ export class ShipTradeUseCase {
       throw new NotFoundException('Producto solicitado no encontrado');
     }
 
-    // 6. Determinar qué productos debe enviar el usuario actual
+    const oferente = await this.userRepository.findById(
+      propuesta.usuarioOferenteId,
+    );
+    const receptor = await this.userRepository.findById(
+      productoSolicitado.usuarioId,
+    );
+
     const envios: ShippingResponseDto[] = [];
     const productosAEnviar: string[] = [];
 
-    // Si el usuario es el OFERENTE (Juan) - envía sus productos ofrecidos
     if (input.usuario_id === propuesta.usuarioOferenteId) {
       const productosOfrecidos =
         await this.productoPropuestaRepository.findByPropuestaId(
           intercambio.propuestaId,
         );
       productosAEnviar.push(...productosOfrecidos.map((p) => p.productoId));
-    }
-    // Si el usuario es el RECEPTOR (María) - envía el producto solicitado
-    else if (input.usuario_id === productoSolicitado.usuarioId) {
+    } else if (input.usuario_id === productoSolicitado.usuarioId) {
       productosAEnviar.push(propuesta.productoSolicitadoId);
     } else {
       throw new BadRequestException(
@@ -109,16 +112,16 @@ export class ShipTradeUseCase {
       );
     }
 
-    // 7. Crear envíos para los productos del usuario actual
     for (const productoId of productosAEnviar) {
       const envio = Envio.create(
         intercambio.id,
         productoId,
-        input.origen_direccion, // Dirección del usuario actual
+        input.origen_direccion,
       );
 
+      const uuid = uuidv4();
       let savedEnvio = envio.asignarTracking(
-        `TRK-${uuidv4().substring(0, 8).toUpperCase()}`,
+        'TRK-' + uuid.substring(0, 8).toUpperCase(),
         'default',
       );
 
@@ -137,7 +140,6 @@ export class ShipTradeUseCase {
       });
     }
 
-    // 8. Actualizar los envíos creados por el usuario actual a recibido_centro
     for (const envio of envios) {
       const envioActualizado = await this.envioRepository.findById(envio.id);
       if (envioActualizado) {
@@ -148,18 +150,15 @@ export class ShipTradeUseCase {
       }
     }
 
-    // 9. Verificar si ambos usuarios completaron sus envíos
     const todosLosEnvios = await this.envioRepository.findByIntercambioId(
       intercambio.id,
     );
 
-    // Obtener los productos ofrecidos por el OFERENTE
     const productosOfrecidos =
       await this.productoPropuestaRepository.findByPropuestaId(
         intercambio.propuestaId,
       );
 
-    // Verificar si el OFERENTE (Juan) ya envió TODOS sus productos
     const enviosOferente = todosLosEnvios.filter((e) =>
       productosOfrecidos.some((pp) => pp.productoId === e.productoId),
     );
@@ -169,7 +168,6 @@ export class ShipTradeUseCase {
         (e) => e.estadoEnvio === EstadoEnvio.RECIBIDO_CENTRO,
       );
 
-    // Verificar si el RECEPTOR (María) ya envió su producto
     const envioReceptor = todosLosEnvios.find(
       (e) => e.productoId === propuesta.productoSolicitadoId,
     );
@@ -177,12 +175,36 @@ export class ShipTradeUseCase {
       envioReceptor &&
       envioReceptor.estadoEnvio === EstadoEnvio.RECIBIDO_CENTRO;
 
-    // Solo cambiar estado si AMBOS completaron sus envíos
     if (oferenteCompletó && receptorCompletó) {
       const intercambioActualizado = intercambio.cambiarEstado(
         'productos_enviados' as any,
       );
       await this.intercambioRepository.update(intercambioActualizado);
+
+      try {
+        if (oferente && receptor) {
+          const offerentFullName = (
+            oferente.nombre +
+            ' ' +
+            oferente.apellido
+          ).trim();
+          const receptorFullName = (
+            receptor.nombre +
+            ' ' +
+            receptor.apellido
+          ).trim();
+
+          await this.notificationService.notifyBothConfirmedShipment(
+            oferente.id,
+            receptor.id,
+            intercambio.id,
+            offerentFullName,
+            receptorFullName,
+          );
+        }
+      } catch (error) {
+        console.error('Error creating shipment notifications:', error);
+      }
     }
 
     return envios;

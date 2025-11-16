@@ -22,7 +22,7 @@ export const useProductDetail = (productId) => {
         setLoading(true);
         setError(null);
 
-        const data = await apiService.get(`/api/v1/products/${productId}`);
+        const data = await apiService.get(`/products/${productId}`);
 
         // Mapear datos de la API al formato del frontend
         const mappedProduct = {

@@ -87,10 +87,7 @@ export class RoleService {
   /**
    * Crear un nuevo rol
    */
-  async createRole(
-    nombre: string,
-    descripcion?: string,
-  ): Promise<any> {
+  async createRole(nombre: string, descripcion?: string): Promise<any> {
     return await this.prisma.roles.create({
       data: {
         nombre,

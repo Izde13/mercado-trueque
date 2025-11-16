@@ -30,7 +30,7 @@ export const useAcceptTradeProposal = () => {
 
       // POST a endpoint de aceptar propuesta
       const response = await apiService.post(
-        `/api/v1/trades/proposals/${proposalId}/accept`,
+        `/trades/proposals/${proposalId}/accept`,
         payload
       );
 

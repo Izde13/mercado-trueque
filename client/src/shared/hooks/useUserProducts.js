@@ -49,7 +49,7 @@ export const useUserProducts = (userId) => {
       // Llamada a la API para obtener productos del usuario
       // TODO: Verificar el endpoint real en el backend
       // Por ahora, obtenemos todos los productos y filtramos por usuario
-      const data = await apiService.get('/api/v1/products');
+      const data = await apiService.get('/products');
 
       // Filtrar productos del usuario actual que estén disponibles
       // TODO: Implementar endpoint específico que retorne solo productos del usuario

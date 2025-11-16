@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import UserMenu from "../UserMenu/UserMenu";
+import { NotificationsSection } from "../../notifications/NotificationsSection";
+import { getCurrentUser } from "../../../auth/authService";
 import "./Navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  // Obtener el userId del usuario autenticado
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (user) {
+      setUserId(user.id);
+    }
+  }, []);
 
   // Sincronizar el input con el parámetro 'nombre' de la URL
   useEffect(() => {
@@ -93,7 +104,10 @@ export default function Navbar() {
               <circle cx="18" cy="20" r="1.7" />
             </svg>
           </a>
-          
+
+          {/* Notificaciones */}
+          {userId && <NotificationsSection userId={userId} />}
+
           {/* Menú de usuario */}
           <UserMenu />
         </div>

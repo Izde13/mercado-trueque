@@ -17,11 +17,13 @@ import type { ProductRepository } from '../../domain/repositories/product.reposi
 import type { ProductoPropuestaRepository } from '../../domain/repositories/producto-propuesta.repository';
 import type { CentroDistribucionRepository } from '../../domain/repositories/centro-distribucion.repository';
 import { Intercambio } from '../../domain/entities/intercambio.entity';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class AcceptTradeProposalUseCase {
   constructor(
     private readonly acceptanceValidator: AcceptancePhaseValidator,
+    private readonly notificationService: NotificationService,
     @Inject('TradeProposalRepository')
     private readonly tradeProposalRepository: TradeProposalRepository,
     @Inject('IntercambioRepository')
@@ -164,6 +166,34 @@ export class AcceptTradeProposalUseCase {
     // Luego persiste los cambios a la BD
     const proposalActualizado =
       await this.tradeProposalRepository.update(propuesta);
+
+    // 10. NOTIFICACIONES: Avisar a ambos usuarios
+    try {
+      const offerentFullName = `${oferente.nombre} ${oferente.apellido}`.trim();
+      const ownerFullName =
+        `${currentUser.nombre} ${currentUser.apellido}`.trim();
+
+      // Notificar al oferente que su propuesta fue aceptada
+      await this.notificationService.notifyProposalAccepted(
+        oferente.id,
+        propuesta.id,
+        savedIntercambio.id,
+        ownerFullName,
+      );
+
+      // Notificar al dueño del producto que aceptó la propuesta
+      await this.notificationService.notifyProposalAcceptedToOwner(
+        currentUser.id,
+        savedIntercambio.id,
+        offerentFullName,
+      );
+    } catch (error) {
+      // Log error pero no fallar la aceptación
+      console.error(
+        'Error creating notifications for accepted proposal:',
+        error,
+      );
+    }
 
     return {
       id: savedIntercambio.id,
