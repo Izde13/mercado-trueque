@@ -34,6 +34,17 @@ async function bootstrap() {
     .addTag('Products', 'Gestión de productos del catálogo')
     .addTag('Categories', 'Categorías de productos')
     .addTag('Users', 'Gestión de usuarios y perfiles')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Ingresa el token JWT obtenido del login',
+        in: 'header',
+      },
+      'access-token', // Este es el nombre de la referencia
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -45,6 +56,8 @@ async function bootstrap() {
       showRequestHeaders: true,
       docExpansion: 'list',
     },
+    jsonDocumentUrl: '/api-docs/openapi.json', // URL para descargar el JSON
+    yamlDocumentUrl: '/api-docs/openapi.yaml', // URL para descargar el YAML
   });
 
   app.enableCors({
@@ -57,5 +70,7 @@ async function bootstrap() {
 
   console.log('🚀 API running on: http://localhost:3000/api/v1');
   console.log('📚 Swagger docs: http://localhost:3000/api-docs');
+  console.log('📄 OpenAPI JSON: http://localhost:3000/api-docs/openapi.json');
+  console.log('📄 OpenAPI YAML: http://localhost:3000/api-docs/openapi.yaml');
 }
 bootstrap();

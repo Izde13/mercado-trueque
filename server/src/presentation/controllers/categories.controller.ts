@@ -20,7 +20,6 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Categories')
-@ApiBearerAuth()
 @Controller('categories')
 export class CategoriesController {
   constructor(
@@ -32,19 +31,15 @@ export class CategoriesController {
 
   /**
    * GET /categories
-   * Solo: admin, usuario, vendedor
-   * NO: revisor
+   * Endpoint público - no requiere autenticación
    */
   @Get()
-  @Auth('admin', 'usuario', 'vendedor')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener todas las categorías',
-    description:
-      'Roles permitidos: admin, usuario, vendedor. El revisor NO tiene acceso.',
+    description: 'Endpoint público para listar categorías',
   })
   async findAll(
-    @CurrentUser() user: any,
     @Query('active') active?: string,
   ): Promise<CategoryResponseDto[]> {
     const categories =
@@ -57,20 +52,16 @@ export class CategoriesController {
 
   /**
    * GET /categories/:id
-   * Solo: admin, usuario, vendedor
-   * NO: revisor
+   * Endpoint público - no requiere autenticación
    */
   @Get(':id')
-  @Auth('admin', 'usuario', 'vendedor')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener una categoría por ID',
-    description:
-      'Roles permitidos: admin, usuario, vendedor. El revisor NO tiene acceso.',
+    description: 'Endpoint público para obtener una categoría específica',
   })
   async findOne(
     @Param('id') id: string,
-    @CurrentUser() user: any,
   ): Promise<CategoryResponseDto | null> {
     const category = await this.getCategoryUseCase.execute(id);
     return category ? new CategoryResponseDto(category) : null;
@@ -83,6 +74,7 @@ export class CategoriesController {
    */
   @Post()
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nueva categoría',
@@ -116,6 +108,7 @@ export class CategoriesController {
    */
   @Put(':id')
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Actualizar categoría',

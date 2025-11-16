@@ -23,6 +23,7 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CreateProductUseCase } from '../../application/use-cases/create-product.use-case';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
@@ -55,6 +56,7 @@ export class ProductsController {
 
   @Post()
   @Auth()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear un nuevo producto',
@@ -67,7 +69,28 @@ export class ProductsController {
   })
   @ApiCreatedResponse({
     description: 'Producto creado exitosamente',
-    type: ProductResponseDto,
+    schema: {
+      example: {
+        success: true,
+        message: 'Producto creado exitosamente',
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          titulo: 'Bicicleta de montaña Trek',
+          descripcion: 'Bicicleta en excelente estado',
+          valorEstimado: 500000,
+          estadoPublicacion: 'PUBLICADO',
+          imagenes: [
+            {
+              url: 'https://ejemplo.com/bici1.jpg',
+              orden: 1,
+              esPrincipal: true,
+            },
+          ],
+        },
+        timestamp: '2024-01-15T10:30:00Z',
+        requestId: 'req_1705316400_abc123',
+      },
+    },
   })
   @ApiBadRequestResponse({
     description: 'Datos de entrada inválidos o regla de negocio violada',
@@ -151,7 +174,38 @@ export class ProductsController {
   })
   @ApiOkResponse({
     description: 'Lista de productos obtenida exitosamente',
-    type: [ProductResponseDto],
+    schema: {
+      example: [
+        {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          titulo: 'Bicicleta de montaña Trek',
+          descripcion: 'Bicicleta en excelente estado',
+          valorEstimado: 500000,
+          estadoPublicacion: 'PUBLICADO',
+          imagenes: [
+            {
+              url: 'https://ejemplo.com/bici1.jpg',
+              orden: 1,
+              esPrincipal: true,
+            },
+          ],
+        },
+        {
+          id: '660e8400-e29b-41d4-a716-446655440001',
+          titulo: 'Laptop Dell XPS 15',
+          descripcion: 'Laptop como nueva, 16GB RAM',
+          valorEstimado: 800000,
+          estadoPublicacion: 'PUBLICADO',
+          imagenes: [
+            {
+              url: 'https://ejemplo.com/laptop1.jpg',
+              orden: 1,
+              esPrincipal: true,
+            },
+          ],
+        },
+      ],
+    },
   })
   @ApiInternalServerErrorResponse({
     description: 'Error al obtener productos',

@@ -6,7 +6,12 @@ import { LoginDto } from '../application/dtos/login-user.dto';
 import { Auth } from './decorators/auth.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -17,13 +22,49 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Registrar nuevo usuario' })
+  @ApiOperation({
+    summary: 'Registrar nuevo usuario',
+    description: 'Crea una nueva cuenta de usuario en el sistema',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuario registrado exitosamente',
+    schema: {
+      example: {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        email: 'juan@ejemplo.com',
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        created_at: '2024-01-15T10:30:00Z',
+      },
+    },
+  })
   register(@Body() dto: RegisterUserDto) {
     return this.authService.register(dto);
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Login de usuario' })
+  @ApiOperation({
+    summary: 'Login de usuario',
+    description: 'Autentica un usuario y retorna un token JWT',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login exitoso',
+    schema: {
+      example: {
+        access_token:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6Imp1YW5AZWplbXBsby5jb20iLCJyb2xlcyI6WyJ1c3VhcmlvIl0sImlhdCI6MTcwNTMxNjQwMCwiZXhwIjoxNzA1NDAyODAwfQ.example',
+        user: {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          email: 'juan@ejemplo.com',
+          nombre: 'Juan',
+          apellido: 'Pérez',
+          roles: ['usuario'],
+        },
+      },
+    },
+  })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
@@ -33,6 +74,7 @@ export class AuthController {
    */
   @Get('admin/dashboard')
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Dashboard admin (Solo admin)',
     description: 'Endpoint protegido solo para usuarios con rol admin',
@@ -54,6 +96,7 @@ export class AuthController {
    */
   @Get('moderator/reports')
   @Auth('admin', 'moderator')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Ver reportes (Admin o Moderator)',
     description:
@@ -79,6 +122,7 @@ export class AuthController {
    */
   @Post('admin/assign-role')
   @Auth('admin')
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Asignar rol a usuario (Admin only)',
     description: 'Permite a un admin asignar un rol a otro usuario',
