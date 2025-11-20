@@ -20,6 +20,9 @@ import RegisterPage from "./pages/register/Registerpage";
 // Página de revisor
 import ReviewerPage from "./pages/reviewer/ReviewerPage";
 
+// Página de perfil
+import ProfilePage from "./pages/profile/ProfilePage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -81,6 +84,15 @@ function App() {
               element={
                 <ProtectedRoute
                   element={<PublishProduct />}
+                />
+              }
+            />
+
+            <Route
+              path="perfil"
+              element={
+                <ProtectedRoute
+                  element={<ProfilePage />}
                 />
               }
             />

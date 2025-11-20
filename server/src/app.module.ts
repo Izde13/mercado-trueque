@@ -19,6 +19,12 @@ import { ProductsController } from './presentation/controllers/products.controll
 
 // Users
 import { UserRepositoryImpl } from './infrastructure/repositories/user.repository.impl';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
+import { GetUserUseCase } from './application/use-cases/get-user.use-case';
+import { GetUsersUseCase } from './application/use-cases/get-users.use-case';
+import { UpdateUserUseCase } from './application/use-cases/update-user.use-case';
+import { DeleteUserUseCase } from './application/use-cases/delete-user.use-case';
+import { UsersController } from './presentation/controllers/users.controller';
 
 // Intercambios
 import { IntercambioRepositoryImpl } from './infrastructure/repositories/intercambio.repository.impl';
@@ -173,6 +179,7 @@ import { AuthModule } from './auth/auth.module';
     AppController,
     CategoriesController,
     ProductsController,
+    UsersController,
     EstadosProductoController,
     TradesController,
     NotificationsController,
@@ -202,6 +209,11 @@ import { AuthModule } from './auth/auth.module';
       provide: 'UserRepository',
       useClass: UserRepositoryImpl,
     },
+    CreateUserUseCase,
+    GetUserUseCase,
+    GetUsersUseCase,
+    UpdateUserUseCase,
+    DeleteUserUseCase,
     // Intercambios
     {
       provide: 'IntercambioRepository',
