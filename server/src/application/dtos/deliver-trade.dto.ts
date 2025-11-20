@@ -3,9 +3,10 @@ import { IsUUID, IsString, IsOptional } from 'class-validator';
 export class DeliverTradeDto {
   @IsUUID()
   usuario_id: string;
-
+    
+  @IsOptional()
   @IsUUID()
-  intercambio_id: string;
+  intercambio_id?: string;
 
   @IsString()
   delivery_address: string;

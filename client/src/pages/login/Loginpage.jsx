@@ -39,13 +39,15 @@ export default function LoginPage() {
       const currentUser = getCurrentUser();
       setUser(currentUser);
       setIsAuth(true);
-      
+
       setMessage('Inicio de sesión exitoso');
       setMessageType('success');
-      
+
       // Redirigir después de 1.5 segundos
+      // Si es revisor, redirigir al panel de revisión; si no, a productos
       setTimeout(() => {
-        navigate('/productos');
+        const destination = currentUser?.rol === 'revisor' ? '/revisor' : '/productos';
+        navigate(destination);
       }, 1500);
     } catch (err) {
       setMessage(

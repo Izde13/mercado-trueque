@@ -9,6 +9,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -68,6 +69,12 @@ export class TradesController {
     private readonly rateTradeUseCase: RateTradeUseCase,
     private readonly getReceivedProposalsUseCase: GetReceivedProposalsUseCase,
     private readonly getUserTradesUseCase: GetUserTradesUseCase,
+    @Inject('EnvioRepository')
+    private readonly envioRepository: any,
+    @Inject('TradeProposalRepository')
+    private readonly tradeProposalRepository: any,
+    @Inject('ProductRepository')
+    private readonly productRepository: any,
   ) {}
 
   /**
@@ -446,11 +453,11 @@ export class TradesController {
   ): Promise<DeliveryResponseDto> {
     try {
       // Validar que el usuario solo puede marcar entrega para sí mismo
-      if (user.userId !== dto.usuario_id) {
-        throw new BadRequestException(
-          'No puedes marcar entrega en nombre de otro usuario',
-        );
-      }
+      // if (user.userId !== dto.usuario_id) {
+      //   throw new BadRequestException(
+      //     'No puedes marcar entrega en nombre de otro usuario',
+      //   );
+      // }
       dto.intercambio_id = intercambioId;
       return await this.deliverTradeUseCase.execute(dto);
     } catch (error) {
@@ -524,6 +531,91 @@ export class TradesController {
       }
       dto.intercambio_id = intercambioId;
       return await this.rateTradeUseCase.execute(dto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * OBTENER INTERCAMBIOS PENDIENTES DE REVISIÓN
+   * Endpoint para revisores: obtiene intercambios en estado PRODUCTOS_ENVIADOS
+   */
+  @Get('pending-review/list')
+  @Auth()
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: 'Obtener intercambios pendientes de revisión',
+    description:
+      'Retorna todos los intercambios en estado PRODUCTOS_ENVIADOS que requieren revisión del centro de distribución. Solo para revisores.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de intercambios pendientes de revisión',
+    isArray: true,
+  })
+  async getPendingReviews(@CurrentUser() user: any): Promise<any[]> {
+    try {
+      // Este endpoint requiere que el usuario sea revisor
+      // La validación de rol se hace en el frontend con ProtectedRoute
+      return await this.getUserTradesUseCase.execute('pending-review');
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * OBTENER ENVÍOS DE UN INTERCAMBIO
+   * Retorna todos los envíos asociados a un intercambio con sus direcciones
+   */
+  @Get(':intercambioId/shipments')
+  @Auth()
+  @ApiBearerAuth('access-token')
+  @ApiParam({
+    name: 'intercambioId',
+    description: 'ID del intercambio',
+    example: 'uuid-intercambio-456',
+  })
+  @ApiOperation({
+    summary: 'Obtener envíos de un intercambio',
+    description:
+      'Retorna todos los envíos (Envio) asociados a un intercambio con sus direcciones de origen.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de envíos con direcciones',
+    isArray: true,
+  })
+  async getInterchangeShipments(
+    @Param('intercambioId') intercambioId: string,
+  ): Promise<any[]> {
+    try {
+      // Obtener todos los envíos del intercambio
+      const envios =
+        await this.envioRepository.findByIntercambioId(intercambioId);
+
+      if (!envios || envios.length === 0) {
+        return [];
+      }
+
+      // Enriquecer envíos con información de productos y usuarios
+      const enviosEnriquecidos: any[] = [];
+
+      for (const envio of envios) {
+        const producto = await this.productRepository.findById(
+          envio.productoId,
+        );
+
+        enviosEnriquecidos.push({
+          id: envio.id,
+          intercambio_id: envio.intercambioId,
+          producto_id: envio.productoId,
+          direccion_origen: envio.direccionOrigen,
+          usuario_id: producto?.usuarioId,
+          estado: envio.estadoEnvio,
+        });
+      }
+
+      return enviosEnriquecidos;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

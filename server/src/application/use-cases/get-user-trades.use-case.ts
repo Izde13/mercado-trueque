@@ -27,6 +27,98 @@ export class GetUserTradesUseCase {
     // Obtener todos los intercambios
     const allIntercambios = await this.intercambioRepository.findAll();
 
+    // Caso especial: pendientes de revisión (para revisores)
+    if (usuarioId === 'pending-review') {
+      const pendingReviews: any[] = [];
+
+      for (const intercambio of allIntercambios) {
+        if (intercambio.estado !== 'productos_enviados') continue;
+
+        const propuesta =
+          await this.tradeProposalRepository.findByIdWithRelations(
+            intercambio.propuestaId,
+          );
+        if (!propuesta) continue;
+
+        // Obtener usuarios
+        const usuarioOferta = await this.userRepository.findById(
+          propuesta.usuarioOferenteId,
+        );
+
+        let usuarioRecepcion: any = null;
+        const productoSolicitado = propuesta.productoSolicitadoId
+          ? await this.productRepository.findById(
+              propuesta.productoSolicitadoId,
+            )
+          : null;
+        if (productoSolicitado) {
+          usuarioRecepcion = await this.userRepository.findById(
+            productoSolicitado.usuarioId,
+          );
+        }
+
+        // Obtener productos ofrecidos
+        const productosPropuesta =
+          await this.productoPropuestaRepository.findByPropuestaId(
+            propuesta.id,
+          );
+
+        const productosOfrecidos: any[] = [];
+        if (productosPropuesta && productosPropuesta.length > 0) {
+          for (const pp of productosPropuesta) {
+            const prod = await this.productRepository.findById(pp.productoId);
+            if (prod) {
+              productosOfrecidos.push({
+                id: prod.id,
+                nombre: prod.titulo,
+                descripcion: prod.descripcion,
+                categoriaId: prod.categoriaId,
+                usuarioId: prod.usuarioId,
+              });
+            }
+          }
+        }
+
+        // Obtener producto solicitado
+        const productoRecibido = productoSolicitado
+          ? {
+              id: productoSolicitado.id,
+              nombre: productoSolicitado.titulo,
+              descripcion: productoSolicitado.descripcion,
+              categoriaId: productoSolicitado.categoriaId,
+              usuarioId: productoSolicitado.usuarioId,
+            }
+          : null;
+
+        pendingReviews.push({
+          id: intercambio.id,
+          propuesta_id: intercambio.propuestaId,
+          estado: intercambio.estado,
+          fecha_creacion: intercambio.fechaInicio,
+          fecha_completado: intercambio.fechaCompletado,
+          centro_distribucion_id: intercambio.centroDistribucionId,
+          usuarioOferta: {
+            id: usuarioOferta?.id,
+            nombre: usuarioOferta?.nombre,
+            apellido: usuarioOferta?.apellido,
+            email: usuarioOferta?.email,
+          },
+          usuarioRecepcion: usuarioRecepcion
+            ? {
+                id: usuarioRecepcion.id,
+                nombre: usuarioRecepcion.nombre,
+                apellido: usuarioRecepcion.apellido,
+                email: usuarioRecepcion.email,
+              }
+            : null,
+          productosOfrecidos,
+          productosRecibidos: productoRecibido ? [productoRecibido] : [],
+        });
+      }
+
+      return pendingReviews;
+    }
+
     // Filtrar intercambios donde el usuario está involucrado
     const userIntercambios: any[] = [];
 

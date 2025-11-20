@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Get,
-  Param,
-  BadRequestException,
-} from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Controller, Get, Param, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { GetUserNotificationsUseCase } from '../../application/use-cases/get-user-notifications.use-case';
@@ -45,7 +35,8 @@ export class NotificationsController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Permiso denegado - intentando acceder a notificaciones de otro usuario',
+    description:
+      'Permiso denegado - intentando acceder a notificaciones de otro usuario',
   })
   async getUserNotifications(
     @Param('userId') userId: string,

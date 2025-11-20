@@ -43,8 +43,14 @@ export class DeliverTradeUseCase {
   ) {}
 
   async execute(input: DeliverTradeDto): Promise<DeliveryResponseDto> {
+    if (!input.intercambio_id) {
+      throw new BadRequestException('El ID del intercambio es requerido');
+    }
+
+    const intercambioId = input.intercambio_id as string;
+
     const intercambio = await this.intercambioRepository.findById(
-      input.intercambio_id,
+      intercambioId,
     );
 
     if (!intercambio) {
@@ -89,7 +95,7 @@ export class DeliverTradeUseCase {
       userRating: 0,
       userTotalTrades: 0,
       timestamp: new Date(),
-      intercambioId: input.intercambio_id,
+      intercambioId: intercambioId,
       productoId: '',
       deliveryAddress: input.delivery_address,
       estimatedDeliveryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
@@ -105,7 +111,7 @@ export class DeliverTradeUseCase {
     }
 
     const todosLosEnvios = await this.envioRepository.findByIntercambioId(
-      input.intercambio_id,
+      intercambioId,
     );
 
     for (const productoId of productosAMarcar) {

@@ -10,12 +10,14 @@ export default function Navbar() {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
-  // Obtener el userId del usuario autenticado
+  // Obtener el userId y rol del usuario autenticado
   useEffect(() => {
     const user = getCurrentUser();
     if (user) {
       setUserId(user.id);
+      setUserRole(user.rol);
     }
   }, []);
 
@@ -47,63 +49,79 @@ export default function Navbar() {
             <span className="mt-logo-word">Trueque</span>
           </Link>
 
-          <ul className="mt-menu" aria-label="Menú principal">
-            <li>
-              <Link to="/productos" className="mt-link">
-                Ver Productos
-              </Link>
-            </li>
-            <li>
-              <Link to="/propuestas-recibidas" className="mt-link">
-                Propuestas Recibidas
-              </Link>
-            </li>
-          </ul>
+          {/* Menú diferente según el rol */}
+          {userRole === 'revisor' ? (
+            <ul className="mt-menu" aria-label="Menú principal">
+              <li>
+                <Link to="/revisor" className="mt-link mt-link-active">
+                  Panel de Revisión
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <ul className="mt-menu" aria-label="Menú principal">
+              <li>
+                <Link to="/productos" className="mt-link">
+                  Ver Productos
+                </Link>
+              </li>
+              <li>
+                <Link to="/propuestas-recibidas" className="mt-link">
+                  Propuestas Recibidas
+                </Link>
+              </li>
+            </ul>
+          )}
         </div>
 
-        {/* Centro: buscador */}
-        <form className="mt-search" role="search" aria-label="Buscar" onSubmit={handleSearch}>
-          <svg className="mt-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle
-              cx="11"
-              cy="11"
-              r="7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <path
-              d="M21 21l-4.3-4.3"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <input
-            type="search"
-            placeholder="Buscar artículos para trueque"
-            aria-label="Buscar artículos para trueque"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </form>
-
-        {/* Derecha: acciones */}
-        <div className="mt-actions">
-          <a href="#" className="mt-icon-btn" aria-label="Carrito">
+        {/* Centro: buscador (solo si no es revisor) */}
+        {userRole !== 'revisor' && (
+          <form className="mt-search" role="search" aria-label="Buscar" onSubmit={handleSearch}>
             <svg className="mt-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
               <path
-                d="M3 4h2l2.4 10.4A2 2 0 0 0 9.4 16h7.8a2 2 0 0 0 2-1.6L21 8H6"
+                d="M21 21l-4.3-4.3"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
               />
-              <circle cx="10" cy="20" r="1.7" />
-              <circle cx="18" cy="20" r="1.7" />
             </svg>
-          </a>
+            <input
+              type="search"
+              placeholder="Buscar artículos para trueque"
+              aria-label="Buscar artículos para trueque"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
+        )}
+
+        {/* Derecha: acciones */}
+        <div className="mt-actions">
+          {/* Carrito (solo si no es revisor) */}
+          {userRole !== 'revisor' && (
+            <a href="#" className="mt-icon-btn" aria-label="Carrito">
+              <svg className="mt-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M3 4h2l2.4 10.4A2 2 0 0 0 9.4 16h7.8a2 2 0 0 0 2-1.6L21 8H6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <circle cx="10" cy="20" r="1.7" />
+                <circle cx="18" cy="20" r="1.7" />
+              </svg>
+            </a>
+          )}
 
           {/* Notificaciones */}
           {userId && <NotificationsSection userId={userId} />}

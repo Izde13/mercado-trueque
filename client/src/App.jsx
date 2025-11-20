@@ -17,6 +17,9 @@ import PublishProduct from "./pages/publishProduct/PublishProduct";
 import LoginPage from "./pages/login/Loginpage";
 import RegisterPage from "./pages/register/Registerpage";
 
+// Página de revisor
+import ReviewerPage from "./pages/reviewer/ReviewerPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -78,6 +81,17 @@ function App() {
               element={
                 <ProtectedRoute
                   element={<PublishProduct />}
+                />
+              }
+            />
+
+            {/* 🔐 Ruta protegida - SOLO REVISORES */}
+            <Route
+              path="revisor"
+              element={
+                <ProtectedRoute
+                  element={<ReviewerPage />}
+                  requiredRoles="revisor"
                 />
               }
             />

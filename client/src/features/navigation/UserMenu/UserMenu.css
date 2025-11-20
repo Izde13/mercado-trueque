@@ -129,6 +129,21 @@
   color: #c12a1a;
 }
 
+/* Estilo especial para el elemento del revisor */
+.reviewer-item {
+  color: #16a085;
+  font-weight: 600;
+  background-color: rgba(22, 160, 133, 0.05);
+}
+
+.reviewer-item:hover {
+  background-color: rgba(22, 160, 133, 0.15) !important;
+}
+
+.reviewer-item .menu-icon {
+  color: #16a085;
+}
+
 .user-menu-guest {
   display: flex;
   gap: 8px;

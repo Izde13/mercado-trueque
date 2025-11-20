@@ -60,9 +60,7 @@ export class CategoriesController {
     summary: 'Obtener una categoría por ID',
     description: 'Endpoint público para obtener una categoría específica',
   })
-  async findOne(
-    @Param('id') id: string,
-  ): Promise<CategoryResponseDto | null> {
+  async findOne(@Param('id') id: string): Promise<CategoryResponseDto | null> {
     const category = await this.getCategoryUseCase.execute(id);
     return category ? new CategoryResponseDto(category) : null;
   }
