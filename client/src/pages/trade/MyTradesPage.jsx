@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useUserTrades } from "../../shared/hooks/useUserTrades";
 import { useAuth } from "../../context/AuthContext";
+import RateModal from "./components/RateModal";
 
 export default function MyTradesPage() {
   const navigate = useNavigate();
@@ -13,6 +14,28 @@ export default function MyTradesPage() {
 
   // Estado para filtro de estado
   const [filterStatus, setFilterStatus] = useState("todos");
+
+  // Estado para modal de calificación
+  const [rateModalOpen, setRateModalOpen] = useState(false);
+  const [selectedTradeForRate, setSelectedTradeForRate] = useState(null);
+
+  // Abrir modal de calificación
+  const handleOpenRateModal = (trade) => {
+    setSelectedTradeForRate(trade);
+    setRateModalOpen(true);
+  };
+
+  // Cerrar modal de calificación
+  const handleCloseRateModal = () => {
+    setRateModalOpen(false);
+    setSelectedTradeForRate(null);
+  };
+
+  // Al completar calificación, refrescar trades
+  const handleRateComplete = () => {
+    // Aquí podrías refrescar los trades si es necesario
+    // Por ahora, el hook se encargará de actualizarlos
+  };
 
   // Función para obtener color según estado
   const getStatusColor = (estado) => {
@@ -195,8 +218,11 @@ export default function MyTradesPage() {
 
                 {(trade.estado?.toUpperCase() === "COMPLETADO" ||
                   trade.estado?.toUpperCase() === "ENTREGADO") && (
-                  <button className="mt-card-btn mt-card-btn-completed" disabled>
-                    ✅ Completado
+                  <button
+                    className="mt-card-btn mt-card-btn-rate"
+                    onClick={() => handleOpenRateModal(trade)}
+                  >
+                    ⭐ Calificar
                   </button>
                 )}
 
@@ -207,6 +233,16 @@ export default function MyTradesPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Modal de Calificación */}
+      {rateModalOpen && selectedTradeForRate && (
+        <RateModal
+          trade={selectedTradeForRate}
+          currentUserId={userId}
+          onClose={handleCloseRateModal}
+          onRateComplete={handleRateComplete}
+        />
       )}
     </section>
   );

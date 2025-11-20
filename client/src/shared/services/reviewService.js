@@ -143,6 +143,38 @@ const reviewService = {
       throw error;
     }
   },
+
+  /**
+   * Califica un intercambio completado (FASE 6: Rating)
+   * @param {string} intercambioId - ID del intercambio
+   * @param {string} usuarioId - ID del usuario que califica
+   * @param {string} usuarioCalificadoId - ID del usuario a calificar
+   * @param {number} calificacionUsuario - Calificación del usuario (1-5)
+   * @param {number} calificacionProducto - Calificación del producto (1-5)
+   * @param {string} comentario - Comentario opcional sobre la calificación
+   */
+  async rateTrade(
+    intercambioId,
+    usuarioId,
+    usuarioCalificadoId,
+    calificacionUsuario,
+    calificacionProducto,
+    comentario = ''
+  ) {
+    try {
+      const response = await api.post(`/trades/${intercambioId}/rate`, {
+        usuario_id: usuarioId,
+        usuario_calificado_id: usuarioCalificadoId,
+        calificacion_usuario: calificacionUsuario,
+        calificacion_producto: calificacionProducto,
+        comentario: comentario.trim(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error rating trade:', error);
+      throw error;
+    }
+  },
 };
 
 export default reviewService;

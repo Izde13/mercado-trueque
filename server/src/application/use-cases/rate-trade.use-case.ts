@@ -32,6 +32,10 @@ export class RateTradeUseCase {
   ) {}
 
   async execute(input: RateTradeDto): Promise<RatingResponseDto> {
+    if (!input.intercambio_id) {
+      throw new BadRequestException('El ID del intercambio es requerido');
+    }
+
     const intercambio = await this.intercambioRepository.findById(
       input.intercambio_id,
     );

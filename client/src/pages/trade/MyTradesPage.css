@@ -325,6 +325,16 @@
   background-color: #d1d5db;
 }
 
+.mt-card-btn-rate {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.mt-card-btn-rate:hover:not(:disabled) {
+  background-color: #d97706;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 980px) {
   .mt-list {
