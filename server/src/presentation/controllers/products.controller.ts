@@ -11,9 +11,11 @@ import {
   Logger,
   BadRequestException,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../../auth/guards/optional-jwt-auth.guard';
 import {
   ApiTags,
   ApiOperation,
@@ -166,11 +168,12 @@ export class ProductsController {
   }
 
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener productos con filtros opcionales',
     description:
-      'Retorna una lista de productos. Se pueden aplicar filtros opcionales por nombre, categoría, estado, ubicación, rango de precio, usuario y estado de publicación.',
+      'Retorna una lista de productos. Se pueden aplicar filtros opcionales por nombre, categoría, estado, ubicación, rango de precio, usuario y estado de publicación. Si el usuario está autenticado, automáticamente se excluyen sus propios productos.',
   })
   @ApiOkResponse({
     description: 'Lista de productos obtenida exitosamente',
@@ -212,6 +215,7 @@ export class ProductsController {
   })
   async findAll(
     @Query() filtersDto: ProductFiltersDto,
+    @CurrentUser() currentUser?: any,
   ): Promise<ProductResponseDto[]> {
     const requestId = this.generateRequestId();
 
@@ -256,12 +260,19 @@ export class ProductsController {
             ? parseFloat(filtersDto.precioMax)
             : undefined,
           usuarioId: filtersDto.usuario,
+          excludeUserId: currentUser?.userId,
           estadoPublicacion: filtersDto.estadoPublicacion,
         });
 
         products = await this.getProductsUseCase.executeWithFilters(filters);
       } else {
-        products = await this.getProductsUseCase.execute();
+        // Si no hay filtros explícitos pero hay un usuario autenticado, excluir sus productos
+        const filters = ProductFiltersVO.create({
+          excludeUserId: currentUser?.userId,
+          estadoPublicacion: filtersDto.estadoPublicacion,
+        });
+
+        products = await this.getProductsUseCase.executeWithFilters(filters);
       }
 
       return products.map((product) => new ProductResponseDto(product));

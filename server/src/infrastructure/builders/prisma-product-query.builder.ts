@@ -19,6 +19,7 @@ export class PrismaProductQueryBuilder {
     this.addPriceRangeFilter(where, filters);
     this.addLocationFilter(where, filters);
     this.addUserFilter(where, filters);
+    this.addExcludeUserFilter(where, filters);
 
     return where;
   }
@@ -127,6 +128,14 @@ export class PrismaProductQueryBuilder {
   private static addUserFilter(where: any, filters: ProductFiltersVO): void {
     if (filters.usuarioId) {
       where.usuario_id = filters.usuarioId;
+    }
+  }
+
+  private static addExcludeUserFilter(where: any, filters: ProductFiltersVO): void {
+    if (filters.excludeUserId) {
+      where.usuario_id = {
+        not: filters.excludeUserId,
+      };
     }
   }
 }

@@ -11,6 +11,7 @@ export class ProductFiltersVO {
     public readonly precioMax?: number,
     public readonly ubicacion?: string,
     public readonly usuarioId?: string,
+    public readonly excludeUserId?: string,
     public readonly estadoPublicacion: string = 'disponible',
   ) {}
 
@@ -25,6 +26,7 @@ export class ProductFiltersVO {
     precioMax?: number;
     ubicacion?: string;
     usuarioId?: string;
+    excludeUserId?: string;
     estadoPublicacion?: string;
   }): ProductFiltersVO {
     // Validar reglas de negocio
@@ -52,6 +54,7 @@ export class ProductFiltersVO {
       params.precioMax,
       params.ubicacion,
       params.usuarioId,
+      params.excludeUserId,
       params.estadoPublicacion || 'disponible',
     );
   }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../services/apiAxios';
+import { useCurrentUser } from './useCurrentUser';
 
 /**
  * Mapea los datos de la API al formato esperado por el frontend
@@ -33,6 +34,7 @@ export const useProducts = (filters = {}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { authUser } = useCurrentUser();
 
   const fetchProducts = async (appliedFilters = filters) => {
     try {
@@ -93,6 +95,7 @@ export const useProducts = (filters = {}) => {
     filters.estado?.join(','),
     filters.precioMin,
     filters.precioMax,
+    authUser?.id,
   ]);
 
   // Función para refrescar productos con nuevos filtros
@@ -106,6 +109,7 @@ export const useProducts = (filters = {}) => {
 /**
  * Hook para obtener todos los productos de una vez
  * Retorna los mismos productos para ambas secciones (nuevos y tendencia)
+ * Si el usuario está autenticado, automáticamente excluye sus propios productos
  * @returns {Object} { newProducts, trendingProducts, loading, error }
  */
 export const useAllProducts = () => {
@@ -115,6 +119,7 @@ export const useAllProducts = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { authUser } = useCurrentUser();
 
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -142,7 +147,7 @@ export const useAllProducts = () => {
     };
 
     fetchAllProducts();
-  }, []);
+  }, [authUser?.id]);
 
   return { ...data, loading, error };
 };
