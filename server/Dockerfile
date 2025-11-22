@@ -6,9 +6,9 @@ WORKDIR /app
 # Instalar pnpm
 RUN npm install -g pnpm
 
-# Copiar archivos de dependencias desde server/
-COPY server/package.json server/pnpm-lock.yaml ./
-COPY server/prisma ./prisma/
+# Copiar archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
 
 # Instalar dependencias
 RUN pnpm install --frozen-lockfile
@@ -16,8 +16,8 @@ RUN pnpm install --frozen-lockfile
 # Generar Prisma Client
 RUN npx prisma generate
 
-# Copiar código fuente desde server/
-COPY server/ .
+# Copiar código fuente
+COPY . .
 
 # Build de la aplicación
 RUN pnpm run build
