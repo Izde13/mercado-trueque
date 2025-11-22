@@ -17,12 +17,19 @@ export const useProductDetail = (productId) => {
       return;
     }
 
+    // Flag para evitar race conditions cuando se navega rápidamente entre productos
+    let isCurrent = true;
+
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError(null);
+        setProduct(null); // Resetear producto anterior para evitar mostrar datos obsoletos
 
         const data = await apiService.get(`/products/${productId}`);
+
+        // Solo actualizar el estado si esta petición sigue siendo relevante
+        if (!isCurrent) return;
 
         // Mapear datos de la API al formato del frontend
         const mappedProduct = {
@@ -43,14 +50,26 @@ export const useProductDetail = (productId) => {
 
         setProduct(mappedProduct);
       } catch (err) {
+        // Solo actualizar error si esta petición sigue siendo relevante
+        if (!isCurrent) return;
+
         setError(err.message || 'Error al cargar el producto');
         console.error('Error fetching product detail:', err);
       } finally {
-        setLoading(false);
+        // Solo actualizar loading si esta petición sigue siendo relevante
+        if (isCurrent) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProduct();
+
+    // Cleanup: marcar esta petición como obsoleta cuando el componente se desmonte
+    // o cuando cambie el productId
+    return () => {
+      isCurrent = false;
+    };
   }, [productId]);
 
   return { product, loading, error };

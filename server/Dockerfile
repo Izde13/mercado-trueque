@@ -1,23 +1,43 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine
+# Etapa 1: Build
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Instalar pnpm
+RUN npm install -g pnpm
 
-# Install dependencies
-RUN npm ci --only=production
+# Copiar archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
 
-# Copy source code
+# Instalar dependencias
+RUN pnpm install --frozen-lockfile
+
+# Generar Prisma Client
+RUN npx prisma generate
+
+# Copiar código fuente
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build de la aplicación
+RUN pnpm run build
 
-# Expose port
+# Etapa 2: Producción
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm
+
+# Copiar archivos necesarios desde builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/prisma ./prisma
+
+# Exponer puerto
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start:prod"]
+# Comando para iniciar la aplicación
+CMD ["pnpm", "start:prod"]

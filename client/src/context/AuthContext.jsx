@@ -1,3 +1,4 @@
+/* @refresh reload */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrentUser, logoutUser, isAuthenticated } from '../auth/authService';
 
