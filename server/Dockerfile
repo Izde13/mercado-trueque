@@ -39,5 +39,5 @@ COPY --from=builder /app/prisma ./prisma
 # Exponer puerto
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
-CMD ["pnpm", "start:prod"]
+# Script de inicio: ejecutar migraciones y luego iniciar la aplicación
+CMD ["sh", "-c", "npx prisma migrate deploy && pnpm start:prod"]

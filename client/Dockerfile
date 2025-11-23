@@ -15,6 +15,10 @@ RUN pnpm install --frozen-lockfile
 # Copiar código fuente
 COPY . .
 
+# ARG para variables de entorno en build time
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build de la aplicación
 RUN pnpm run build
 
