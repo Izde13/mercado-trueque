@@ -8,6 +8,11 @@ function resolveImagePath(imagePath) {
     return PLACEHOLDER_IMAGE;
   }
 
+  // Detectar URLs inválidas (example.com, placeholders, etc.)
+  if (imagePath.includes('example.com') || imagePath.includes('placeholder')) {
+    return PLACEHOLDER_IMAGE;
+  }
+
   const hasProtocol = /^(?:https?:)?\/\//i.test(imagePath);
   if (hasProtocol || imagePath.startsWith("data:")) {
     return imagePath;
@@ -24,8 +29,13 @@ export default function ProductCard({
   popularity = 4.0,
   views = 0,
 }) {
-  // Asegurar que popularity esté entre 0 y 5
-  const validPopularity = Math.max(0, Math.min(5, Number(popularity) || 0));
+  // Normalizar popularity de 0-100 a 0-5 (si viene en escala 0-100)
+  // Si popularity > 5, asumimos que está en escala 0-100
+  const rawPopularity = popularity != null ? Number(popularity) : 0;
+  const normalizedPopularity = rawPopularity > 5
+    ? (rawPopularity / 100) * 5
+    : rawPopularity;
+  const validPopularity = Math.max(0, Math.min(5, normalizedPopularity));
 
   const fullStars = Math.floor(validPopularity);
   const hasHalfStar = validPopularity % 1 >= 0.5;
@@ -75,7 +85,9 @@ export default function ProductCard({
       </div>
 
       <div className="pcard-price">
-        <span className="price-now">${estimatedValue}</span>
+        <span className="price-now">
+          ${Number(estimatedValue)?.toLocaleString('es-CL') || '0'}
+        </span>
       </div>
     </article>
   );

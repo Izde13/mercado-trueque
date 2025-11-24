@@ -15,7 +15,8 @@
       "Bash(nul)",
       "Bash(cat:*)",
       "Bash(curl:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

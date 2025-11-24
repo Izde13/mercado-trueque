@@ -60,10 +60,12 @@ async function bootstrap() {
     yamlDocumentUrl: '/api-docs/openapi.yaml', // URL para descargar el YAML
   });
 
+  // CORS configurado para aceptar cualquier origen
   app.enableCors({
-    origin: 'http://localhost:5400',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: true, // Acepta cualquier origen
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: '*',
   });
 
   await app.listen(process.env.PORT ?? 3000);

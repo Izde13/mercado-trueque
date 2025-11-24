@@ -38,11 +38,31 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = [
-    product.mainImage,
-    "/images/products/headphones.png",
-    "/images/products/iphone.png",
-  ];
+  // Generar 3 imágenes: si tiene mainImage válida, repetirla; sino usar imágenes por defecto locales
+  const generateImages = () => {
+    // Validar que la imagen principal sea una URL real (no example.com ni placeholders)
+    const isValidImage = product.mainImage &&
+                        !product.mainImage.includes('example.com') &&
+                        !product.mainImage.includes('placeholder');
+
+    if (isValidImage) {
+      // Si tiene imagen principal válida, repetirla 3 veces
+      return [
+        product.mainImage,
+        product.mainImage,
+        product.mainImage
+      ];
+    }
+
+    // Si no tiene imagen o es inválida, usar 3 imágenes por defecto locales
+    return [
+      '/images/products/laptop.png',
+      '/images/products/headphones.png',
+      '/images/products/camera.png'
+    ];
+  };
+
+  const images = generateImages();
 
   return (
     <section className="pdp">
@@ -51,10 +71,10 @@ export default function ProductDetailPage() {
 
         <ProductSummary
           id={product.id}
-          title={product.title}
-          popularity={product.popularity}
-          estimatedValue={product.estimatedValue}
-          description={product.description}
+          title={product.title || 'Sin título'}
+          popularity={product.popularity || 0}
+          estimatedValue={product.estimatedValue || 0}
+          description={product.description || 'Sin descripción disponible'}
           mainImage={product.mainImage}
         />
       </div>
