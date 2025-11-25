@@ -18,18 +18,23 @@ export default function ProductSummary({
     navigate(`/propuesta/${id}`);
   };
 
+  // Normalizar popularity de 0-100 a 0-5 para el sistema de estrellas
+  const normalizedRating = popularity != null
+    ? Math.min(Math.max((popularity / 100) * 5, 0), 5)
+    : 0;
+
   return (
     <section className="ps">
       <h1 className="ps-title">{title}</h1>
 
       <div className="ps-rating">
-        <Stars rating={popularity} />
-        <span className="ps-rating-text">{popularity.toFixed(1)}/5</span>
+        <Stars rating={normalizedRating} />
+        <span className="ps-rating-text">{normalizedRating.toFixed(1)}/5</span>
       </div>
 
       <p className="ps-price">
         <span className="label">Valor estimado:</span>{" "}
-        <strong>${estimatedValue}</strong>
+        <strong>${estimatedValue?.toLocaleString('es-CL') || '0'}</strong>
       </p>
 
       <p className="ps-desc">{description}</p>
