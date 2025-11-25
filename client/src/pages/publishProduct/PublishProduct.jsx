@@ -4,9 +4,11 @@ import SuccessModal from "../../shared/components/SuccessModal";
 import { FormField, SelectField, TextAreaField } from "../../shared/components/Form";
 import { useCategories } from "../../shared/hooks/useCategories";
 import { useEstadosProducto } from "../../shared/hooks/useEstadosProducto";
+import { useCharacteristicsByCategory } from "../../shared/hooks/useCharacteristicsByCategory";
 import { useCreateProduct } from "../../shared/hooks/useCreateProduct";
 import { useForm } from "../../shared/hooks/useForm";
 import { productValidationRules, validateProductImages } from "../../shared/utils/validationRules";
+import CharacteristicsForm from "../../features/publishProduct/CharacteristicsForm/CharacteristicsForm";
 import "./PublishProduct.css";
 import "./PublishProductEnhancements.css";
 
@@ -27,12 +29,18 @@ const ProductDetailsForm = React.memo(({
   errors,
   handleChange,
   handleBlur,
+  handleCategoryChange,
   categories,
   categoriesLoading,
   categoriesError,
   estados,
   estadosLoading,
-  estadosError
+  estadosError,
+  characteristics,
+  characteristicsLoading,
+  characteristicsError,
+  characteristicValues,
+  handleCharacteristicChange
 }) => {
   // Transform categories for SelectField
   const categoryOptions = useMemo(() =>
@@ -61,7 +69,7 @@ const ProductDetailsForm = React.memo(({
         label="Categoría"
         placeholder="Selecciona una categoría..."
         value={form.values.categoriaId}
-        onChange={handleChange('categoriaId')}
+        onChange={handleCategoryChange}
         onBlur={handleBlur('categoriaId')}
         error={errors.categoriaId || categoriesError}
         loading={categoriesLoading}
@@ -122,6 +130,14 @@ const ProductDetailsForm = React.memo(({
         showCharacterCount
         required
       />
+
+      <CharacteristicsForm
+        characteristics={characteristics}
+        characteristicValues={characteristicValues}
+        handleCharacteristicChange={handleCharacteristicChange}
+        loading={characteristicsLoading}
+        error={characteristicsError}
+      />
     </div>
   );
 });
@@ -156,19 +172,22 @@ ImageUploadSection.displayName = 'ImageUploadSection';
  * Main PublishProduct Component - Refactored with best practices
  */
 const PublishProduct = () => {
-  // Custom hooks for data and operations
-  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
-  const { estados, loading: estadosLoading, error: estadosError } = useEstadosProducto();
-  const { createProduct, loading: creatingProduct, error: createProductError, clearError } = useCreateProduct();
-
-  // Form management with custom hook
-  const form = useForm(INITIAL_FORM_VALUES, productValidationRules);
-
-  // Local state for images and modal
+  // Local state first
   const [images, setImages] = useState([]);
   const [imageError, setImageError] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdProduct, setCreatedProduct] = useState(null);
+  const [characteristicValues, setCharacteristicValues] = useState({});
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+
+  // Custom hooks for data and operations
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { estados, loading: estadosLoading, error: estadosError } = useEstadosProducto();
+  const { characteristics, loading: characteristicsLoading, error: characteristicsError } = useCharacteristicsByCategory(selectedCategoryId);
+  const { createProduct, loading: creatingProduct, error: createProductError, clearError } = useCreateProduct();
+
+  // Form management with custom hook
+  const form = useForm(INITIAL_FORM_VALUES, productValidationRules);
 
   // Refs
   const uploadMediaRef = useRef(null);
@@ -178,6 +197,26 @@ const PublishProduct = () => {
     setImages(newImages);
     const error = validateProductImages(newImages);
     setImageError(error || '');
+  }, []);
+
+  // Handle category change - load characteristics for selected category
+  const handleCategoryChange = useCallback((e) => {
+    const categoryId = e.target.value;
+    setSelectedCategoryId(categoryId);
+    form.handleChange('categoriaId')(e);
+    // Clear previous characteristic values
+    setCharacteristicValues({});
+  }, [form]);
+
+  // Handle characteristic value changes
+  const handleCharacteristicChange = useCallback((characteristicId) => {
+    return (e) => {
+      const value = e.target.value;
+      setCharacteristicValues(prev => ({
+        ...prev,
+        [characteristicId]: value
+      }));
+    };
   }, []);
 
   // Handle form submission
@@ -199,8 +238,8 @@ const PublishProduct = () => {
     clearError(); // Clear previous API errors
 
     try {
-      // Enviar el formulario con las imágenes
-      const result = await createProduct(form.values, images);
+      // Enviar el formulario con las imágenes y características
+      const result = await createProduct(form.values, images, characteristicValues);
 
       // Show success modal with product data
       setCreatedProduct({
@@ -214,13 +253,15 @@ const PublishProduct = () => {
       form.reset();
       setImages([]);
       setImageError('');
+      setCharacteristicValues({});
+      setSelectedCategoryId('');
       uploadMediaRef.current?.clearFiles();
 
     } catch (error) {
       console.error("Error creating product:", error);
       // Error is handled by the useCreateProduct hook
     }
-  }, [form, images, createProduct, clearError]);
+  }, [form, images, characteristicValues, createProduct, clearError]);
 
   // Handle modal close
   const handleCloseModal = useCallback(() => {
@@ -263,12 +304,18 @@ const PublishProduct = () => {
             errors={form.errors}
             handleChange={form.handleChange}
             handleBlur={form.handleBlur}
+            handleCategoryChange={handleCategoryChange}
             categories={categories}
             categoriesLoading={categoriesLoading}
             categoriesError={categoriesError}
             estados={estados}
             estadosLoading={estadosLoading}
             estadosError={estadosError}
+            characteristics={characteristics}
+            characteristicsLoading={characteristicsLoading}
+            characteristicsError={characteristicsError}
+            characteristicValues={characteristicValues}
+            handleCharacteristicChange={handleCharacteristicChange}
           />
 
           {/* API Error Display */}

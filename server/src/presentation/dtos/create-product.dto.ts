@@ -40,6 +40,24 @@ export class ImagenDto {
   esPrincipal?: boolean;
 }
 
+export class CaracteristicaProductoDto {
+  @ApiProperty({
+    description: 'ID de la característica de la categoría',
+    example: '880e8400-e29b-41d4-a716-446655440003',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  caracteristicaId: string;
+
+  @ApiProperty({
+    description: 'Valor de la característica para este producto',
+    example: 'M',
+  })
+  @IsString()
+  @IsNotEmpty()
+  valor: string;
+}
+
 export class CreateProductDto {
   @ApiProperty({
     description: 'ID del usuario propietario',
@@ -107,4 +125,19 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ImagenDto)
   imagenes: ImagenDto[];
+
+  @ApiProperty({
+    description: 'Array de características específicas del producto según su categoría',
+    type: [CaracteristicaProductoDto],
+    example: [
+      { caracteristicaId: '880e8400-e29b-41d4-a716-446655440003', valor: 'M' },
+      { caracteristicaId: '880e8400-e29b-41d4-a716-446655440004', valor: 'Azul' },
+    ],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CaracteristicaProductoDto)
+  caracteristicas?: CaracteristicaProductoDto[];
 }

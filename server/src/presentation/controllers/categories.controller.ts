@@ -51,6 +51,28 @@ export class CategoriesController {
   }
 
   /**
+   * GET /categories/characteristics/:categoryId
+   * Endpoint público - no requiere autenticación
+   * Obtiene las características de una categoría
+   */
+  @Get('characteristics/:categoryId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener características de una categoría',
+    description: 'Endpoint público para obtener todas las características de una categoría',
+  })
+  async getCharacteristicsByCategory(
+    @Param('categoryId') categoryId: string,
+  ) {
+    try {
+      const characteristics = await this.getCategoryUseCase.executeGetCharacteristics(categoryId);
+      return characteristics || [];
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
    * GET /categories/:id
    * Endpoint público - no requiere autenticación
    */

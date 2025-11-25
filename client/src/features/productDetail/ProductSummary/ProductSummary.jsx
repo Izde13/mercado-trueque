@@ -1,6 +1,6 @@
 import "./ProductSummary.css";
 import { useNavigate } from "react-router-dom";
-import VariantsSelector from "../VariantsSelector/VariantsSelector.jsx";
+import ProductCharacteristics from "../ProductCharacteristics/ProductCharacteristics.jsx";
 
 export default function ProductSummary({
   id,
@@ -9,6 +9,7 @@ export default function ProductSummary({
   estimatedValue,
   description,
   mainImage,
+  characteristics,
 }) {
   const navigate = useNavigate();
 
@@ -35,7 +36,7 @@ export default function ProductSummary({
 
       <hr className="ps-hr" />
 
-      <VariantsSelector />
+      <ProductCharacteristics characteristics={characteristics} />
 
       <button type="button" className="ps-cta" onClick={handlePropose}>
         Proponer trueque

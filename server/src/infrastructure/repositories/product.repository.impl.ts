@@ -9,6 +9,23 @@ import { PrismaProductQueryBuilder } from '../builders/prisma-product-query.buil
 export class ProductRepositoryImpl implements ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Helper para incluir características con información de la categoría
+  private getIncludeWithCharacteristics() {
+    return {
+      imagenes_producto: true,
+      caracteristicas_producto: {
+        include: {
+          caracteristicas_categoria: {
+            select: {
+              id: true,
+              nombre: true,
+            },
+          },
+        },
+      },
+    };
+  }
+
   async save(product: Product): Promise<Product> {
     const created = await this.prisma.productos.create({
       data: {
@@ -37,9 +54,7 @@ export class ProductRepositoryImpl implements ProductRepository {
               }
             : undefined,
       },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return this.toDomainEntity(created);
@@ -48,9 +63,7 @@ export class ProductRepositoryImpl implements ProductRepository {
   async findById(id: string): Promise<Product | null> {
     const product = await this.prisma.productos.findUnique({
       where: { id },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return product ? this.toDomainEntity(product) : null;
@@ -59,9 +72,7 @@ export class ProductRepositoryImpl implements ProductRepository {
   async findAll(): Promise<Product[]> {
     const products = await this.prisma.productos.findMany({
       orderBy: { fecha_publicacion: 'desc' },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -71,9 +82,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { usuario_id: usuarioId },
       orderBy: { fecha_publicacion: 'desc' },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -83,9 +92,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { categoria_id: categoriaId },
       orderBy: { fecha_publicacion: 'desc' },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -95,9 +102,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     const products = await this.prisma.productos.findMany({
       where: { estado_publicacion: estado },
       orderBy: { fecha_publicacion: 'desc' },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -116,9 +121,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         vistas: product.vistas,
         popularidad: product.popularidad,
       },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return this.toDomainEntity(updated);
@@ -163,9 +166,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         estado_publicacion: 'disponible',
       },
       orderBy: { fecha_publicacion: 'desc' },
-      include: {
-        imagenes_producto: true,
-      },
+      include: this.getIncludeWithCharacteristics(),
     });
 
     return products.map((product) => this.toDomainEntity(product));
@@ -179,6 +180,15 @@ export class ProductRepositoryImpl implements ProductRepository {
         urlImagen: img.url_imagen,
         orden: img.orden,
         esPrincipal: img.es_principal,
+      })) || [];
+
+    const caracteristicas =
+      prismaProduct.caracteristicas_producto?.map((char: any) => ({
+        id: char.id,
+        productoId: char.producto_id,
+        caracteristicaId: char.caracteristica_id,
+        nombre: char.caracteristicas_categoria?.nombre || '',
+        valor: char.valor,
       })) || [];
 
     return new Product(
@@ -197,6 +207,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       prismaProduct.vistas,
       prismaProduct.popularidad,
       imagenes,
+      caracteristicas,
     );
   }
 }

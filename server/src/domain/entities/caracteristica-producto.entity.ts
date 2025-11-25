@@ -4,6 +4,7 @@ export class CaracteristicaProducto {
     public readonly productoId: string,
     public readonly caracteristicaId: string,
     public readonly valor: string,
+    public readonly nombre?: string,
   ) {
     this.validarValor(valor);
   }

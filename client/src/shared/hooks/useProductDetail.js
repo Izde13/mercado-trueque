@@ -38,7 +38,8 @@ export const useProductDetail = (productId) => {
           views: data.vistas || 0,
           popularity: data.popularidad || 0,
           productStatusId: data.estadoProductoId,
-          images: data.imagenes
+          images: data.imagenes,
+          characteristics: data.caracteristicas || []
         };
 
         setProduct(mappedProduct);

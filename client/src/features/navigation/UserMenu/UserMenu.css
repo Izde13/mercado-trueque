@@ -6,23 +6,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: transparent;
   border: none;
   border-radius: 50%;
-  color: #111213;
+  color: #0f1419;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .user-menu-button:hover {
-  background-color: rgba(0, 0, 0, 0.06);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.user-menu-button:active {
+  background-color: rgba(0, 0, 0, 0.12);
 }
 
 .user-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .user-menu-dropdown {
@@ -31,9 +35,9 @@
   top: 100%;
   margin-top: 8px;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(15, 20, 25, 0.15);
   min-width: 280px;
   z-index: 1000;
   animation: slideDown 0.2s ease-out;
@@ -52,19 +56,20 @@
 
 .user-menu-header {
   padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e8eaed;
+  background: #fafbfc;
 }
 
 .user-name {
   font-weight: 600;
-  color: #111213;
+  color: #0f1419;
   margin: 0 0 4px 0;
   font-size: 14px;
 }
 
 .user-email {
   font-size: 12px;
-  color: #6b727a;
+  color: #5a6c7d;
   margin: 0 0 8px 0;
   word-break: break-word;
 }
@@ -77,7 +82,7 @@
 .role-badge {
   display: inline-block;
   background: #e6f2ff;
-  color: #3483fa;
+  color: #2e5bba;
   padding: 4px 8px;
   border-radius: 4px;
   font-weight: 600;
@@ -87,7 +92,7 @@
 
 .user-menu-divider {
   height: 1px;
-  background: #e5e7eb;
+  background: #e8eaed;
 }
 
 .user-menu-item {
@@ -97,24 +102,24 @@
   padding: 12px 16px;
   background: none;
   border: none;
-  color: #111213;
+  color: #0f1419;
   text-decoration: none;
   cursor: pointer;
   font-size: 14px;
   width: 100%;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .user-menu-item:hover {
-  background-color: #f5f5f5;
+  background-color: #f5f6f7;
 }
 
 .menu-icon {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  color: #6b727a;
+  color: #5a6c7d;
 }
 
 .logout-item {
@@ -150,18 +155,20 @@
 }
 
 .user-menu-link {
-  padding: 8px 16px;
-  background: #3483fa;
+  padding: 9px 18px;
+  background: #2e5bba;
   color: white;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .user-menu-link:hover {
-  background-color: #2a6dd0;
+  background-color: #1e3a7a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 91, 186, 0.2);
 }
 
 /* Responsivo */

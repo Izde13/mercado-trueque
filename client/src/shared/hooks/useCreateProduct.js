@@ -7,7 +7,7 @@ export const useCreateProduct = () => {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const createProduct = async (productData, images = []) => {
+  const createProduct = async (productData, images = [], characteristicValues = {}) => {
     try {
       setLoading(true);
       setError(null);
@@ -51,6 +51,15 @@ export const useCreateProduct = () => {
         });
       }
 
+      // Convertir características al formato esperado por el backend
+      // characteristicValues = { caracteristicaId: value, ... }
+      const caracteristicas = Object.entries(characteristicValues)
+        .filter(([, value]) => value !== '' && value !== null && value !== undefined)
+        .map(([caracteristicaId, valor]) => ({
+          caracteristicaId,
+          valor: String(valor)
+        }));
+
       const payload = {
         usuarioId: userId,
         categoriaId: productData.categoriaId,
@@ -58,7 +67,8 @@ export const useCreateProduct = () => {
         titulo: productData.titulo.trim(),
         descripcion: productData.descripcion.trim(),
         valorEstimado: parseFloat(productData.valorEstimado),
-        imagenes: imagenesFormateadas
+        imagenes: imagenesFormateadas,
+        caracteristicas
       };
 
       const result = await apiService.post('/products', payload);

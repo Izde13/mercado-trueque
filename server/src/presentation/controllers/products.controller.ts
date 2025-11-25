@@ -128,6 +128,7 @@ export class ProductsController {
         createProductDto.imagenes,
         createProductDto.descripcion,
         createProductDto.valorEstimado,
+        createProductDto.caracteristicas,
       );
 
       const response = new ProductResponseDto(product);

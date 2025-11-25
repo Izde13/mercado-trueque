@@ -56,6 +56,7 @@ export default function ProductDetailPage() {
           estimatedValue={product.estimatedValue}
           description={product.description}
           mainImage={product.mainImage}
+          characteristics={product.characteristics}
         />
       </div>
     </section>

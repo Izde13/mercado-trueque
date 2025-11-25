@@ -1,8 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductImage } from '../../domain/entities/product-image';
+import { CaracteristicaProducto } from '../../domain/entities/caracteristica-producto.entity';
 import type { ProductRepository } from '../../domain/repositories/product.repository';
 import type { UserRepository } from '../../domain/repositories/user.repository';
+import type { CaracteristicaProductoRepository } from '../../domain/repositories/caracteristica-producto.repository';
 import { ProductPublicationValidator } from '../../domain/specifications/product/product-publication.validator';
 import { ProductPublicationContext } from '../../domain/specifications/product/product-publication-context';
 import { ProductValidationException } from '../../domain/errors';
@@ -13,6 +15,11 @@ interface ImageData {
   esPrincipal?: boolean;
 }
 
+interface CaracteristicaData {
+  caracteristicaId: string;
+  valor: string;
+}
+
 @Injectable()
 export class CreateProductUseCase {
   constructor(
@@ -20,6 +27,8 @@ export class CreateProductUseCase {
     private readonly productRepository: ProductRepository,
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
+    @Inject('CaracteristicaProductoRepository')
+    private readonly caracteristicaProductoRepository: CaracteristicaProductoRepository,
     private readonly publicationValidator: ProductPublicationValidator,
   ) {}
 
@@ -31,6 +40,7 @@ export class CreateProductUseCase {
     imagenes: ImageData[],
     descripcion?: string,
     valorEstimado?: number,
+    caracteristicas?: CaracteristicaData[],
   ): Promise<Product> {
     // 1. Obtener datos del usuario para validaciones
     const user = await this.userRepository.findById(usuarioId);
@@ -113,6 +123,20 @@ export class CreateProductUseCase {
     });
 
     // 7. Guardar en BD
-    return this.productRepository.save(product);
+    const savedProduct = await this.productRepository.save(product);
+
+    // 8. Guardar características del producto si las hay
+    if (caracteristicas && caracteristicas.length > 0) {
+      for (const caracteristica of caracteristicas) {
+        const caracteristicaProducto = CaracteristicaProducto.create(
+          savedProduct.id,
+          caracteristica.caracteristicaId,
+          caracteristica.valor,
+        );
+        await this.caracteristicaProductoRepository.save(caracteristicaProducto);
+      }
+    }
+
+    return savedProduct;
   }
 }

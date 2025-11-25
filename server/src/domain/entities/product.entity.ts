@@ -1,4 +1,5 @@
 import { ProductImage } from './product-image';
+import { CaracteristicaProducto } from './caracteristica-producto.entity';
 
 export class Product {
   constructor(
@@ -15,6 +16,7 @@ export class Product {
     public vistas?: number,
     public popularidad?: number,
     public imagenes?: ProductImage[],
+    public caracteristicas?: CaracteristicaProducto[],
   ) {}
 
   static create(
