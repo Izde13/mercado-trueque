@@ -12,12 +12,14 @@ import type { ProductoPropuestaRepository } from '../../domain/repositories/prod
 import { TradeProposal } from '../../domain/entities/trade-proposal.entity';
 import { ProductoPropuesta } from '../../domain/entities/producto-propuesta.entity';
 import { NotificationService } from '../services/notification.service';
+import { ZmqProducerService } from '../../infrastructure/zmq';
 
 @Injectable()
 export class CreateTradeProposalUseCase {
   constructor(
     private readonly proposalValidator: ProposalPhaseValidator,
     private readonly notificationService: NotificationService,
+    private readonly zmqProducerService: ZmqProducerService,
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     @Inject('ProductRepository')
@@ -164,6 +166,34 @@ export class CreateTradeProposalUseCase {
     } catch (error) {
       // Log error pero no fallar la creación de la propuesta
       console.error('Error creating notification for proposal:', error);
+    }
+
+    // 10. EVENTO ZMQ: Publicar evento a subscribers (para envío de correos, etc.)
+    try {
+      const ownerUser = await this.userRepository.findById(productSolicitado.usuarioId);
+      const ownerEmail = ownerUser?.email || 'unknown@example.com';
+      const ownerName = `${ownerUser?.nombre || ''} ${ownerUser?.apellido || ''}`.trim();
+
+      const oferenteName = `${oferente.nombre || ''} ${oferente.apellido || ''}`.trim();
+
+      // Construir JSON con información de la propuesta
+      const eventData = JSON.stringify({
+        ownerEmail: ownerEmail,
+        ownerName: ownerName,
+        oferentEmail: oferente.email,
+        oferentName: oferenteName,
+        proposalId: savedProposal.id,
+        proposalMessage: savedProposal.mensaje || '',
+        requestedProductTitle: productSolicitado.titulo,
+        requestedProductId: productSolicitado.id,
+        timestamp: new Date().toISOString(),
+      });
+
+      await this.zmqProducerService.publishEvent('SendEmail', eventData);
+      console.log(`✅ Evento ZMQ publicado: ProposalCreated para ${ownerEmail}`);
+    } catch (error) {
+      // Log error pero no fallar la creación de la propuesta
+      console.error('Error publishing ZMQ event for proposal:', error);
     }
 
     return {

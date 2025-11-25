@@ -167,6 +167,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 
+// ZMQ Module
+import { ZmqModule } from './infrastructure/zmq';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -174,6 +177,7 @@ import { AuthModule } from './auth/auth.module';
       envFilePath: '.env',
     }),
     AuthModule, // Integración del módulo de autenticación
+    ZmqModule, // Módulo de ZeroMQ para publicación de eventos
   ],
   controllers: [
     AppController,
@@ -361,7 +365,10 @@ import { AuthModule } from './auth/auth.module';
     // Command Pattern
     CommandBus,
     // Event Bus
-    EventBus,
+    {
+      provide: 'EventBus',
+      useClass: EventBus,
+    },
     // Saga Pattern
     SagaOrchestrator,
     // Trade Use Cases

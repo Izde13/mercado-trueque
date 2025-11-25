@@ -16,7 +16,12 @@
       "Bash(cat:*)",
       "Bash(curl:*)",
       "Bash(lsof:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(dir /s 'C:\\Users\\izsac\\Documents\\Ing web\\Project\\mercado-trueque\\server\\src\\domain\\events' 2)",
+      "Bash(findstr:*)",
+      "Bash(cd:*)",
+      "WebSearch",
+      "Bash(dir \"C:\\Users\\izsac\\Documents\\Ing web\\Project\\mercado-trueque\\server\\src\" /S /B)"
     ],
     "deny": [],
     "ask": []
