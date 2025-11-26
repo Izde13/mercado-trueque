@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { apiService } from '../services/apiAxios';
+import { useState, useEffect } from "react";
+import { apiService } from "../services/apiAxios";
 
 /**
  * Mapea los datos de la API al formato esperado por el frontend
@@ -20,7 +20,7 @@ const mapProductFromAPI = (apiProduct) => {
     views: apiProduct.vistas || 0,
     popularity: apiProduct.popularidad || 0,
     productStatusId: apiProduct.estadoProductoId,
-    images: apiProduct.imagenes
+    images: apiProduct.imagenes,
   };
 };
 
@@ -38,7 +38,7 @@ export const useUserProducts = (userId) => {
   const fetchUserProducts = async () => {
     try {
       if (!userId) {
-        setError('Usuario no identificado');
+        setError("Usuario no identificado");
         setLoading(false);
         return;
       }
@@ -49,23 +49,18 @@ export const useUserProducts = (userId) => {
       // Llamada a la API para obtener productos del usuario
       // TODO: Verificar el endpoint real en el backend
       // Por ahora, obtenemos todos los productos y filtramos por usuario
-      const data = await apiService.get('/products');
-
-      // Filtrar productos del usuario actual que estén disponibles
-      // TODO: Implementar endpoint específico que retorne solo productos del usuario
-      const userProducts = data
-        .filter(p => p.usuarioId === userId)
-        .filter(p =>
-          p.estadoPublicacion === 'disponible' ||
-          p.estadoPublicacion === 'ACTIVO' ||
-          p.estadoPublicacion === 'ACTIVE'
-        )
-        .map(mapProductFromAPI);
+      const data = await apiService.get("/products", {
+        params: {
+          usuario: userId, // ← Filtro en backend
+          estadoPublicacion: "disponible",
+        },
+      });
+      const userProducts = data.map(mapProductFromAPI); // Sin filtros extra
 
       setProducts(userProducts);
     } catch (err) {
-      setError(err.message || 'Error al cargar productos');
-      console.error('Error fetching user products:', err);
+      setError(err.message || "Error al cargar productos");
+      console.error("Error fetching user products:", err);
     } finally {
       setLoading(false);
     }

@@ -45,7 +45,7 @@ export class ProductResponseDto {
 
     // Mapear características con información de la categoría
     if (product.caracteristicas && product.caracteristicas.length > 0) {
-      this.caracteristicas = product.caracteristicas.map(char => ({
+      this.caracteristicas = product.caracteristicas.map((char) => ({
         id: char.id,
         caracteristicaId: char.caracteristicaId,
         nombre: char.nombre || '',

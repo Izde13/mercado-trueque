@@ -68,7 +68,8 @@ export class ProductFiltersDto {
   usuario?: string;
 
   @ApiPropertyOptional({
-    description: 'ID del usuario a excluir de los resultados (para no mostrar productos propios)',
+    description:
+      'ID del usuario a excluir de los resultados (para no mostrar productos propios)',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsOptional()

@@ -131,7 +131,10 @@ export class PrismaProductQueryBuilder {
     }
   }
 
-  private static addExcludeUserFilter(where: any, filters: ProductFiltersVO): void {
+  private static addExcludeUserFilter(
+    where: any,
+    filters: ProductFiltersVO,
+  ): void {
     if (filters.excludeUserId) {
       where.usuario_id = {
         not: filters.excludeUserId,

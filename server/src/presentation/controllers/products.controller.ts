@@ -261,7 +261,8 @@ export class ProductsController {
             ? parseFloat(filtersDto.precioMax)
             : undefined,
           usuarioId: filtersDto.usuario,
-          excludeUserId: currentUser?.userId,
+          // Solo excluir el usuario actual si no se está filtrando por un usuario específico
+          excludeUserId: filtersDto.usuario ? undefined : currentUser?.userId,
           estadoPublicacion: filtersDto.estadoPublicacion,
         });
 
@@ -269,7 +270,9 @@ export class ProductsController {
       } else {
         // Si no hay filtros explícitos pero hay un usuario autenticado, excluir sus productos
         const filters = ProductFiltersVO.create({
-          excludeUserId: currentUser?.userId,
+          usuarioId: filtersDto.usuario,
+          // Solo excluir si no se filtra por usuario específico
+          excludeUserId: filtersDto.usuario ? undefined : currentUser?.userId,
           estadoPublicacion: filtersDto.estadoPublicacion,
         });
 

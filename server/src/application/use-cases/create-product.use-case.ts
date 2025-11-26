@@ -133,7 +133,9 @@ export class CreateProductUseCase {
           caracteristica.caracteristicaId,
           caracteristica.valor,
         );
-        await this.caracteristicaProductoRepository.save(caracteristicaProducto);
+        await this.caracteristicaProductoRepository.save(
+          caracteristicaProducto,
+        );
       }
     }
 

@@ -21,6 +21,8 @@ export class GetCategoryUseCase {
   }
 
   async executeGetCharacteristics(categoriaId: string) {
-    return this.caracteristicaCategoriaRepository.findByCategoriaId(categoriaId);
+    return this.caracteristicaCategoriaRepository.findByCategoriaId(
+      categoriaId,
+    );
   }
 }

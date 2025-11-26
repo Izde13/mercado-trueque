@@ -49,9 +49,8 @@ export class DeliverTradeUseCase {
 
     const intercambioId = input.intercambio_id as string;
 
-    const intercambio = await this.intercambioRepository.findById(
-      intercambioId,
-    );
+    const intercambio =
+      await this.intercambioRepository.findById(intercambioId);
 
     if (!intercambio) {
       throw new NotFoundException('Intercambio no encontrado');
@@ -110,9 +109,8 @@ export class DeliverTradeUseCase {
       });
     }
 
-    const todosLosEnvios = await this.envioRepository.findByIntercambioId(
-      intercambioId,
-    );
+    const todosLosEnvios =
+      await this.envioRepository.findByIntercambioId(intercambioId);
 
     for (const productoId of productosAMarcar) {
       const envio = todosLosEnvios.find((e) => e.productoId === productoId);

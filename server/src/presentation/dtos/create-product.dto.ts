@@ -127,11 +127,15 @@ export class CreateProductDto {
   imagenes: ImagenDto[];
 
   @ApiProperty({
-    description: 'Array de características específicas del producto según su categoría',
+    description:
+      'Array de características específicas del producto según su categoría',
     type: [CaracteristicaProductoDto],
     example: [
       { caracteristicaId: '880e8400-e29b-41d4-a716-446655440003', valor: 'M' },
-      { caracteristicaId: '880e8400-e29b-41d4-a716-446655440004', valor: 'Azul' },
+      {
+        caracteristicaId: '880e8400-e29b-41d4-a716-446655440004',
+        valor: 'Azul',
+      },
     ],
     required: false,
   })

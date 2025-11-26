@@ -59,13 +59,13 @@ export class CategoriesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener características de una categoría',
-    description: 'Endpoint público para obtener todas las características de una categoría',
+    description:
+      'Endpoint público para obtener todas las características de una categoría',
   })
-  async getCharacteristicsByCategory(
-    @Param('categoryId') categoryId: string,
-  ) {
+  async getCharacteristicsByCategory(@Param('categoryId') categoryId: string) {
     try {
-      const characteristics = await this.getCategoryUseCase.executeGetCharacteristics(categoryId);
+      const characteristics =
+        await this.getCategoryUseCase.executeGetCharacteristics(categoryId);
       return characteristics || [];
     } catch (error) {
       throw new BadRequestException(error.message);

@@ -1,8 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 /**
@@ -14,7 +10,10 @@ import { AuthGuard } from '@nestjs/passport';
  * de información del usuario autenticado si está disponible
  */
 @Injectable()
-export class OptionalJwtAuthGuard extends AuthGuard('jwt') implements CanActivate {
+export class OptionalJwtAuthGuard
+  extends AuthGuard('jwt')
+  implements CanActivate
+{
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const result = await super.canActivate(context);
