@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  NotFoundException,
 } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -56,6 +57,7 @@ import {
   RateTradeDto,
   RatingResponseDto,
 } from '../../application/dtos/rate-trade.dto';
+import { EstadoEnvio } from '../../domain/entities/envio.entity';
 
 @ApiTags('Trades')
 @Controller('trades')
@@ -618,6 +620,88 @@ export class TradesController {
       return enviosEnriquecidos;
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * WEBHOOK: ACTUALIZAR ESTADO DE ENVÍO
+   * Endpoint para que las transportadoras notifiquen cuando el envío llega al centro de distribución
+   * Sin autenticación requerida (es un webhook externo)
+   */
+  @Post('envios/:envioId/update-state')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Webhook - Actualizar estado de envío',
+    description:
+      'Endpoint webhook para que las transportadoras notifiquen cuando un envío llega al centro de distribución. Sin autenticación.',
+  })
+  @ApiParam({
+    name: 'envioId',
+    description: 'ID del envío a actualizar',
+    example: 'uuid-envio-123',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        estado: {
+          type: 'string',
+          example: 'recibido_centro',
+        },
+        transportadora: {
+          type: 'string',
+          example: 'UPS',
+        },
+      },
+      required: ['estado'],
+    },
+  })
+  async updateShipmentState(
+    @Param('envioId') envioId: string,
+    @Body() dto: { estado: string; transportadora?: string },
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      // Obtener el envío
+      const envio = await this.envioRepository.findById(envioId);
+
+      if (!envio) {
+        throw new NotFoundException('Envío no encontrado');
+      }
+
+      // Mapear string a enum de EstadoEnvio
+      const estadoKey = dto.estado.toUpperCase().replace(/ /g, '_');
+      const nuevoEstado = EstadoEnvio[estadoKey];
+
+      if (!nuevoEstado) {
+        throw new BadRequestException(
+          `Estado inválido: ${dto.estado}. Estados válidos: ${Object.values(EstadoEnvio).join(', ')}`
+        );
+      }
+
+      // Actualizar estado del envío
+      let envioActualizado = envio.cambiarEstado(nuevoEstado);
+
+      // Si se proporciona transportadora, asignarla (reasignar tracking)
+      if (dto.transportadora && !envio.transportadora) {
+        envioActualizado = envioActualizado.asignarTracking(
+          envio.codigoTracking || 'TRK-' + envioId.substring(0, 8),
+          dto.transportadora
+        );
+      }
+
+      await this.envioRepository.update(envioActualizado);
+
+      return {
+        success: true,
+        message: `Envío ${envioId} actualizado a estado ${dto.estado}${dto.transportadora ? ` por ${dto.transportadora}` : ''}`,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Error al actualizar envío'
+      );
     }
   }
 }

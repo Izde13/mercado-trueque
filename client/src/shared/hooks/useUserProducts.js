@@ -46,20 +46,17 @@ export const useUserProducts = (userId) => {
       setLoading(true);
       setError(null);
 
-      // Llamada a la API para obtener productos del usuario
-      // TODO: Verificar el endpoint real en el backend
-      // Por ahora, obtenemos todos los productos y filtramos por usuario
-      const data = await apiService.get('/products');
+      // Llamada a la API para obtener productos del usuario específico
+      // Pasamos el usuario como parámetro de filtro
+      const data = await apiService.get('/products', {
+        params: {
+          usuario: userId,
+          estadoPublicacion: 'disponible'
+        }
+      });
 
-      // Filtrar productos del usuario actual que estén disponibles
-      // TODO: Implementar endpoint específico que retorne solo productos del usuario
+      // Mapear productos del usuario
       const userProducts = data
-        .filter(p => p.usuarioId === userId)
-        .filter(p =>
-          p.estadoPublicacion === 'disponible' ||
-          p.estadoPublicacion === 'ACTIVO' ||
-          p.estadoPublicacion === 'ACTIVE'
-        )
         .map(mapProductFromAPI);
 
       setProducts(userProducts);

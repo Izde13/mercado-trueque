@@ -261,7 +261,8 @@ export class ProductsController {
             ? parseFloat(filtersDto.precioMax)
             : undefined,
           usuarioId: filtersDto.usuario,
-          excludeUserId: currentUser?.userId,
+          // Solo excluir el usuario actual si no se está filtrando por un usuario específico
+          excludeUserId: filtersDto.usuario ? undefined : currentUser?.userId,
           estadoPublicacion: filtersDto.estadoPublicacion,
         });
 

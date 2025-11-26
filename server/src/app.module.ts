@@ -79,6 +79,9 @@ import { ReviewRepositoryImpl } from './infrastructure/repositories/review.repos
 // Notifications
 import { NotificationRepositoryImpl } from './infrastructure/repositories/notification.repository.impl';
 import { NotificationService } from './application/services/notification.service';
+
+// Shipping Queue Service
+import { ShippingQueueService } from './application/services/shipping-queue.service';
 // Product Validations
 import { ProductPublicationValidator } from './domain/specifications/product/product-publication.validator';
 import { UserReputationLimitsRule } from './domain/specifications/product/user/user-reputation-limits.rule';
@@ -314,6 +317,7 @@ import { ZmqModule } from './infrastructure/zmq';
       useClass: NotificationRepositoryImpl,
     },
     NotificationService,
+    ShippingQueueService,
     // Product Validations
     ProductPublicationValidator,
     UserReputationLimitsRule,

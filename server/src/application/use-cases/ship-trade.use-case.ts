@@ -16,12 +16,14 @@ import type { ProductRepository } from '../../domain/repositories/product.reposi
 import type { UserRepository } from '../../domain/repositories/user.repository';
 import { Envio, EstadoEnvio } from '../../domain/entities/envio.entity';
 import { NotificationService } from '../services/notification.service';
+import { ShippingQueueService } from '../services/shipping-queue.service';
 
 @Injectable()
 export class ShipTradeUseCase {
   constructor(
     private readonly shippingValidator: ShippingPhaseValidator,
     private readonly notificationService: NotificationService,
+    private readonly shippingQueueService: ShippingQueueService,
     @Inject('IntercambioRepository')
     private readonly intercambioRepository: IntercambioRepository,
     @Inject('TradeProposalRepository')
@@ -126,6 +128,15 @@ export class ShipTradeUseCase {
       );
 
       savedEnvio = await this.envioRepository.save(savedEnvio);
+
+      // 🚚 Publicar envío en la cola de transportistas
+      await this.shippingQueueService.publishShipment({
+        envio_id: savedEnvio.id,
+        intercambio_id: savedEnvio.intercambioId,
+        origen: input.origen_direccion,
+        destino: input.destino_direccion,
+        producto_id: productoId,
+      });
 
       envios.push({
         id: savedEnvio.id,
